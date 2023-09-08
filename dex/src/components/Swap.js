@@ -7,8 +7,10 @@ import {
 } from "@ant-design/icons";
 import tokenList from "../tokenList.json";
 import axios from "axios";
-import { useSendTransaction, useWaitForTransaction, erc20ABI } from "wagmi";
+import { useSendTransaction, useWaitForTransaction } from "wagmi";
 import { Alchemy, Network } from "alchemy-sdk";
+
+//import {erc20ABI} from "wagmi";
 //import Web3 from "web3";
 
 const config = {

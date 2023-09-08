@@ -19,7 +19,6 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
   [alchemyProvider({ apiKey: process.env.ALCHEMY_KEY }), publicProvider()]
 );
 
-// Set up wagmi config
 const config = createConfig({
   autoConnect: true,
   connectors: [
@@ -58,25 +57,6 @@ const config = createConfig({
   publicClient,
   webSocketPublicClient,
 });
-
-/* const config = createConfig({
-  autoConnect: true,
-  publicClient: createPublicClient({
-    chain: mainnet,
-    transport: http()
-  }),
-}) */
-
-/* const { provider, webSocketProvider } = configureChains(
-  [mainnet],
-  [publicProvider()]
-);
-
-const client = createClient({
-  autoConnect: true,
-  provider,
-  webSocketProvider,
-}); */
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
