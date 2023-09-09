@@ -1,7 +1,8 @@
-import "./App.css";
+import "./styles/App.css";
 import Header from "./components/Header";
 import Swap from "./components/Swap";
 import Tokens from "./components/Tokens";
+import Charts from "./components/Charts";
 import { Routes, Route } from "react-router-dom";
 import { useAccount } from "wagmi";
 
@@ -20,6 +21,7 @@ function App() {
                 element={<Swap isConnected={isConnected} address={address} />}
               />
               <Route path="/tokens" element={<Tokens />} />
+              <Route path="/charts" element={<Charts />} />
             </Routes>
           </div>{" "}
         </div>

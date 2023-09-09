@@ -1,7 +1,6 @@
 import React from "react";
 import Logo from "../logo.png";
 import { Link } from "react-router-dom";
-import { Web3NetworkSwitch, Web3Button } from "@web3modal/react";
 
 function Header() {
   return (
@@ -14,15 +13,17 @@ function Header() {
         <Link to="/tokens" className="link">
           <div className="headerItem">Tokens</div>
         </Link>
+        <Link to="/charts" className="link">
+          <div className="headerItem">Charts</div>
+        </Link>
       </div>
+
       <div className="rightH">
         <div className="headerItem">
-          <Web3NetworkSwitch />
+          <w3m-network-button />
         </div>
         <div className="headerItem">
-        <Web3Button icon="show" label="Connect Wallet" balance="show" />
-        </div>
-        <div className="headerItem">
+          <w3m-account-button />
         </div>
       </div>
     </header>

@@ -154,6 +154,7 @@ export default function Defiswap() {
       } else {
         document.getElementById("get_balance").innerHTML = balance;
       }
+      return item.tokenBalance;
     });
   }
 
@@ -214,6 +215,7 @@ export default function Defiswap() {
     try {
       await swapOrders.orders.find((item) => {
         document.getElementById("defisource").innerHTML = item.source;
+        return item.source;
       });
     } catch (error) {
       document.getElementById("defisource").innerHTML = "Pool Not Available";
@@ -425,7 +427,7 @@ export default function Defiswap() {
         </Modal.Footer>
       </Modal>
       <Row justify="center">
-        <img src="arrow.png" width={"2%"} />
+        <img src="arrow.png" width={"2%"} alt="arrow" />
       </Row>
       <Row justify="center">
         <Grid sm={4}>
@@ -470,7 +472,7 @@ export default function Defiswap() {
                   ml: "$10",
                 }}
               >
-                <img src={tlogo} style={{ width: "50px" }} />
+                <img src={tlogo} style={{ width: "50px" }} alt="tlogo"/>
                 {" " + tname}
               </Text>
             </a>
@@ -549,7 +551,7 @@ export default function Defiswap() {
                 <Text color="#fff" size={10}>
                   Secured with
                 </Text>
-                <img src="alchemy-white.png" width={"30%"} />
+                <img src="alchemy-white.png" width={"30%"} alt="alch" />
               </Row>
               <Row justify="center" css={{ mt: "$2" }}>
                 <Text
