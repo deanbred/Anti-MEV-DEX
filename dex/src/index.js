@@ -3,54 +3,61 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
-import { configureChains, WagmiConfig, createConfig } from "wagmi";
-import { mainnet, optimism, arbitrum, polygon } from "wagmi/chains";
-import { alchemyProvider } from "wagmi/providers/alchemy";
-import { publicProvider } from "wagmi/providers/public";
-//import { createPublicClient, http } from 'viem'
+
+import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import { mainnet, goerli, optimism, avalanche } from "wagmi/chains";
 
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { InjectedConnector } from "wagmi/connectors/injected";
+import { LedgerConnector } from "wagmi/connectors/ledger";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
+
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [mainnet, optimism, arbitrum, polygon],
+  [mainnet, goerli, optimism, avalanche],
   [alchemyProvider({ apiKey: process.env.ALCHEMY_KEY }), publicProvider()]
 );
 
 const config = createConfig({
   autoConnect: true,
   connectors: [
-    new MetaMaskConnector({ chains }),
-
-    new WalletConnectConnector({
+    new MetaMaskConnector({
       chains,
       options: {
-        projectId: process.env.WALLETCONNECT_PROJECT_ID,
-        metadata: {
-          name: 'AntiMEV Swap',
-          description: 'AntiMEV DEX',
-          url: 'https://antimev.io/dapp/',
-          icons: ['https://antimev.io/logo.png'],
-        },
+        UNSTABLE_shimOnConnectSelectAccount: true,
       },
     }),
-
-    new InjectedConnector({
-      chains,
-      options: {
-        name: "Injected",
-        shimDisconnect: true,
-      },
-    }),
-
     new CoinbaseWalletConnector({
       chains,
       options: {
-        appName: "AntiMEV Swap",
-        jsonRpcUrl:
-          process.env.MAINNET_RPC,
+        appName: "wagmi",
+      },
+    }),
+    new WalletConnectConnector({
+      chains,
+      options: {
+        projectId: process.env.WALLETCONNECT_PROJECT_ID ?? "",
+      },
+    }),
+    new LedgerConnector({
+      chains,
+      options: {
+        projectId: process.env.WALLETCONNECT_PROJECT_ID ?? "",
+      },
+    }),
+    new InjectedConnector({
+      chains,
+      options: {
+        name: (detectedName) =>
+          `Injected (${
+            typeof detectedName === "string"
+              ? detectedName
+              : detectedName.join(", ")
+          })`,
+        shimDisconnect: true,
       },
     }),
   ],

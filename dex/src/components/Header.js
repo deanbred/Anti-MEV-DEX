@@ -2,11 +2,11 @@ import React from "react";
 import Logo from "../logo.png";
 import Eth from "../eth.svg";
 import { Link } from "react-router-dom";
-import { Connect } from "./Connect";
+import Connect from "./Connect";
+import NetworkSwitcher from "./NetworkSwitcher";
+import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
 
-function Header(props) {
-  const { address, isConnected, connect } = props;
-
+function Header() {
   return (
     <header>
       <div className="leftH">
@@ -21,17 +21,17 @@ function Header(props) {
       </div>
       <div className="rightH">
         <div className="headerItem">
-          <img src={Eth} alt="eth" className="eth" />
-          Ethereum
+          <NetworkSwitcher />
         </div>
-
-        <Connect />
-
-{/*         <div className="connectButton" onClick={connect}>
-          {isConnected
-            ? address.slice(0, 4) + "..." + address.slice(38)
-            : "Connect"}
-        </div> */}
+        <div className="headerItem">
+          <Connect />
+        </div>
+        <div className="headerItem">
+          <Web3Button icon="show" label="Connect Wallet" balance="show" />
+        </div>
+        <div className="headerItem">
+          <Web3NetworkSwitch />
+        </div>
       </div>
     </header>
   );

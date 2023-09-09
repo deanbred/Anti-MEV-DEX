@@ -8,10 +8,10 @@ import {
 import tokenList from "../tokenList.json";
 import axios from "axios";
 import { useSendTransaction, useWaitForTransaction } from "wagmi";
-import { Alchemy, Network } from "alchemy-sdk";
 
-//import {erc20ABI} from "wagmi";
-//import Web3 from "web3";
+/* import { Alchemy, Network } from "alchemy-sdk";
+import {erc20ABI} from "wagmi";
+import Web3 from "web3";
 
 const config = {
   apiKey: process.env.ALCHEMY_KEY,
@@ -19,7 +19,7 @@ const config = {
 };
 
 const alchemy = new Alchemy(config);
-//var zeroxapi = "https://api.0x.org";
+var zeroxapi = "https://api.0x.org"; */
 
 function Swap(props) {
   const { address, isConnected } = props;
@@ -62,7 +62,7 @@ function Swap(props) {
     } else {
       setTokenTwoAmount(null);
     }
-    alchemy.core.getBlockNumber().then(console.log);
+    //alchemy.core.getBlockNumber().then(console.log);
   }
 
   function switchTokens() {

@@ -1,7 +1,7 @@
 import { useAccount, useConnect } from "wagmi";
 import { useIsMounted } from "./useIsMounted";
 
-export const Connect = () => {
+const Connect = () => {
   const isMounted = useIsMounted();
   const { connector, isReconnecting } = useAccount();
   const { connect, connectors, isLoading, error, pendingConnector } =
@@ -26,5 +26,8 @@ export const Connect = () => {
 
       <div>{error?.message}</div>
     </div>
+
   );
 };
+
+export default Connect;
