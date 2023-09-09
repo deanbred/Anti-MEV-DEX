@@ -2,6 +2,7 @@ import React from "react";
 import Logo from "../logo.png";
 import Eth from "../eth.svg";
 import { Link } from "react-router-dom";
+import { Connect } from "./Connect";
 
 function Header(props) {
   const { address, isConnected, connect } = props;
@@ -24,11 +25,13 @@ function Header(props) {
           Ethereum
         </div>
 
-        <div className="connectButton" onClick={connect}>
+        <Connect />
+
+{/*         <div className="connectButton" onClick={connect}>
           {isConnected
             ? address.slice(0, 4) + "..." + address.slice(38)
             : "Connect"}
-        </div>
+        </div> */}
       </div>
     </header>
   );

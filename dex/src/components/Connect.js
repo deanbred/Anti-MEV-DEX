@@ -1,5 +1,5 @@
 import { useAccount, useConnect } from "wagmi";
-import { useIsMounted } from "useIsMounted";
+import { useIsMounted } from "./useIsMounted";
 
 export const Connect = () => {
   const isMounted = useIsMounted();
