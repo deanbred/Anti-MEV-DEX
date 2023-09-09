@@ -132,28 +132,6 @@ function Swap(props) {
     setTxDetails(tx.data.tx);
   }
 
-/*     async function displayBalance() {
-    const tokenContractAddresses = [tokenOne.address, tokenTwo.address];
-    const data = await alchemy.core.getTokenBalances(
-      address,
-      tokenContractAddresses
-    );
-    data.tokenBalances.find((item) => {
-      let rawbalance = parseInt(item.tokenBalance, 16).toString();
-      let formatbalance = Number(Web3.utils.fromWei(rawbalance));
-      let balance = formatbalance.toFixed(2);
-      if (
-        item.tokenBalance ===
-        "0x0000000000000000000000000000000000000000000000000000000000000000"
-      ) {
-        document.getElementById("get_balance").innerHTML = "0.00";
-      } else {
-        document.getElementById("get_balance").innerHTML = balance;
-      }
-      return item.tokenBalance;
-    });
-  }  */
-
   useEffect(() => {
     fetchPrices(tokenList[0].address, tokenList[1].address);
   }, []);
@@ -273,13 +251,6 @@ function Swap(props) {
           onClick={fetchDexSwap}
         >
           Swap
-        </div>
-        <div className="balance">
-          Balance:{" "}
-          <span id="get_balance" className="tokenBalance">
-            0.00
-          </span>{" "}
-          {tokenOne.ticker}
         </div>
       </div>
     </>

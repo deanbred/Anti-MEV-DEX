@@ -4,36 +4,46 @@ import "./index.css";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import {
+  EthereumClient,
+  w3mConnectors,
+  w3mProvider,
+} from "@web3modal/ethereum";
+import { Web3Modal } from "@web3modal/react";
+
+import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import { mainnet, arbitrum, optimism, avalanche } from "wagmi/chains";
 
-import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
+/* import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { InjectedConnector } from "wagmi/connectors/injected";
-import { LedgerConnector } from "wagmi/connectors/ledger";
-import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import { LedgerConnector } from "wagmi/connectors/ledger"; */
 
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+//require("dotenv").config();
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [mainnet, arbitrum, optimism, avalanche],
-  [alchemyProvider({ apiKey: process.env.ALCHEMY_KEY }), publicProvider()]
+const chains = [mainnet, arbitrum, optimism, avalanche];
+const projectId = "fd8d18072056d2a74e2a5a29c946bb47";
+
+const { publicClient, webSocketPublicClient } = configureChains(
+  chains,
+  [w3mProvider({ projectId })],
+  [alchemyProvider({ apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T" }), publicProvider()]
 );
 
-const projectId = process.env.WALLETCONNECT_PROJECT_ID;
+const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors: w3mConnectors({ projectId, chains }),
+  publicClient,
+  webSocketPublicClient,
+});
 
-console.log(projectId);
+const ethereumClient = new EthereumClient(wagmiConfig, chains);
 
-const config = createConfig({
+/* const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: [
-    new MetaMaskConnector({
-      chains,
-      options: {
-        UNSTABLE_shimOnConnectSelectAccount: true,
-      },
-    }),
     new CoinbaseWalletConnector({
       chains,
       options: {
@@ -67,15 +77,16 @@ const config = createConfig({
   ],
   publicClient,
   webSocketPublicClient,
-});
+}); */
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <WagmiConfig config={config}>
+    <WagmiConfig config={wagmiConfig}>
       <BrowserRouter>
         <App />
       </BrowserRouter>
     </WagmiConfig>
+    <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />
   </React.StrictMode>
 );
