@@ -8,10 +8,9 @@ import {
 import tokenList from "../tokenList.json";
 import axios from "axios";
 import { useSendTransaction, useWaitForTransaction } from "wagmi";
-
-/* import { Alchemy, Network } from "alchemy-sdk";
-import {erc20ABI} from "wagmi";
-import Web3 from "web3";
+import { Alchemy, Network } from "alchemy-sdk";
+//import {erc20ABI} from "wagmi";
+//import Web3 from "web3";
 
 const config = {
   apiKey: process.env.ALCHEMY_KEY,
@@ -19,7 +18,7 @@ const config = {
 };
 
 const alchemy = new Alchemy(config);
-var zeroxapi = "https://api.0x.org"; */
+//var zeroxapi = "https://api.0x.org";
 
 function Swap(props) {
   const { address, isConnected } = props;
@@ -62,7 +61,7 @@ function Swap(props) {
     } else {
       setTokenTwoAmount(null);
     }
-    //alchemy.core.getBlockNumber().then(console.log);
+    alchemy.core.getBlockNumber().then(console.log);
   }
 
   function switchTokens() {
@@ -133,7 +132,7 @@ function Swap(props) {
     setTxDetails(tx.data.tx);
   }
 
-  /*   async function displayBalance() {
+/*     async function displayBalance() {
     const tokenContractAddresses = [tokenOne.address, tokenTwo.address];
     const data = await alchemy.core.getTokenBalances(
       address,
@@ -151,8 +150,9 @@ function Swap(props) {
       } else {
         document.getElementById("get_balance").innerHTML = balance;
       }
+      return item.tokenBalance;
     });
-  } */
+  }  */
 
   useEffect(() => {
     fetchPrices(tokenList[0].address, tokenList[1].address);
@@ -273,6 +273,13 @@ function Swap(props) {
           onClick={fetchDexSwap}
         >
           Swap
+        </div>
+        <div className="balance">
+          Balance:{" "}
+          <span id="get_balance" className="tokenBalance">
+            0.00
+          </span>{" "}
+          {tokenOne.ticker}
         </div>
       </div>
     </>

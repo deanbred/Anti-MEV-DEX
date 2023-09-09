@@ -5,7 +5,7 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { mainnet, goerli, optimism, avalanche } from "wagmi/chains";
+import { mainnet, arbitrum, optimism, avalanche } from "wagmi/chains";
 
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { InjectedConnector } from "wagmi/connectors/injected";
@@ -17,9 +17,13 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [mainnet, goerli, optimism, avalanche],
+  [mainnet, arbitrum, optimism, avalanche],
   [alchemyProvider({ apiKey: process.env.ALCHEMY_KEY }), publicProvider()]
 );
+
+const projectId = process.env.WALLETCONNECT_PROJECT_ID;
+
+console.log(projectId);
 
 const config = createConfig({
   autoConnect: true,
@@ -39,13 +43,13 @@ const config = createConfig({
     new WalletConnectConnector({
       chains,
       options: {
-        projectId: process.env.WALLETCONNECT_PROJECT_ID ?? "",
+        projectId: "fd8d18072056d2a74e2a5a29c946bb47",
       },
     }),
     new LedgerConnector({
       chains,
       options: {
-        projectId: process.env.WALLETCONNECT_PROJECT_ID ?? "",
+        projectId: "fd8d18072056d2a74e2a5a29c946bb47",
       },
     }),
     new InjectedConnector({

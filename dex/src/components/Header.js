@@ -1,6 +1,5 @@
 import React from "react";
 import Logo from "../logo.png";
-import Eth from "../eth.svg";
 import { Link } from "react-router-dom";
 import Connect from "./Connect";
 import NetworkSwitcher from "./NetworkSwitcher";
