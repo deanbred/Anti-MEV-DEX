@@ -8,7 +8,7 @@ import {
 import tokenList from "../tokenList3.json";
 import axios from "axios";
 import { useSendTransaction, useWaitForTransaction } from "wagmi";
-import { Alchemy, Network } from "alchemy-sdk";
+import { Alchemy, Network, Utils } from "alchemy-sdk";
 //import qs from "qs";
 //import {erc20ABI} from "wagmi";
 //import Web3 from "web3";
@@ -62,7 +62,6 @@ function Swap(props) {
     } else {
       setTokenTwoAmount(null);
     }
-    alchemy.core.getBlockNumber().then(console.log);
   }
 
   function switchTokens() {
@@ -93,6 +92,24 @@ function Swap(props) {
       fetchPrices(tokenOne.address, tokenList[i].address);
     }
     setIsOpen(false);
+  }
+
+  async function fetchGas() {
+    const blockNumber = alchemy.core.getBlockNumber().then(console.log);
+    console.log(blockNumber);
+
+    const gasPrice = await alchemy.core.getGasPrice();
+    console.log(gasPrice);
+
+    const gasEstimate = await alchemy.core.estimateGas({
+      // Wrapped ETH address
+      to: "vitalik.eth",
+      // `function deposit() payable`
+      data: "0xd0e30db0",
+      // 1 ether
+      value: Utils.parseEther("1.0"),
+    });
+    console.log(gasEstimate);
   }
 
   async function fetchPrices(one, two) {
