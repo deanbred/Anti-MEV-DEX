@@ -87,6 +87,7 @@ export default function Defiswap() {
     setAlert(false);
     console.log("closed");
   };
+  
   async function connect() {
     const web3Modal = new Web3Modal();
     const connection = await web3Modal.connect();

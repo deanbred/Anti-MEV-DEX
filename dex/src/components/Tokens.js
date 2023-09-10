@@ -1,5 +1,5 @@
 import React from "react";
-import TokensBalancePanel from "./TokenBalances.js";
+import TokensBalancePanel from "./TokenBalances.jsx";
 
 function Tokens() {
   return (

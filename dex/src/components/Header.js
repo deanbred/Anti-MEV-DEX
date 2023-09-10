@@ -13,9 +13,6 @@ function Header() {
         <Link to="/tokens" className="link">
           <div className="headerItem">Tokens</div>
         </Link>
-        <Link to="/charts" className="link">
-          <div className="headerItem">Charts</div>
-        </Link>
       </div>
 
       <div className="rightH">

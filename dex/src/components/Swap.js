@@ -5,10 +5,11 @@ import {
   DownOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import tokenList from "../tokenList.json";
+import tokenList from "../tokenList3.json";
 import axios from "axios";
 import { useSendTransaction, useWaitForTransaction } from "wagmi";
 import { Alchemy, Network } from "alchemy-sdk";
+//import qs from "qs";
 //import {erc20ABI} from "wagmi";
 //import Web3 from "web3";
 
@@ -18,7 +19,7 @@ const config = {
 };
 
 const alchemy = new Alchemy(config);
-//var zeroxapi = "https://api.0x.org";
+var zeroxapi = "https://api.0x.org";
 
 function Swap(props) {
   const { address, isConnected } = props;
@@ -211,6 +212,7 @@ function Swap(props) {
           })}
         </div>
       </Modal>
+
       <div className="tradeBox">
         <div className="tradeBoxHeader">
           <h4 className="">AntiMEV Swap</h4>

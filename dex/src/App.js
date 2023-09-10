@@ -2,9 +2,9 @@ import "./styles/App.css";
 import Header from "./components/Header";
 import Swap from "./components/Swap";
 import Tokens from "./components/Tokens";
-import Charts from "./components/Charts";
 import { Routes, Route } from "react-router-dom";
 import { useAccount } from "wagmi";
+import TradingViewWidget from "./components/TradingViewWidget";
 
 function App() {
   const { isConnected } = useAccount();
@@ -12,19 +12,21 @@ function App() {
 
   return (
     <>
-        <div className="App">
-        <Header/>
-          <div className="mainWindow">
-            <Routes>
-              <Route
-                path="/"
-                element={<Swap isConnected={isConnected} address={address} />}
-              />
-              <Route path="/tokens" element={<Tokens />} />
-              <Route path="/charts" element={<Charts />} />
-            </Routes>
-          </div>{" "}
+      <div className="App">
+        <Header />
+        <div className="mainWindow">
+          <Routes>
+            <Route
+              path="/"
+              element={<Swap isConnected={isConnected} address={address} />}
+            />
+            <Route path="/tokens" element={<Tokens />} />
+          </Routes>
         </div>
+        <div className="mainWindow">
+          <TradingViewWidget />
+        </div>
+      </div>
     </>
   );
 }
