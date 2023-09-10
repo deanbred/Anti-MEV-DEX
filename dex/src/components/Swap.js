@@ -19,7 +19,7 @@ const config = {
 };
 
 const alchemy = new Alchemy(config);
-var zeroxapi = "https://api.0x.org";
+//var zeroxapi = "https://api.0x.org";
 
 function Swap(props) {
   const { address, isConnected } = props;
@@ -62,6 +62,7 @@ function Swap(props) {
     } else {
       setTokenTwoAmount(null);
     }
+    fetchGas();
   }
 
   function switchTokens() {
@@ -99,7 +100,8 @@ function Swap(props) {
     console.log(blockNumber);
 
     const gasPrice = await alchemy.core.getGasPrice();
-    console.log(gasPrice);
+    let gasPriceGwei = gasPrice.toString();
+    console.log(gasPriceGwei);
 
     const gasEstimate = await alchemy.core.estimateGas({
       // Wrapped ETH address
@@ -109,7 +111,8 @@ function Swap(props) {
       // 1 ether
       value: Utils.parseEther("1.0"),
     });
-    console.log(gasEstimate);
+    let gasEstimateEther = gasEstimate.toString();
+    console.log(gasEstimateEther);
   }
 
   async function fetchPrices(one, two) {

@@ -44,11 +44,6 @@ const wagmiConfig = createConfig({
 
 createWeb3Modal({ wagmiConfig, projectId, chains, themeMode: "dark" });
 
-<script
-type="text/javascript"
-src="https://files.coinmarketcap.com/static/widget/coinMarquee.js"
-></script>
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>

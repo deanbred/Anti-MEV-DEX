@@ -27,14 +27,6 @@ function App() {
         <div className="mainWindow">
           <TradingViewWidget />
         </div>
-        <div
-          id="coinmarketcap-widget-marquee"
-          coins="1,1027,825"
-          currency="USD"
-          theme="light"
-          transparent="true"
-          show-symbol-logo="true"
-        ></div>
       </div>
     </>
   );
