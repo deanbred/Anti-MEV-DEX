@@ -9,17 +9,19 @@ import tokenList from "../tokenList3.json";
 import axios from "axios";
 import { useSendTransaction, useWaitForTransaction } from "wagmi";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
-//import qs from "qs";
+import qs from "qs";
 //import {erc20ABI} from "wagmi";
 //import Web3 from "web3";
 
 const config = {
   apiKey: process.env.ALCHEMY_KEY,
-  network: Network.ETH_MAINNET,
+  network: Network.ETH_GOERLI,
 };
 
 const alchemy = new Alchemy(config);
 //var zeroxapi = "https://api.0x.org";
+var zeroxapi = "https://goerli.api.0x.org/";
+//Goerli Sources: https://goerli.api.0x.org/swap/v1/sources
 
 function Swap(props) {
   const { address, isConnected } = props;
@@ -96,23 +98,23 @@ function Swap(props) {
   }
 
   async function fetchGas() {
-    const blockNumber = alchemy.core.getBlockNumber().then(console.log);
-    console.log(blockNumber);
+    const blockNumber = await alchemy.core.getBlockNumber();
+    console.log(`Block Number: ${blockNumber}`);
 
     const gasPrice = await alchemy.core.getGasPrice();
     let gasPriceGwei = gasPrice.toString();
-    console.log(gasPriceGwei);
+    console.log(`Gas Price (gwei): ${gasPriceGwei}`);
 
     const gasEstimate = await alchemy.core.estimateGas({
       // Wrapped ETH address
-      to: "vitalik.eth",
+      to: "0x657D378e66B5E28143C88D85B116C053b8455509",
       // `function deposit() payable`
       data: "0xd0e30db0",
       // 1 ether
       value: Utils.parseEther("1.0"),
     });
     let gasEstimateEther = gasEstimate.toString();
-    console.log(gasEstimateEther);
+    console.log(`Gas Estimate (ether): ${gasEstimateEther}`);
   }
 
   async function fetchPrices(one, two) {
@@ -121,6 +123,48 @@ function Swap(props) {
     });
 
     setPrices(res.data);
+    console.log(`prices in res.data: ${res.data}`);
+  }
+
+  async function fetchQuote(one, two) {
+    console.log("Getting Price");
+
+    let amount = tokenOneAmount.padEnd(
+      one.decimals + tokenOneAmount.length,
+      "0"
+    );
+    if (amount <=0)
+    return;
+    const params = {
+      sellToken: one,
+      buyToken: two,
+      sellAmount: amount,
+    };
+    const response = await fetch(
+      zeroxapi + `/swap/v1/price?${qs.stringify(params)}`
+    );
+    const sources = await fetch(
+      zeroxapi + `/swap/v1/quote?${qs.stringify(params)}`
+    );
+    var swapPriceJSON = await response.json();
+    console.log(`swapPriceJSON: ${swapPriceJSON}`);
+    var swapOrders = await sources.json();
+    try {
+      await swapOrders.orders.find((item) => {
+        //document.getElementById("defisource").innerHTML = item.source;
+        console.log(`0x defi source: ${item.source}`);
+        return item.source;
+      });
+    } catch (error) {
+     // document.getElementById("defisource").innerHTML = "Pool Not Available";
+    }
+    var rawvalue = swapOrders.buyAmount / 10 ** 18;
+    var value = rawvalue.toFixed(2);
+    console.log(`value: ${value}`);
+    console.log(`estimatedGas: ${swapPriceJSON.estimatedGas}`);
+    //document.getElementById("to_amount").innerHTML = value;
+    //document.getElementById("gas_estimate").innerHTML =
+      //swapPriceJSON.estimatedGas;
   }
 
   async function fetchDexSwap() {

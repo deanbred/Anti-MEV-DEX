@@ -16,7 +16,7 @@ export default function TokensBalancePanel({ walletAddress, chain }) {
           method: "POST",
           body: JSON.stringify({
             address: address,
-            chain: chain ? chain : "ETH_MAINNET",
+            chain: chain ? chain : "ETH_GOERLI",
           }),
         }).then((res) => res.json());
         setTokensBalance(fetchedTokensBalance);

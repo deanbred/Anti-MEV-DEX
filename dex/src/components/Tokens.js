@@ -6,8 +6,8 @@ function Tokens() {
     <div>
       Tokens
       <TokensBalancePanel
-        walletAddress={"deanbred.eth"}
-        chain={"ETH_MAINNET"}
+        walletAddress={"0x657D378e66B5E28143C88D85B116C053b8455509"}
+        chain={"ETH_GOERLI"}
       />
     </div>
   );

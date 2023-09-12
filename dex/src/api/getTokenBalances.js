@@ -12,8 +12,8 @@ export default async function handler(req, res) {
 
   // set the settings for Alchemy SDK
   const settings = {
-    apiKey: process.env.ALCHEMY_KEY,
-    network: Network[chain],
+    apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
+    network: Network.ETH_GOERLI,
   };
 
   // create an instance of the Alchemy SDK

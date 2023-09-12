@@ -12,13 +12,13 @@ app.get("/tokenPrice", async (req, res) => {
   const { query } = req;
 
   const responseOne = await Moralis.EvmApi.token.getTokenPrice({
-    include: "percent_change",
+    //include: "percent_change",
     //exchange: "uniswapv2",
     address: query.addressOne,
   });
 
   const responseTwo = await Moralis.EvmApi.token.getTokenPrice({
-    include: "percent_change",
+    //include: "percent_change",
     //exchange: "uniswapv2",
     address: query.addressTwo,
   });
@@ -29,16 +29,11 @@ app.get("/tokenPrice", async (req, res) => {
     ratio: responseOne.raw.usdPrice / responseTwo.raw.usdPrice,
   };
 
-  /*   const response = await Moralis.EvmApi.marketData.getTopERC20TokensByMarketCap(
-    {}
-  ); */
-
   return res.status(200).json(usdPrices);
 });
 
 Moralis.start({
-  apiKey:
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjViZjAyNzlmLTM4YmQtNDU1NC1iMmUzLTk5MjI5MjY5YjZhNyIsIm9yZ0lkIjoiMzI4MzIyIiwidXNlcklkIjoiMzM3NTU5IiwidHlwZUlkIjoiYTRkMWE3ZTktNmQwMS00ZjRmLWE0ODctN2JjZTM0MDNjMDgxIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE2OTM4MTI2MTAsImV4cCI6NDg0OTU3MjYxMH0.93-12EoZNHE8muucuOd60rEZB7BeP9EQCkwuNrkrT0w",
+  apiKey: process.env.MORALIS_API_KEY,
 }).then(() => {
   app.listen(port, () => {
     console.log(`Listening for API Calls`);
