@@ -1,11 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { Input, Popover, Radio, Modal, message, Grid, Col, Row } from "antd";
+import { Input, Popover, Radio, Modal, message, Col, Row } from "antd";
 import {
   ArrowDownOutlined,
   DownOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import tokenList from "../tokenList3.json";
+import tokenList from "../tokenList.json";
+//import { PriceResponse, QuoteResponse } from "../api/types.ts";
+
 import axios from "axios";
 import { useSendTransaction, useWaitForTransaction } from "wagmi";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
@@ -19,8 +22,8 @@ const config = {
 };
 
 const alchemy = new Alchemy(config);
-//var zeroxapi = "https://api.0x.org";
-var zeroxapi = "https://goerli.api.0x.org/";
+var zeroxapi = "https://api.0x.org";
+//var zeroxapi = "https://goerli.api.0x.org/";
 //Goerli Sources: https://goerli.api.0x.org/swap/v1/sources
 
 function Swap(props) {
@@ -31,8 +34,8 @@ function Swap(props) {
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
   const [tokenOne, setTokenOne] = useState(tokenList[0]);
   const [tokenTwo, setTokenTwo] = useState(tokenList[1]);
-  const [tokenOneBalance, setTokenOneBalance] = useState(tokenList[0].address);
-  const [tokenTwoBalance, setTokenTwoBalance] = useState(tokenList[1].address);
+  const [tokenOneBalance, setTokenOneBalance] = useState(null);
+  const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
@@ -80,8 +83,9 @@ function Swap(props) {
     setTokenOne(two);
     setTokenTwo(one);
     fetchPrices(two.address, one.address);
-    getBalanceOne();
-    getBalanceTwo();
+    fetchBalances();
+    //getBalanceOne();
+    //getBalanceTwo();
   }
 
   function openModal(asset) {
@@ -96,26 +100,31 @@ function Swap(props) {
     if (changeToken === 1) {
       setTokenOne(tokenList[i]);
       fetchPrices(tokenList[i].address, tokenTwo.address);
-      getBalanceOne();
+      fetchBalances();
+      //getBalanceOne();
     } else {
       setTokenTwo(tokenList[i]);
       fetchPrices(tokenOne.address, tokenList[i].address);
-      getBalanceTwo();
+      fetchBalances();
+      //getBalanceTwo();
     }
     setIsOpen(false);
   }
 
   async function fetchGas() {
     setIsFetching(true);
+    try {
+      const blockNumber = await alchemy.core.getBlockNumber();
+      setBlockNumber(blockNumber);
 
-    const blockNumber = await alchemy.core.getBlockNumber();
-    setBlockNumber(blockNumber);
-
-    const gasPrice = await alchemy.core.getGasPrice();
-    let gasPriceGwei = gasPrice.toString();
-    setGasPriceGwei(gasPriceGwei);
-
-    setIsFetching(false);
+      const gasPrice = await alchemy.core.getGasPrice();
+      let gasPriceGwei = gasPrice.toString();
+      setGasPriceGwei(gasPriceGwei);
+    } catch (error) {
+      console.error("Failed to fetch gas:", error);
+    } finally {
+      setIsFetching(false);
+    }
 
     /*     const gasEstimate = await alchemy.core.estimateGas({
       // Wrapped ETH address
@@ -129,7 +138,50 @@ function Swap(props) {
     console.log(`Gas Estimate (ether): ${gasEstimateEther}`); */
   }
 
-  async function getBalanceOne() {
+  async function fetchBalances() {
+    let data1 = await alchemy.core.getTokenBalances(
+      address,
+      [tokenOne.address]
+    );
+
+    data1.tokenBalances.find((item) => {
+      let formatbalance = Number(Utils.formatUnits(item.tokenBalance, "ether"));
+      let balance = formatbalance.toFixed(3);
+      if (
+        item.tokenBalance ===
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ) {
+        setTokenOneBalance("0");
+      } else {
+        setTokenOneBalance(balance);
+      }
+      console.log(`balance1: ${balance}`);
+      return item.tokenBalance;
+    });
+
+    let data2 = await alchemy.core.getTokenBalances(
+      address,
+      [tokenTwo.address]
+    );
+
+    data2.tokenBalances.find((item) => {
+      let formatbalance = Number(Utils.formatUnits(item.tokenBalance, "ether"));
+      let balance = formatbalance.toFixed(3);
+      if (
+        item.tokenBalance ===
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ) {
+        setTokenTwoBalance("0");
+      } else {
+        setTokenTwoBalance(balance);
+      }
+      console.log(`balance2: ${balance}`);
+      return item.tokenBalance;
+    });
+
+  } 
+
+/*    async function getBalanceOne() {
     const tokenContractAddresses = [tokenOne.address];
     const data = await alchemy.core.getTokenBalances(
       address,
@@ -150,9 +202,9 @@ function Swap(props) {
       console.log(`balance1: ${balance}`);
       return item.tokenBalance;
     });
-  }
+  }  */
 
-  async function getBalanceTwo() {
+/*   async function getBalanceTwo() {
     const tokenContractAddresses = [tokenTwo.address];
     const data = await alchemy.core.getTokenBalances(
       address,
@@ -173,55 +225,52 @@ function Swap(props) {
       console.log(`balance2: ${balance}`);
       return item.tokenBalance;
     });
-  }
+  } */
 
-  async function fetchPrices(one, two) {
+/*   async function fetchPrice(one, two) {
     const res = await axios.get(`http://localhost:3001/tokenPrice`, {
       params: { addressOne: one, addressTwo: two },
     });
 
     setPrices(res.data);
     console.log(`prices in res.data: ${res.data}`);
-  }
+  } */
 
-  async function fetchQuote(one, two) {
+  async function fetchPrices(one, two) {
     console.log("Getting Price");
 
-    let amount = tokenOneAmount.padEnd(
-      one.decimals + tokenOneAmount.length,
-      "0"
-    );
-
+    const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
     const params = {
-      sellToken: one.address,
-      buyToken: two.address,
-      sellAmount: amount,
+      sellToken: one,
+      buyToken: two,
+      sellAmount: tokenOneAmount,
+      takerAddress: address,
     };
+
     const response = await fetch(
-      zeroxapi + `/swap/v1/price?${qs.stringify(params)}`
-    );
-    const sources = await fetch(
-      zeroxapi + `/swap/v1/quote?${qs.stringify(params)}`
-    );
+      zeroxapi + `/swap/v1/price?${qs.stringify(params)}`, { headers }
+    ); 
     var swapPriceJSON = await response.json();
-    console.log(`swapPriceJSON: ${swapPriceJSON}`);
-    var swapOrders = await sources.json();
-    try {
-      await swapOrders.orders.find((item) => {
-        //document.getElementById("defisource").innerHTML = item.source;
-        console.log(`0x defi source: ${item.source}`);
-        return item.source;
-      });
-    } catch (error) {
-      // document.getElementById("defisource").innerHTML = "Pool Not Available";
-    }
-    var rawvalue = swapOrders.buyAmount / 10 ** 18;
+    console.log(JSON.stringify(swapPriceJSON));
+    console.log(`swapPriceJSON: ${swapPriceJSON.price}`);
+
+    const data = {
+      tokenOne: swapPriceJSON.buyAmount,
+      tokenTwo: swapPriceJSON.sellAmount,
+      ratio: swapPriceJSON.price,
+    };
+    setPrices(data);
+
+
+/*     const sources = await fetch(
+      zeroxapi + `/swap/v1/quote?${qs.stringify(params)}`, { headers }
+    );
+    var quote = await sources.json();
+    console.log(`Quote: ${quote.source}`); 
+   
+    var rawvalue = quote.buyAmount / 10 ** 18;
     var value = rawvalue.toFixed(2);
-    console.log(`value: ${value}`);
-    console.log(`estimatedGas: ${swapPriceJSON.estimatedGas}`);
-    //document.getElementById("to_amount").innerHTML = value;
-    //document.getElementById("gas_estimate").innerHTML =
-    //swapPriceJSON.estimatedGas;
+    console.log(`value: ${value}`); */
   }
 
   async function fetchDexSwap() {
@@ -264,14 +313,16 @@ function Swap(props) {
   }, []);
 
   useEffect(() => {
-    getBalanceOne();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchBalances();
   }, []);
 
-  useEffect(() => {
+/*   useEffect(() => {
+    getBalanceOne();
+  }, []); */
+
+/*   useEffect(() => {
     getBalanceTwo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); */
 
   /*   useEffect(() => {
     const delayDebounce = setTimeout(() => {
