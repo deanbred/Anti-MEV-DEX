@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Input, Popover, Radio, Modal, message } from "antd";
+import { Input, Popover, Radio, Modal, message, Grid, Col, Row } from "antd";
 import {
   ArrowDownOutlined,
   DownOutlined,
@@ -15,7 +15,7 @@ import qs from "qs";
 
 const config = {
   apiKey: process.env.ALCHEMY_KEY,
-  network: Network.ETH_GOERLI,
+  network: Network.ETH_MAINNET,
 };
 
 const alchemy = new Alchemy(config);
@@ -31,9 +31,14 @@ function Swap(props) {
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
   const [tokenOne, setTokenOne] = useState(tokenList[0]);
   const [tokenTwo, setTokenTwo] = useState(tokenList[1]);
+  const [tokenOneBalance, setTokenOneBalance] = useState(tokenList[0].address);
+  const [tokenTwoBalance, setTokenTwoBalance] = useState(tokenList[1].address);
   const [isOpen, setIsOpen] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
   const [prices, setPrices] = useState(null);
+  const [gasPriceGwei, setGasPriceGwei] = useState(null);
+  const [blockNumber, setBlockNumber] = useState(null);
   const [txDetails, setTxDetails] = useState({
     to: null,
     data: null,
@@ -64,7 +69,6 @@ function Swap(props) {
     } else {
       setTokenTwoAmount(null);
     }
-    fetchGas();
   }
 
   function switchTokens() {
@@ -76,6 +80,8 @@ function Swap(props) {
     setTokenOne(two);
     setTokenTwo(one);
     fetchPrices(two.address, one.address);
+    getBalanceOne();
+    getBalanceTwo();
   }
 
   function openModal(asset) {
@@ -90,22 +96,28 @@ function Swap(props) {
     if (changeToken === 1) {
       setTokenOne(tokenList[i]);
       fetchPrices(tokenList[i].address, tokenTwo.address);
+      getBalanceOne();
     } else {
       setTokenTwo(tokenList[i]);
       fetchPrices(tokenOne.address, tokenList[i].address);
+      getBalanceTwo();
     }
     setIsOpen(false);
   }
 
   async function fetchGas() {
+    setIsFetching(true);
+
     const blockNumber = await alchemy.core.getBlockNumber();
-    console.log(`Block Number: ${blockNumber}`);
+    setBlockNumber(blockNumber);
 
     const gasPrice = await alchemy.core.getGasPrice();
     let gasPriceGwei = gasPrice.toString();
-    console.log(`Gas Price (gwei): ${gasPriceGwei}`);
+    setGasPriceGwei(gasPriceGwei);
 
-    const gasEstimate = await alchemy.core.estimateGas({
+    setIsFetching(false);
+
+    /*     const gasEstimate = await alchemy.core.estimateGas({
       // Wrapped ETH address
       to: "0x657D378e66B5E28143C88D85B116C053b8455509",
       // `function deposit() payable`
@@ -114,7 +126,53 @@ function Swap(props) {
       value: Utils.parseEther("1.0"),
     });
     let gasEstimateEther = gasEstimate.toString();
-    console.log(`Gas Estimate (ether): ${gasEstimateEther}`);
+    console.log(`Gas Estimate (ether): ${gasEstimateEther}`); */
+  }
+
+  async function getBalanceOne() {
+    const tokenContractAddresses = [tokenOne.address];
+    const data = await alchemy.core.getTokenBalances(
+      address,
+      tokenContractAddresses
+    );
+
+    data.tokenBalances.find((item) => {
+      let formatbalance = Number(Utils.formatUnits(item.tokenBalance, "ether"));
+      let balance = formatbalance.toFixed(3);
+      if (
+        item.tokenBalance ===
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ) {
+        setTokenOneBalance("0");
+      } else {
+        setTokenOneBalance(balance);
+      }
+      console.log(`balance1: ${balance}`);
+      return item.tokenBalance;
+    });
+  }
+
+  async function getBalanceTwo() {
+    const tokenContractAddresses = [tokenTwo.address];
+    const data = await alchemy.core.getTokenBalances(
+      address,
+      tokenContractAddresses
+    );
+
+    data.tokenBalances.find((item) => {
+      let formatbalance = Number(Utils.formatUnits(item.tokenBalance, "ether"));
+      let balance = formatbalance.toFixed(3);
+      if (
+        item.tokenBalance ===
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ) {
+        setTokenTwoBalance("0");
+      } else {
+        setTokenTwoBalance(balance);
+      }
+      console.log(`balance2: ${balance}`);
+      return item.tokenBalance;
+    });
   }
 
   async function fetchPrices(one, two) {
@@ -133,11 +191,10 @@ function Swap(props) {
       one.decimals + tokenOneAmount.length,
       "0"
     );
-    if (amount <=0)
-    return;
+
     const params = {
-      sellToken: one,
-      buyToken: two,
+      sellToken: one.address,
+      buyToken: two.address,
       sellAmount: amount,
     };
     const response = await fetch(
@@ -156,7 +213,7 @@ function Swap(props) {
         return item.source;
       });
     } catch (error) {
-     // document.getElementById("defisource").innerHTML = "Pool Not Available";
+      // document.getElementById("defisource").innerHTML = "Pool Not Available";
     }
     var rawvalue = swapOrders.buyAmount / 10 ** 18;
     var value = rawvalue.toFixed(2);
@@ -164,7 +221,7 @@ function Swap(props) {
     console.log(`estimatedGas: ${swapPriceJSON.estimatedGas}`);
     //document.getElementById("to_amount").innerHTML = value;
     //document.getElementById("gas_estimate").innerHTML =
-      //swapPriceJSON.estimatedGas;
+    //swapPriceJSON.estimatedGas;
   }
 
   async function fetchDexSwap() {
@@ -200,6 +257,29 @@ function Swap(props) {
   useEffect(() => {
     fetchPrices(tokenList[0].address, tokenList[1].address);
   }, []);
+
+  useEffect(() => {
+    const intervalId = setInterval(fetchGas, 12500); //
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    getBalanceOne();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    getBalanceTwo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /*   useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchGas();
+    }, 1000);
+    return () => clearTimeout(delayDebounce);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hold]); */
 
   useEffect(() => {
     if (txDetails.to && isConnected) {
@@ -289,6 +369,7 @@ function Swap(props) {
             <SettingOutlined className="cog" />
           </Popover>
         </div>
+
         <div className="inputs">
           <Input
             placeholder="0"
@@ -297,20 +378,28 @@ function Swap(props) {
             disabled={!prices}
           />
           <Input placeholder="0" value={tokenTwoAmount} disabled={true} />
+
           <div className="switchButton" onClick={switchTokens}>
             <ArrowDownOutlined className="switchArrow" />
           </div>
+
           <div className="assetOne" onClick={() => openModal(1)}>
             <img src={tokenOne.img} alt="assetOneLogo" className="assetLogo" />
             {tokenOne.ticker}
             <DownOutlined />
           </div>
+
+          <div className="balanceOne">Balance: {tokenOneBalance}</div>
+
           <div className="assetTwo" onClick={() => openModal(2)}>
             <img src={tokenTwo.img} alt="assetOneLogo" className="assetLogo" />
             {tokenTwo.ticker}
             <DownOutlined />
           </div>
+
+          <div className="balanceTwo">Balance: {tokenTwoBalance}</div>
         </div>
+
         <div
           className="swapButton"
           disabled={!tokenOneAmount || !isConnected}
@@ -318,6 +407,26 @@ function Swap(props) {
         >
           Swap
         </div>
+
+        <Row gutter={48}>
+          <Col flex={3}>
+            <div className="data">
+              Gas Price:{" "}
+              <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
+                {gasPriceGwei} gwei{" "}
+              </span>{" "}
+            </div>
+          </Col>
+
+          <Col flex={2}>
+            <div className="data" x>
+              Block Number:{" "}
+              <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
+                {blockNumber}
+              </span>
+            </div>
+          </Col>
+        </Row>
       </div>
     </>
   );
