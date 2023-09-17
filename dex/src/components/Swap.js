@@ -17,14 +17,13 @@ import qs from "qs";
 //import Web3 from "web3";
 
 const config = {
-  apiKey: process.env.ALCHEMY_KEY,
+  apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T", //process.env.ALCHEMY_KEY,
   network: Network.ETH_MAINNET,
 };
 
 const alchemy = new Alchemy(config);
 var zeroxapi = "https://api.0x.org";
 //var zeroxapi = "https://goerli.api.0x.org/";
-//Goerli Sources: https://goerli.api.0x.org/swap/v1/sources
 
 function Swap(props) {
   const { address, isConnected } = props;
@@ -139,9 +138,10 @@ function Swap(props) {
   }
 
   async function fetchBalances() {
+    const tokenContractAddress = [tokenOne.address];
     let data1 = await alchemy.core.getTokenBalances(
       address,
-      [tokenOne.address]
+      tokenContractAddress
     );
 
     data1.tokenBalances.find((item) => {
@@ -159,9 +159,10 @@ function Swap(props) {
       return item.tokenBalance;
     });
 
+    const tokenContractAddress2 = [tokenTwo.address];
     let data2 = await alchemy.core.getTokenBalances(
       address,
-      [tokenTwo.address]
+      tokenContractAddress2
     );
 
     data2.tokenBalances.find((item) => {
@@ -178,10 +179,9 @@ function Swap(props) {
       console.log(`balance2: ${balance}`);
       return item.tokenBalance;
     });
+  }
 
-  } 
-
-/*    async function getBalanceOne() {
+  /*    async function getBalanceOne() {
     const tokenContractAddresses = [tokenOne.address];
     const data = await alchemy.core.getTokenBalances(
       address,
@@ -204,7 +204,7 @@ function Swap(props) {
     });
   }  */
 
-/*   async function getBalanceTwo() {
+  /*   async function getBalanceTwo() {
     const tokenContractAddresses = [tokenTwo.address];
     const data = await alchemy.core.getTokenBalances(
       address,
@@ -227,7 +227,7 @@ function Swap(props) {
     });
   } */
 
-/*   async function fetchPrice(one, two) {
+  /*   async function fetchPrice(one, two) {
     const res = await axios.get(`http://localhost:3001/tokenPrice`, {
       params: { addressOne: one, addressTwo: two },
     });
@@ -239,17 +239,19 @@ function Swap(props) {
   async function fetchPrices(one, two) {
     console.log("Getting Price");
 
+    let amount = 100 * 10 ** 18;
     const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
     const params = {
       sellToken: one,
       buyToken: two,
-      sellAmount: tokenOneAmount,
+      sellAmount: amount,
       takerAddress: address,
     };
 
     const response = await fetch(
-      zeroxapi + `/swap/v1/price?${qs.stringify(params)}`, { headers }
-    ); 
+      zeroxapi + `/swap/v1/price?${qs.stringify(params)}`,
+      { headers }
+    );
     var swapPriceJSON = await response.json();
     console.log(JSON.stringify(swapPriceJSON));
     console.log(`swapPriceJSON: ${swapPriceJSON.price}`);
@@ -261,8 +263,7 @@ function Swap(props) {
     };
     setPrices(data);
 
-
-/*     const sources = await fetch(
+    /*     const sources = await fetch(
       zeroxapi + `/swap/v1/quote?${qs.stringify(params)}`, { headers }
     );
     var quote = await sources.json();
@@ -316,11 +317,11 @@ function Swap(props) {
     fetchBalances();
   }, []);
 
-/*   useEffect(() => {
+  /*   useEffect(() => {
     getBalanceOne();
   }, []); */
 
-/*   useEffect(() => {
+  /*   useEffect(() => {
     getBalanceTwo();
   }, []); */
 
@@ -459,8 +460,8 @@ function Swap(props) {
           Swap
         </div>
 
-        <Row gutter={48}>
-          <Col flex={3}>
+        <Row gutter={78}>
+          <Col>
             <div className="data">
               Gas Price:{" "}
               <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
@@ -469,7 +470,7 @@ function Swap(props) {
             </div>
           </Col>
 
-          <Col flex={2}>
+          <Col>
             <div className="data" x>
               Block Number:{" "}
               <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
@@ -479,6 +480,14 @@ function Swap(props) {
           </Col>
         </Row>
       </div>
+      <div
+        id="coinmarketcap-widget-marquee"
+        coins="1,1027,825"
+        currency="USD"
+        theme="light"
+        transparent="false"
+        show-symbol-logo="true"
+      ></div>{" "}
     </>
   );
 }

@@ -14,19 +14,27 @@
     "img": "https://tokens.1inch.io/0x514910771af9ca656af840dff83e8264ecf986ca.png"
   },
   {
+    "address": "0x6810e776880C02933D47DB1b9fc05908e5386b96",
+
+    "name": "Gnosis",
+    "ticker": "GNO",
+    "decimals": 18,
+    "img": "https://tokens.1inch.io/0x6810e776880c02933d47db1b9fc05908e5386b96.png"
+  },
+  {
+    "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+
+    "name": "WrappedBTC",
+    "ticker": "WBTC",
+    "decimals": 8,
+    "img": "https://tokens.1inch.io/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599.png"
+  },
+  {
     "address": "0x006BeA43Baa3f7A6f765F14f10A1a1b08334EF45",
     "name": "Stox",
     "ticker": "STX",
     "decimals": 18,
     "img": "https://tokens.1inch.io/0x006bea43baa3f7a6f765f14f10a1a1b08334ef45.png"
-  },
-  {
-    "address": "0x0327112423F3A68efdF1fcF402F6c5CB9f7C33fd",
-
-    "name": "PieDAOBTC++",
-    "ticker": "BTC",
-    "decimals": 18,
-    "img": "https://tokens.1inch.io/0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd.png"
   },
   {
     "address": "0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828",
@@ -203,14 +211,6 @@
     "ticker": "REPv2",
     "decimals": 18,
     "img": "https://tokens.1inch.io/0x221657776846890989a759ba2973e427dff5c9bb.png"
-  },
-  {
-    "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-
-    "name": "WrappedBTC",
-    "ticker": "WBTC",
-    "decimals": 8,
-    "img": "https://tokens.1inch.io/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599.png"
   },
   {
     "address": "0x255Aa6DF07540Cb5d3d297f0D0D4D84cb52bc8e6",
@@ -563,14 +563,6 @@
     "ticker": "MFG",
     "decimals": 18,
     "img": "https://tokens.1inch.io/0x6710c63432a2de02954fc0f851db07146a6c0312.png"
-  },
-  {
-    "address": "0x6810e776880C02933D47DB1b9fc05908e5386b96",
-
-    "name": "Gnosis",
-    "ticker": "GNO",
-    "decimals": 18,
-    "img": "https://tokens.1inch.io/0x6810e776880c02933d47db1b9fc05908e5386b96.png"
   },
   {
     "address": "0x68d57c9a1C35f63E2c83eE8e49A64e9d70528D25",

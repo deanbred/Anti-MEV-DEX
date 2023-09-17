@@ -7,7 +7,7 @@ function Tokens() {
       Tokens
       <TokensBalancePanel
         walletAddress={"0x657D378e66B5E28143C88D85B116C053b8455509"}
-        chain={"ETH_GOERLI"}
+        chain={"ETH_MAINNET"}
       />
     </div>
   );
