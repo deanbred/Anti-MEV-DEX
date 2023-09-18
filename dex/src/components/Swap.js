@@ -1,4 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+//import {erc20ABI} from "wagmi";
+//var zeroxapi = "https://goerli.api.0x.org/";
+//require('dotenv').config();
+
 import React, { useState, useEffect } from "react";
 import { Input, Popover, Radio, Modal, message, Col, Row } from "antd";
 import {
@@ -7,14 +11,11 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import tokenList from "../tokenList.json";
-//import { PriceResponse, QuoteResponse } from "../api/types.ts";
 
 import axios from "axios";
 import { useSendTransaction, useWaitForTransaction } from "wagmi";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import qs from "qs";
-//import {erc20ABI} from "wagmi";
-//import Web3 from "web3";
 
 const config = {
   apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T", //process.env.ALCHEMY_KEY,
@@ -23,7 +24,6 @@ const config = {
 
 const alchemy = new Alchemy(config);
 var zeroxapi = "https://api.0x.org";
-//var zeroxapi = "https://goerli.api.0x.org/";
 
 function Swap(props) {
   const { address, isConnected } = props;
@@ -127,58 +127,54 @@ function Swap(props) {
   }
 
   async function fetchBalances() {
-    let tokenAddress = [tokenOne.address];
-    let data = await alchemy.core.getTokenBalances(address, tokenAddress);
+    try {
+      let tokenAddress = [tokenOne.address];
+      let data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
-    data.tokenBalances.find((item) => {
-      let formatbalance = Number(Utils.formatUnits(item.tokenBalance, "ether"));
-      let balance = formatbalance.toFixed(3);
-      if (
-        item.tokenBalance ===
-        "0x0000000000000000000000000000000000000000000000000000000000000000"
-      ) {
-        setTokenOneBalance("0.00");
-      } else {
-        setTokenOneBalance(balance);
-      }
-      console.log(`balance1: ${balance}`);
-      return item.tokenBalance;
-    });
+      data.tokenBalances.find((item) => {
+        let formatbalance = Number(
+          Utils.formatUnits(item.tokenBalance, "ether")
+        );
+        let balance = formatbalance.toFixed(3);
+        if (
+          item.tokenBalance ===
+          "0x0000000000000000000000000000000000000000000000000000000000000000"
+        ) {
+          setTokenOneBalance("0.00");
+        } else {
+          setTokenOneBalance(balance);
+        }
+        console.log(`balance1: ${balance}`);
+        return item.tokenBalance;
+      });
 
-    tokenAddress = [tokenTwo.address];
-    data = await alchemy.core.getTokenBalances(address, tokenAddress);
+      tokenAddress = [tokenTwo.address];
+      data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
-    data.tokenBalances.find((item) => {
-      let formatbalance = Number(Utils.formatUnits(item.tokenBalance, "ether"));
-      let balance = formatbalance.toFixed(3);
-      if (
-        item.tokenBalance ===
-        "0x0000000000000000000000000000000000000000000000000000000000000000"
-      ) {
-        setTokenTwoBalance("0.00");
-      } else {
-        setTokenTwoBalance(balance);
-      }
-      console.log(`balance2: ${balance}`);
-      return item.tokenBalance;
-    });
+      data.tokenBalances.find((item) => {
+        let formatbalance = Number(
+          Utils.formatUnits(item.tokenBalance, "ether")
+        );
+        let balance = formatbalance.toFixed(3);
+        if (
+          item.tokenBalance ===
+          "0x0000000000000000000000000000000000000000000000000000000000000000"
+        ) {
+          setTokenTwoBalance("0.00");
+        } else {
+          setTokenTwoBalance(balance);
+        }
+        console.log(`balance2: ${balance}`);
+        return item.tokenBalance;
+      });
+    } catch (error) {
+      console.error("An error occurred while fetching balances:", error);
+    }
   }
-
-  /*   async function fetchPrice(one, two) {
-    const res = await axios.get(`http://localhost:3001/tokenPrice`, {
-      params: { addressOne: one, addressTwo: two },
-    });
-
-    setPrices(res.data);
-    console.log(`prices in res.data: ${res.data}`);
-  } */
 
   async function fetchPrices(one, two) {
     try {
-      console.log("Getting Price");
-      console.log(`tokenOne: ${one}`);
-      console.log(`tokenTwo: ${two}`);
-      console.log(`tokenOneAmount: ${tokenOneAmount}`);
+      console.log("Fetching Price");
 
       let amount = 100 * 10 ** 18;
       const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
@@ -194,7 +190,6 @@ function Swap(props) {
         { headers }
       );
 
-      // Check if the fetch request was successful
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -203,7 +198,6 @@ function Swap(props) {
       console.log(JSON.stringify(swapPriceJSON));
       console.log(`swapPriceJSON: ${swapPriceJSON.price}`);
 
-      // Check if the required fields are present in the response
       if (
         !swapPriceJSON.sellAmount ||
         !swapPriceJSON.buyAmount ||
@@ -220,20 +214,41 @@ function Swap(props) {
 
       setPrices(data);
     } catch (error) {
-      console.error("An error occurred:", error);
+      console.error("Error fetching price:", error);
     }
   }
 
-  /* create a fetchSources() async function
-      const sources = await fetch(
-      zeroxapi + `/swap/v1/quote?${qs.stringify(params)}`, { headers }
-    );
-    var quote = await sources.json();
-    console.log(`Quote: ${quote.source}`); 
-   
-    var rawvalue = quote.buyAmount / 10 ** 18;
-    var value = rawvalue.toFixed(2);
-    console.log(`value: ${value}`); */
+  async function fetchQuote() {
+    try {
+      console.log("Fetching Quote");
+
+      let amount = 100 * 10 ** 18;
+      const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
+      const params = {
+        sellToken: tokenOne.address,
+        buyToken: tokenTwo.address,
+        sellAmount: amount,
+        takerAddress: address,
+      };
+      const response = await fetch(
+        zeroxapi + `/swap/v1/quote?${qs.stringify(params)}`,
+        { headers }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      var quote = await response.json();
+      console.log(`Quote: ${quote.source}`);
+
+      var rawvalue = quote.buyAmount / 10 ** 18;
+      var value = rawvalue.toFixed(2);
+      console.log(`value: ${value}`);
+    } catch (error) {
+      console.error("Error fetching quote:", error);
+    }
+  }
 
   async function fetchDexSwap() {
     const allowance = await axios.get(

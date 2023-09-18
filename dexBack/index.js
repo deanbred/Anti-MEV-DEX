@@ -39,3 +39,13 @@ Moralis.start({
     console.log(`Listening for API Calls`);
   });
 });
+
+
+  /*   async function fetchPrice(one, two) {
+    const res = await axios.get(`http://localhost:3001/tokenPrice`, {
+      params: { addressOne: one, addressTwo: two },
+    });
+
+    setPrices(res.data);
+    console.log(`prices in res.data: ${res.data}`);
+  } */

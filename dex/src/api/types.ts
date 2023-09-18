@@ -1,4 +1,5 @@
 import { Address } from "wagmi";
+//import { PriceResponse, QuoteResponse } from "../api/types.ts"; add this to the top of the file
 
 // https://docs.0x.org/0x-api-swap/api-references/get-swap-v1-price#response
 export interface PriceResponse {
