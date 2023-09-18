@@ -82,9 +82,6 @@ function Swap(props) {
     setTokenOne(two);
     setTokenTwo(one);
     fetchPrices(two.address, one.address);
-    fetchBalances();
-    //getBalanceOne();
-    //getBalanceTwo();
   }
 
   function openModal(asset) {
@@ -99,13 +96,9 @@ function Swap(props) {
     if (changeToken === 1) {
       setTokenOne(tokenList[i]);
       fetchPrices(tokenList[i].address, tokenTwo.address);
-      fetchBalances();
-      //getBalanceOne();
     } else {
       setTokenTwo(tokenList[i]);
       fetchPrices(tokenOne.address, tokenList[i].address);
-      fetchBalances();
-      //getBalanceTwo();
     }
     setIsOpen(false);
   }
@@ -138,20 +131,20 @@ function Swap(props) {
   }
 
   async function fetchBalances() {
-    const tokenContractAddress = [tokenOne.address];
-    let data1 = await alchemy.core.getTokenBalances(
+    let tokenAddress = [tokenOne.address];
+    let data = await alchemy.core.getTokenBalances(
       address,
-      tokenContractAddress
+      tokenAddress
     );
 
-    data1.tokenBalances.find((item) => {
+    data.tokenBalances.find((item) => {
       let formatbalance = Number(Utils.formatUnits(item.tokenBalance, "ether"));
       let balance = formatbalance.toFixed(3);
       if (
         item.tokenBalance ===
         "0x0000000000000000000000000000000000000000000000000000000000000000"
       ) {
-        setTokenOneBalance("0");
+        setTokenOneBalance("0.000");
       } else {
         setTokenOneBalance(balance);
       }
@@ -159,20 +152,20 @@ function Swap(props) {
       return item.tokenBalance;
     });
 
-    const tokenContractAddress2 = [tokenTwo.address];
-    let data2 = await alchemy.core.getTokenBalances(
+    tokenAddress = [tokenTwo.address];
+    data = await alchemy.core.getTokenBalances(
       address,
-      tokenContractAddress2
+      tokenAddress
     );
 
-    data2.tokenBalances.find((item) => {
+    data.tokenBalances.find((item) => {
       let formatbalance = Number(Utils.formatUnits(item.tokenBalance, "ether"));
       let balance = formatbalance.toFixed(3);
       if (
         item.tokenBalance ===
         "0x0000000000000000000000000000000000000000000000000000000000000000"
       ) {
-        setTokenTwoBalance("0");
+        setTokenTwoBalance("0.000");
       } else {
         setTokenTwoBalance(balance);
       }
@@ -180,52 +173,6 @@ function Swap(props) {
       return item.tokenBalance;
     });
   }
-
-  /*    async function getBalanceOne() {
-    const tokenContractAddresses = [tokenOne.address];
-    const data = await alchemy.core.getTokenBalances(
-      address,
-      tokenContractAddresses
-    );
-
-    data.tokenBalances.find((item) => {
-      let formatbalance = Number(Utils.formatUnits(item.tokenBalance, "ether"));
-      let balance = formatbalance.toFixed(3);
-      if (
-        item.tokenBalance ===
-        "0x0000000000000000000000000000000000000000000000000000000000000000"
-      ) {
-        setTokenOneBalance("0");
-      } else {
-        setTokenOneBalance(balance);
-      }
-      console.log(`balance1: ${balance}`);
-      return item.tokenBalance;
-    });
-  }  */
-
-  /*   async function getBalanceTwo() {
-    const tokenContractAddresses = [tokenTwo.address];
-    const data = await alchemy.core.getTokenBalances(
-      address,
-      tokenContractAddresses
-    );
-
-    data.tokenBalances.find((item) => {
-      let formatbalance = Number(Utils.formatUnits(item.tokenBalance, "ether"));
-      let balance = formatbalance.toFixed(3);
-      if (
-        item.tokenBalance ===
-        "0x0000000000000000000000000000000000000000000000000000000000000000"
-      ) {
-        setTokenTwoBalance("0");
-      } else {
-        setTokenTwoBalance(balance);
-      }
-      console.log(`balance2: ${balance}`);
-      return item.tokenBalance;
-    });
-  } */
 
   /*   async function fetchPrice(one, two) {
     const res = await axios.get(`http://localhost:3001/tokenPrice`, {
@@ -257,8 +204,8 @@ function Swap(props) {
     console.log(`swapPriceJSON: ${swapPriceJSON.price}`);
 
     const data = {
-      tokenOne: swapPriceJSON.buyAmount,
-      tokenTwo: swapPriceJSON.sellAmount,
+      tokenOne: swapPriceJSON.sellAmount,
+      tokenTwo: swapPriceJSON.buyAmount,
       ratio: swapPriceJSON.price,
     };
     setPrices(data);
@@ -315,23 +262,7 @@ function Swap(props) {
 
   useEffect(() => {
     fetchBalances();
-  }, []);
-
-  /*   useEffect(() => {
-    getBalanceOne();
-  }, []); */
-
-  /*   useEffect(() => {
-    getBalanceTwo();
-  }, []); */
-
-  /*   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      fetchGas();
-    }, 1000);
-    return () => clearTimeout(delayDebounce);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hold]); */
+  }, [modifyToken]);
 
   useEffect(() => {
     if (txDetails.to && isConnected) {
