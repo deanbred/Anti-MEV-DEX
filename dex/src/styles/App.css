@@ -166,17 +166,13 @@ header {
   position: absolute;
   min-width: 80px;
   height: 24px;
-  //background-color: #3a4157;
   top: 72px;
   right: 20px;
-  //border-radius: 100px;
   display: flex;
-  //justify-content: flex-start;
   align-items: center;
   gap: 5px;
   font-weight: semi-bold;
   font-size: 13px;
-  //padding-right: 6px;
 }
 
 .assetTwo {
@@ -200,41 +196,22 @@ header {
   position: absolute;
   min-width: 80px;
   height: 24px;
-  //background-color: #3a4157;
   top: 172px;
   right: 20px;
-  //border-radius: 100px;
   display: flex;
-  //justify-content: flex-start;
   align-items: center;
   gap: 5px;
   font-weight: semi-bold;
   font-size: 13px;
-  //padding-right: 6px;
 }
 
 .data{
-  //position: absolute;
-  //min-width: 80px;
-  //height: 24px;
-  //top: 275px;
-  //right: 0px;
-  //display: flex;
-  //align-items: center;
   gap: 5px;
   font-weight: semi-bold;
   font-size: 13px;
 }
 
 .gas{
-  //position: absolute;
-  //min-width: 100px;
-  //height: 24px;
-  //top: 275px;
-  //right: 230px;
-  //display: flex;
-  //justify-content: flex-end;
-  //align-items: center;
   gap: 5px;
   font-weight: semi-bold;
   font-size: 13px;

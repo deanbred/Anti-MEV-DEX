@@ -64,6 +64,13 @@ function Swap(props) {
     setSlippage(e.target.value);
   }
 
+  const handleCustomSlippageChange = (e) => {
+    const customSlippage = parseFloat(e.target.value);
+    if (!isNaN(customSlippage)) {
+      setSlippage(customSlippage);
+    }
+  };
+
   function changeAmount(e) {
     setTokenOneAmount(e.target.value);
     if (e.target.value && prices) {
@@ -117,25 +124,11 @@ function Swap(props) {
     } finally {
       setIsFetching(false);
     }
-
-    /*     const gasEstimate = await alchemy.core.estimateGas({
-      // Wrapped ETH address
-      to: "0x657D378e66B5E28143C88D85B116C053b8455509",
-      // `function deposit() payable`
-      data: "0xd0e30db0",
-      // 1 ether
-      value: Utils.parseEther("1.0"),
-    });
-    let gasEstimateEther = gasEstimate.toString();
-    console.log(`Gas Estimate (ether): ${gasEstimateEther}`); */
   }
 
   async function fetchBalances() {
     let tokenAddress = [tokenOne.address];
-    let data = await alchemy.core.getTokenBalances(
-      address,
-      tokenAddress
-    );
+    let data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
     data.tokenBalances.find((item) => {
       let formatbalance = Number(Utils.formatUnits(item.tokenBalance, "ether"));
@@ -144,7 +137,7 @@ function Swap(props) {
         item.tokenBalance ===
         "0x0000000000000000000000000000000000000000000000000000000000000000"
       ) {
-        setTokenOneBalance("0.000");
+        setTokenOneBalance("0.00");
       } else {
         setTokenOneBalance(balance);
       }
@@ -153,10 +146,7 @@ function Swap(props) {
     });
 
     tokenAddress = [tokenTwo.address];
-    data = await alchemy.core.getTokenBalances(
-      address,
-      tokenAddress
-    );
+    data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
     data.tokenBalances.find((item) => {
       let formatbalance = Number(Utils.formatUnits(item.tokenBalance, "ether"));
@@ -165,7 +155,7 @@ function Swap(props) {
         item.tokenBalance ===
         "0x0000000000000000000000000000000000000000000000000000000000000000"
       ) {
-        setTokenTwoBalance("0.000");
+        setTokenTwoBalance("0.00");
       } else {
         setTokenTwoBalance(balance);
       }
@@ -184,33 +174,58 @@ function Swap(props) {
   } */
 
   async function fetchPrices(one, two) {
-    console.log("Getting Price");
+    try {
+      console.log("Getting Price");
+      console.log(`tokenOne: ${one}`);
+      console.log(`tokenTwo: ${two}`);
+      console.log(`tokenOneAmount: ${tokenOneAmount}`);
 
-    let amount = 100 * 10 ** 18;
-    const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
-    const params = {
-      sellToken: one,
-      buyToken: two,
-      sellAmount: amount,
-      takerAddress: address,
-    };
+      let amount = 100 * 10 ** 18;
+      const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
+      const params = {
+        sellToken: one,
+        buyToken: two,
+        sellAmount: amount,
+        takerAddress: address,
+      };
 
-    const response = await fetch(
-      zeroxapi + `/swap/v1/price?${qs.stringify(params)}`,
-      { headers }
-    );
-    var swapPriceJSON = await response.json();
-    console.log(JSON.stringify(swapPriceJSON));
-    console.log(`swapPriceJSON: ${swapPriceJSON.price}`);
+      const response = await fetch(
+        zeroxapi + `/swap/v1/price?${qs.stringify(params)}`,
+        { headers }
+      );
 
-    const data = {
-      tokenOne: swapPriceJSON.sellAmount,
-      tokenTwo: swapPriceJSON.buyAmount,
-      ratio: swapPriceJSON.price,
-    };
-    setPrices(data);
+      // Check if the fetch request was successful
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-    /*     const sources = await fetch(
+      const swapPriceJSON = await response.json();
+      console.log(JSON.stringify(swapPriceJSON));
+      console.log(`swapPriceJSON: ${swapPriceJSON.price}`);
+
+      // Check if the required fields are present in the response
+      if (
+        !swapPriceJSON.sellAmount ||
+        !swapPriceJSON.buyAmount ||
+        !swapPriceJSON.price
+      ) {
+        throw new Error("Missing required fields in API response");
+      }
+
+      const data = {
+        tokenOne: swapPriceJSON.sellAmount,
+        tokenTwo: swapPriceJSON.buyAmount,
+        ratio: swapPriceJSON.price,
+      };
+
+      setPrices(data);
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  }
+
+  /* create a fetchSources() async function
+      const sources = await fetch(
       zeroxapi + `/swap/v1/quote?${qs.stringify(params)}`, { headers }
     );
     var quote = await sources.json();
@@ -219,7 +234,6 @@ function Swap(props) {
     var rawvalue = quote.buyAmount / 10 ** 18;
     var value = rawvalue.toFixed(2);
     console.log(`value: ${value}`); */
-  }
 
   async function fetchDexSwap() {
     const allowance = await axios.get(
@@ -256,13 +270,13 @@ function Swap(props) {
   }, []);
 
   useEffect(() => {
-    const intervalId = setInterval(fetchGas, 12500); //
-    return () => clearInterval(intervalId);
-  }, []);
+    fetchBalances();
+  }, [tokenOne, tokenTwo]);
 
   useEffect(() => {
-    fetchBalances();
-  }, [modifyToken]);
+    const intervalId = setInterval(fetchGas, 12500);
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     if (txDetails.to && isConnected) {
@@ -308,6 +322,14 @@ function Swap(props) {
           <Radio.Button value={2.5}>2.5%</Radio.Button>
           <Radio.Button value={5}>5.0%</Radio.Button>
         </Radio.Group>
+        <div>
+          <Input
+            placeholder="Custom slippage"
+            style={{ width: 250 }}
+            addonAfter="%"
+            onChange={handleCustomSlippageChange}
+          />
+        </div>
       </div>
     </>
   );
@@ -321,6 +343,10 @@ function Swap(props) {
         onCancel={() => setIsOpen(false)}
         title="Select a token"
       >
+        {/*         <div className="modalContent">
+          Paste in a token address or select from the list below
+          <Input placeholder="0x..." value={newToken} onChange={addTokenList} />
+        </div> */}
         <div className="modalContent">
           {tokenList?.map((e, i) => {
             return (
@@ -372,7 +398,7 @@ function Swap(props) {
             <DownOutlined />
           </div>
 
-          <div className="balanceOne">Balance: {tokenOneBalance}</div>
+          <div className="balanceOne">Balance:{tokenOneBalance}</div>
 
           <div className="assetTwo" onClick={() => openModal(2)}>
             <img src={tokenTwo.img} alt="assetOneLogo" className="assetLogo" />
@@ -380,7 +406,7 @@ function Swap(props) {
             <DownOutlined />
           </div>
 
-          <div className="balanceTwo">Balance: {tokenTwoBalance}</div>
+          <div className="balanceTwo">Balance:{tokenTwoBalance}</div>
         </div>
 
         <div
@@ -396,13 +422,13 @@ function Swap(props) {
             <div className="data">
               Gas Price:{" "}
               <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
-                {gasPriceGwei} gwei{" "}
-              </span>{" "}
+                {gasPriceGwei}
+              </span>
             </div>
           </Col>
 
           <Col>
-            <div className="data" x>
+            <div className="data">
               Block Number:{" "}
               <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
                 {blockNumber}
@@ -411,14 +437,6 @@ function Swap(props) {
           </Col>
         </Row>
       </div>
-      <div
-        id="coinmarketcap-widget-marquee"
-        coins="1,1027,825"
-        currency="USD"
-        theme="light"
-        transparent="false"
-        show-symbol-logo="true"
-      ></div>{" "}
     </>
   );
 }
