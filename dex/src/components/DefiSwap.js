@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import { Input } from "@nextui-org/react";
 import {
   Card,
@@ -192,6 +193,7 @@ export default function Defiswap() {
     getToDec(toDec);
     displayBalance();
   }
+
   async function getPrice() {
     console.log("Getting Price");
     if (!faddr || !taddr || !document.getElementById("from_amount").value)
@@ -263,7 +265,8 @@ export default function Defiswap() {
       gasPrice: null,
       gas: quote.gas,
     };
-    await ethereum.request({
+    
+    await window.ethereum.request({
       method: "eth_sendTransaction",
       params: [txParams],
     });

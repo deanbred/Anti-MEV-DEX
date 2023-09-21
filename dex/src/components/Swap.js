@@ -1,7 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-//import {erc20ABI} from "wagmi";
-//var zeroxapi = "https://goerli.api.0x.org/";
-//require('dotenv').config();
 
 import React, { useState, useEffect } from "react";
 import { Input, Popover, Radio, Modal, message, Col, Row } from "antd";
@@ -12,10 +9,13 @@ import {
 } from "@ant-design/icons";
 import tokenList from "../tokenList.json";
 
-import axios from "axios";
-import { useSendTransaction, useWaitForTransaction } from "wagmi";
+import { useSendTransaction, useWaitForTransaction, erc20ABI } from "wagmi";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import qs from "qs";
+import { ethers } from "ethers";
+//import axios from "axios";
+//import Web3 from "web3";
+//import { Web3Modal } from "@web3modal";
 
 const config = {
   apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T", //process.env.ALCHEMY_KEY,
@@ -24,8 +24,8 @@ const config = {
 
 const alchemy = new Alchemy(config);
 var zeroxapi = "https://api.0x.org";
-
-const axiosInstance = axios.create();
+//var zeroxapi = "https://goerli.api.0x.org/";
+//const axiosInstance = axios.create();
 
 function Swap(props) {
   const { address, isConnected } = props;
@@ -54,6 +54,8 @@ function Swap(props) {
       to: String(txDetails.to),
       data: String(txDetails.data),
       value: String(txDetails.value),
+      gasPrice: null,
+      gas: String(txDetails.gas),
     },
   });
 
@@ -169,10 +171,9 @@ function Swap(props) {
 
   async function fetchPrices(one, two) {
     try {
-      console.log("Fetching Price");
-      console.log(`tokenOneAmount: ${tokenOneAmount}`);
+      console.log("Fetching Prices...");
 
-      const amount = tokenOneAmount ? tokenOneAmount : 100 * 10 ** 18;
+      const amount = tokenOneAmount ? tokenOneAmount : 10 * 10 ** 18;
       const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
       let params = {
         sellToken: one,
@@ -193,78 +194,83 @@ function Swap(props) {
       const priceJSON = await response.json();
       console.log(`priceJSON: ${JSON.stringify(priceJSON)}`);
 
-      params = {
-        sellToken: one,
-        buyToken: two,
-        sellAmount: amount.toString(),
-        //takerAddress: address,
-        //slippagePercentage: slippage,
-      };
-      const quote = await fetch(
-        zeroxapi + `/swap/v1/quote?${qs.stringify(params)}`,
-        { headers }
-      );
-
-      const quoteJSON = await quote.json();
-      console.log(`quoteJSON: ${JSON.stringify(quoteJSON)}`);
-
       if (!priceJSON.sellAmount || !priceJSON.buyAmount || !priceJSON.price) {
         throw new Error("Missing required fields in API response");
       }
 
       const data = {
-        tokenOne: priceJSON.sellAmount,
-        tokenTwo: priceJSON.buyAmount,
+        tokenOneAmount: priceJSON.sellAmount,
+        tokenTwoAmount: priceJSON.buyAmount,
         ratio: priceJSON.price,
         estimatedGas: priceJSON.estimatedGas,
       };
 
       setPrices(data);
+      setTxDetails(priceJSON);
     } catch (error) {
       console.error("Error fetching price:", error);
     }
   }
 
-  async function fetchQuote(one, two) {
+  async function fetchQuote() {
     try {
-      console.log("Fetching Quote");
+      console.log("Fetching Quote...");
 
-      let amount = 100 * 10 ** 18;
+      let amount = 10 * 10 ** 18;
       const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
       const params = {
-        sellToken: one,
-        buyToken: two,
+        sellToken: tokenOne.address,
+        buyToken: tokenTwo.address,
         sellAmount: amount.toString(),
-        //takerAddress: address,
       };
       const response = await fetch(
         zeroxapi + `/swap/v1/quote?${qs.stringify(params)}`,
         { headers }
       );
 
-      /* const quote = await axiosInstance.get(`${zeroxapi}/swap/v1/quote`, {
-        params: params,
-        headers: headers,
-      });
-      const { data, to, value, gas, gasPrice } = swapResponse.data;
- */
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      var quote = await response.json();
-      console.log(`Quote: ${quote.source}`);
+      const quoteJSON = await response.json();
+      console.log(`quoteJSON: ${JSON.stringify(quoteJSON)}`);
 
-      var rawvalue = quote.buyAmount / 10 ** 18;
-      var value = rawvalue.toFixed(2);
-      console.log(`value: ${value}`);
+      setTxDetails(quoteJSON);
+
+      /*       var proxy = quoteJSON.allowanceTarget;
+      var amountstr = amount.toString();
+      const ERC20Contract = new ethers.Contract(
+        tokenOne.address,
+        erc20ABI,
+        address
+      );
+      const approval = await ERC20Contract.approve(proxy, amountstr);
+      await approval.wait(); */
+
+      /*       const web3 = new Web3(connection);
+      const provider = new ethers.providers.Web3Provider(connection);
+      const signer = provider.getSigner();
+      const userWallet = await signer.getAddress();
+
+      const txParams = {
+        ...quoteJSON,
+        from: address,
+        to: quoteJSON.to,
+        value: quoteJSON.value.toString(16),
+        gasPrice: null,
+        gas: quoteJSON.gas,
+      };
+
+      await window.ethereum.request({
+        method: "eth_sendTransaction",
+        params: [txParams],
+      }); */
     } catch (error) {
       console.error("Error fetching quote:", error);
     }
   }
 
-  async function fetchDexSwap() {
+  /*   async function fetchDexSwap() {
     const allowance = await axios.get(
       `https://api.1inch.io/v5.0/1/approve/allowance?tokenAddress=${tokenOne.address}&walletAddress=${address}`
     );
@@ -292,7 +298,7 @@ function Swap(props) {
     setTokenTwoAmount((Number(tx.data.toTokenAmount) / decimals).toFixed(2));
 
     setTxDetails(tx.data.tx);
-  }
+  } */
 
   useEffect(() => {
     fetchPrices(tokenList[0].address, tokenList[1].address);
@@ -362,6 +368,23 @@ function Swap(props) {
       </div>
     </>
   );
+
+  function renderJsonObject(jsonObject) {
+    if (jsonObject) {
+      return (
+        <ul>
+          {Object.entries(jsonObject).map(([key, value]) => (
+            <li key={key}>
+              <strong>{key}:</strong>{" "}
+              {typeof value === "object"
+                ? renderJsonObject(value)
+                : String(value)}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+  }
 
   return (
     <>
@@ -441,10 +464,19 @@ function Swap(props) {
         <div
           className="swapButton"
           disabled={!tokenOneAmount || !isConnected}
-          onClick={fetchDexSwap}
+          onClick={fetchQuote}
         >
           Swap
         </div>
+
+        <Popover
+          content={renderJsonObject(txDetails)}
+          //title="Swap Details"
+          trigger="click"
+          placement="bottom"
+        >
+          <button className="swapButton">Show Details</button>
+        </Popover>
 
         <Row gutter={78}>
           <Col>

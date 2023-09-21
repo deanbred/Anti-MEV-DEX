@@ -9,7 +9,11 @@ Goerli Sources: https://goerli.api.0x.org/swap/v1/sources.
 
       //curl --location --request GET 'https://api.0x.org/swap/v1/quote?buyToken=DAI&sellToken=ETH&sellAmount=100000&excludedSources=Kyber' --header '0x-api-key: 0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d'
 
-
+       const quote = await axiosInstance.get(`${zeroxapi}/swap/v1/quote`, {
+        params: params,
+        headers: headers,
+      });
+      const { data, to, value, gas, gasPrice } = swapResponse.data;
 
 ## Test tokens available on Goerli
 Recommended testing pair is WETH <> UNI deployed by Uniswap on Goerli.

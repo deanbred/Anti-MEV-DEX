@@ -27,7 +27,7 @@ const executeSwap = async (quote: any) => {
 
   // Execute trade directly with Metamask
   try {
-    const txHash = await ethereum.request({
+    const txHash = await window.ethereum.request({
       method: "eth_sendTransaction",
       params: [txParams],
     });
