@@ -25,6 +25,8 @@ const config = {
 const alchemy = new Alchemy(config);
 var zeroxapi = "https://api.0x.org";
 
+const axiosInstance = axios.create();
+
 function Swap(props) {
   const { address, isConnected } = props;
   const [messageApi, contextHolder] = message.useMessage();
@@ -39,7 +41,6 @@ function Swap(props) {
   const [isFetching, setIsFetching] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
   const [prices, setPrices] = useState(null);
-  const [gasPriceGwei, setGasPriceGwei] = useState(null);
   const [blockNumber, setBlockNumber] = useState(null);
   const [txDetails, setTxDetails] = useState({
     to: null,
@@ -115,12 +116,8 @@ function Swap(props) {
     try {
       const blockNumber = await alchemy.core.getBlockNumber();
       setBlockNumber(blockNumber);
-
-      const gasPrice = await alchemy.core.getGasPrice();
-      let gasPriceGwei = gasPrice.toString();
-      setGasPriceGwei(gasPriceGwei);
     } catch (error) {
-      console.error("Failed to fetch gas:", error);
+      console.error("Failed to fetch block:", error);
     } finally {
       setIsFetching(false);
     }
@@ -132,15 +129,14 @@ function Swap(props) {
       let data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
       data.tokenBalances.find((item) => {
-        let formatbalance = Number(
+        let balance = Number(
           Utils.formatUnits(item.tokenBalance, "ether")
-        );
-        let balance = formatbalance.toFixed(3);
+        ).toFixed(3);
         if (
           item.tokenBalance ===
           "0x0000000000000000000000000000000000000000000000000000000000000000"
         ) {
-          setTokenOneBalance("0.00");
+          setTokenOneBalance("0.000");
         } else {
           setTokenOneBalance(balance);
         }
@@ -152,15 +148,14 @@ function Swap(props) {
       data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
       data.tokenBalances.find((item) => {
-        let formatbalance = Number(
+        let balance = Number(
           Utils.formatUnits(item.tokenBalance, "ether")
-        );
-        let balance = formatbalance.toFixed(3);
+        ).toFixed(3);
         if (
           item.tokenBalance ===
           "0x0000000000000000000000000000000000000000000000000000000000000000"
         ) {
-          setTokenTwoBalance("0.00");
+          setTokenTwoBalance("0.000");
         } else {
           setTokenTwoBalance(balance);
         }
@@ -175,13 +170,14 @@ function Swap(props) {
   async function fetchPrices(one, two) {
     try {
       console.log("Fetching Price");
+      console.log(`tokenOneAmount: ${tokenOneAmount}`);
 
-      let amount = 100 * 10 ** 18;
+      const amount = tokenOneAmount ? tokenOneAmount : 100 * 10 ** 18;
       const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
-      const params = {
+      let params = {
         sellToken: one,
         buyToken: two,
-        sellAmount: amount,
+        sellAmount: amount.toString(),
         takerAddress: address,
       };
 
@@ -194,22 +190,33 @@ function Swap(props) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const swapPriceJSON = await response.json();
-      console.log(JSON.stringify(swapPriceJSON));
-      console.log(`swapPriceJSON: ${swapPriceJSON.price}`);
+      const priceJSON = await response.json();
+      console.log(`priceJSON: ${JSON.stringify(priceJSON)}`);
 
-      if (
-        !swapPriceJSON.sellAmount ||
-        !swapPriceJSON.buyAmount ||
-        !swapPriceJSON.price
-      ) {
+      params = {
+        sellToken: one,
+        buyToken: two,
+        sellAmount: amount.toString(),
+        //takerAddress: address,
+        //slippagePercentage: slippage,
+      };
+      const quote = await fetch(
+        zeroxapi + `/swap/v1/quote?${qs.stringify(params)}`,
+        { headers }
+      );
+
+      const quoteJSON = await quote.json();
+      console.log(`quoteJSON: ${JSON.stringify(quoteJSON)}`);
+
+      if (!priceJSON.sellAmount || !priceJSON.buyAmount || !priceJSON.price) {
         throw new Error("Missing required fields in API response");
       }
 
       const data = {
-        tokenOne: swapPriceJSON.sellAmount,
-        tokenTwo: swapPriceJSON.buyAmount,
-        ratio: swapPriceJSON.price,
+        tokenOne: priceJSON.sellAmount,
+        tokenTwo: priceJSON.buyAmount,
+        ratio: priceJSON.price,
+        estimatedGas: priceJSON.estimatedGas,
       };
 
       setPrices(data);
@@ -218,22 +225,29 @@ function Swap(props) {
     }
   }
 
-  async function fetchQuote() {
+  async function fetchQuote(one, two) {
     try {
       console.log("Fetching Quote");
 
       let amount = 100 * 10 ** 18;
       const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
       const params = {
-        sellToken: tokenOne.address,
-        buyToken: tokenTwo.address,
-        sellAmount: amount,
-        takerAddress: address,
+        sellToken: one,
+        buyToken: two,
+        sellAmount: amount.toString(),
+        //takerAddress: address,
       };
       const response = await fetch(
         zeroxapi + `/swap/v1/quote?${qs.stringify(params)}`,
         { headers }
       );
+
+      /* const quote = await axiosInstance.get(`${zeroxapi}/swap/v1/quote`, {
+        params: params,
+        headers: headers,
+      });
+      const { data, to, value, gas, gasPrice } = swapResponse.data;
+ */
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -413,7 +427,7 @@ function Swap(props) {
             <DownOutlined />
           </div>
 
-          <div className="balanceOne">Balance:{tokenOneBalance}</div>
+          <div className="balanceOne">Balance: {tokenOneBalance}</div>
 
           <div className="assetTwo" onClick={() => openModal(2)}>
             <img src={tokenTwo.img} alt="assetOneLogo" className="assetLogo" />
@@ -421,7 +435,7 @@ function Swap(props) {
             <DownOutlined />
           </div>
 
-          <div className="balanceTwo">Balance:{tokenTwoBalance}</div>
+          <div className="balanceTwo">Balance: {tokenTwoBalance}</div>
         </div>
 
         <div
@@ -435,10 +449,16 @@ function Swap(props) {
         <Row gutter={78}>
           <Col>
             <div className="data">
-              Gas Price:{" "}
-              <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
-                {gasPriceGwei}
-              </span>
+              {prices && prices.ratio
+                ? `1 ${tokenOne.ticker} = ${parseFloat(prices.ratio).toFixed(
+                    3
+                  )} ${tokenTwo.ticker}`
+                : "Fetching Price..."}
+            </div>
+            <div className="data">
+              {prices && prices.estimatedGas
+                ? `Estimated Gas: ${prices.estimatedGas} gwei`
+                : "Fetching Gas..."}
             </div>
           </Col>
 
