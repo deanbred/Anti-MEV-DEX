@@ -20,7 +20,6 @@ import {
 
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import qs from "qs";
-import TickerWidget from "./TickerWidget";
 //import { ethers } from "ethers";
 //import axios from "axios";
 //import Web3 from "web3";

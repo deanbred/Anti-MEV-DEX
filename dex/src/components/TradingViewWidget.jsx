@@ -15,9 +15,8 @@ export default function TradingViewWidget() {
         const script = document.createElement("script");
         script.id = "tradingview-widget-loading-script";
         script.src = "https://s3.tradingview.com/tv.js";
-        script.type = "text/javascript";
         script.onload = resolve;
-
+        script.type = "text/javascript";
         document.head.appendChild(script);
       });
     }
