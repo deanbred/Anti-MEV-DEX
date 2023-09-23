@@ -5,6 +5,7 @@ import Tokens from "./components/Tokens";
 import { Routes, Route } from "react-router-dom";
 import { useAccount } from "wagmi";
 import TradingViewWidget from "./components/TradingViewWidget";
+import TickerWidget from "./components/TickerWidget";
 
 function App() {
   const { address, isConnected } = useAccount();
@@ -13,6 +14,7 @@ function App() {
     <>
       <div className="App">
         <Header />
+        <TickerWidget />
         <div className="mainWindow">
           <Routes>
             <Route

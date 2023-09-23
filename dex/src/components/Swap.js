@@ -2,16 +2,7 @@
 //import BigNumber from "https://cdn.skypack.dev/bignumber.js";
 
 import React, { useState, useEffect } from "react";
-import {
-  Input,
-  Popover,
-  Collapse,
-  Radio,
-  Modal,
-  message,
-  Col,
-  Row,
-} from "antd";
+import { Input, Popover, Radio, Modal, message, Col, Row } from "antd";
 import {
   ArrowDownOutlined,
   DownOutlined,
@@ -29,6 +20,7 @@ import {
 
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import qs from "qs";
+import TickerWidget from "./TickerWidget";
 //import { ethers } from "ethers";
 //import axios from "axios";
 //import Web3 from "web3";
@@ -64,7 +56,7 @@ function Swap(props) {
     value: null,
   });
 
-  const { config } = usePrepareSendTransaction({
+  const { prep } = usePrepareSendTransaction({
     to: txDetails?.to, // The address of the contract to send call data to, in this case 0x Exchange Proxy
     data: txDetails?.data, // The call data required to be sent to the to contract address.
   });
@@ -339,7 +331,6 @@ function Swap(props) {
 
   useEffect(() => {
     if (txDetails.to && isConnected) {
-      
       sendTransaction();
     }
   }, [txDetails]);
@@ -497,17 +488,6 @@ function Swap(props) {
               }`
             : "Fetching Price..."}
         </div>
-
-        <Collapse
-          className="collapse"
-          items={[
-            {
-              key: "1",
-              children: <p>{renderJsonObject(txDetails)}</p>,
-            },
-          ]}
-          expandIconPosition="right"
-        />
 
         {isConnected ? (
           <div
