@@ -1,31 +1,46 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+//import BigNumber from "https://cdn.skypack.dev/bignumber.js";
 
 import React, { useState, useEffect } from "react";
-import { Input, Popover, Radio, Modal, message, Col, Row } from "antd";
+import {
+  Input,
+  Popover,
+  Collapse,
+  Radio,
+  Modal,
+  message,
+  Col,
+  Row,
+} from "antd";
 import {
   ArrowDownOutlined,
   DownOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
 import tokenList from "../tokenList.json";
+import ConnectButton from "./ConnectButton";
 
-import { useSendTransaction, useWaitForTransaction, erc20ABI } from "wagmi";
+import {
+  //erc20ABI,
+  usePrepareSendTransaction,
+  useSendTransaction,
+  useWaitForTransaction,
+} from "wagmi";
+
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import qs from "qs";
-import { ethers } from "ethers";
+//import { ethers } from "ethers";
 //import axios from "axios";
 //import Web3 from "web3";
-//import { Web3Modal } from "@web3modal";
 
 const config = {
-  apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T", //process.env.ALCHEMY_KEY,
+  apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
   network: Network.ETH_MAINNET,
 };
 
 const alchemy = new Alchemy(config);
 var zeroxapi = "https://api.0x.org";
 //var zeroxapi = "https://goerli.api.0x.org/";
-//const axiosInstance = axios.create();
 
 function Swap(props) {
   const { address, isConnected } = props;
@@ -40,12 +55,18 @@ function Swap(props) {
   const [isOpen, setIsOpen] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
-  const [prices, setPrices] = useState(null);
   const [blockNumber, setBlockNumber] = useState(null);
+  const [price, setPrice] = useState(null);
   const [txDetails, setTxDetails] = useState({
+    from: null,
     to: null,
     data: null,
     value: null,
+  });
+
+  const { config } = usePrepareSendTransaction({
+    to: txDetails?.to, // The address of the contract to send call data to, in this case 0x Exchange Proxy
+    data: txDetails?.data, // The call data required to be sent to the to contract address.
   });
 
   const { data, sendTransaction } = useSendTransaction({
@@ -54,8 +75,6 @@ function Swap(props) {
       to: String(txDetails.to),
       data: String(txDetails.data),
       value: String(txDetails.value),
-      gasPrice: null,
-      gas: String(txDetails.gas),
     },
   });
 
@@ -76,15 +95,15 @@ function Swap(props) {
 
   function changeAmount(e) {
     setTokenOneAmount(e.target.value);
-    if (e.target.value && prices) {
-      setTokenTwoAmount((e.target.value * prices.ratio).toFixed(2));
+    if (e.target.value && price) {
+      setTokenTwoAmount((e.target.value * price.ratio).toFixed(2));
     } else {
       setTokenTwoAmount(null);
     }
   }
 
   function switchTokens() {
-    setPrices(null);
+    setPrice(null);
     setTokenOneAmount(null);
     setTokenTwoAmount(null);
     const one = tokenOne;
@@ -100,7 +119,7 @@ function Swap(props) {
   }
 
   function modifyToken(i) {
-    setPrices(null);
+    setPrice(null);
     setTokenOneAmount(null);
     setTokenTwoAmount(null);
     if (changeToken === 1) {
@@ -113,13 +132,13 @@ function Swap(props) {
     setIsOpen(false);
   }
 
-  async function fetchGas() {
+  async function getBlock() {
     setIsFetching(true);
     try {
       const blockNumber = await alchemy.core.getBlockNumber();
       setBlockNumber(blockNumber);
     } catch (error) {
-      console.error("Failed to fetch block:", error);
+      console.error("Failed to get block:", error);
     } finally {
       setIsFetching(false);
     }
@@ -142,7 +161,6 @@ function Swap(props) {
         } else {
           setTokenOneBalance(balance);
         }
-        console.log(`balance1: ${balance}`);
         return item.tokenBalance;
       });
 
@@ -161,7 +179,6 @@ function Swap(props) {
         } else {
           setTokenTwoBalance(balance);
         }
-        console.log(`balance2: ${balance}`);
         return item.tokenBalance;
       });
     } catch (error) {
@@ -171,9 +188,9 @@ function Swap(props) {
 
   async function fetchPrices(one, two) {
     try {
-      console.log("Fetching Prices...");
+      console.log("Fetching price...");
 
-      const amount = tokenOneAmount ? tokenOneAmount : 10 * 10 ** 18;
+      const amount = tokenOneAmount ? tokenOneAmount : 100 * 10 ** 18;
       const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
       let params = {
         sellToken: one,
@@ -194,19 +211,15 @@ function Swap(props) {
       const priceJSON = await response.json();
       console.log(`priceJSON: ${JSON.stringify(priceJSON)}`);
 
-      if (!priceJSON.sellAmount || !priceJSON.buyAmount || !priceJSON.price) {
-        throw new Error("Missing required fields in API response");
-      }
-
-      const data = {
+      const res = {
+        ...priceJSON,
         tokenOneAmount: priceJSON.sellAmount,
         tokenTwoAmount: priceJSON.buyAmount,
         ratio: priceJSON.price,
         estimatedGas: priceJSON.estimatedGas,
       };
 
-      setPrices(data);
-      setTxDetails(priceJSON);
+      setPrice(res);
     } catch (error) {
       console.error("Error fetching price:", error);
     }
@@ -216,7 +229,7 @@ function Swap(props) {
     try {
       console.log("Fetching Quote...");
 
-      let amount = 10 * 10 ** 18;
+      let amount = 100 * 10 ** 18;
       const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
       const params = {
         sellToken: tokenOne.address,
@@ -235,9 +248,21 @@ function Swap(props) {
       const quoteJSON = await response.json();
       console.log(`quoteJSON: ${JSON.stringify(quoteJSON)}`);
 
-      setTxDetails(quoteJSON);
+      const res = {
+        from: address,
+        to: quoteJSON.to,
+        data: quoteJSON.data,
+        value: quoteJSON.value,
+        ...quoteJSON,
+      };
+      setTxDetails(res);
+    } catch (error) {
+      console.error("Error fetching quote:", error);
+    }
+  }
 
-      /*       var proxy = quoteJSON.allowanceTarget;
+  async function executeSwap() {
+    /*       var proxy = quoteJSON.allowanceTarget;
       var amountstr = amount.toString();
       const ERC20Contract = new ethers.Contract(
         tokenOne.address,
@@ -246,8 +271,7 @@ function Swap(props) {
       );
       const approval = await ERC20Contract.approve(proxy, amountstr);
       await approval.wait(); */
-
-      /*       const web3 = new Web3(connection);
+    /*       const web3 = new Web3(connection);
       const provider = new ethers.providers.Web3Provider(connection);
       const signer = provider.getSigner();
       const userWallet = await signer.getAddress();
@@ -259,15 +283,15 @@ function Swap(props) {
         value: quoteJSON.value.toString(16),
         gasPrice: null,
         gas: quoteJSON.gas,
+        value: new BigNumber(quote.value).toString(16), // Convert value to hexadecimal
+        gas: new BigNumber(quote.gas).toString(16), // Convert gas to hexadecimal
+        gasPrice: new BigNumber(quote.gasPrice).toString(16), // Convert gasPrice to hexadecimal
       };
 
       await window.ethereum.request({
         method: "eth_sendTransaction",
         params: [txParams],
       }); */
-    } catch (error) {
-      console.error("Error fetching quote:", error);
-    }
   }
 
   /*   async function fetchDexSwap() {
@@ -309,15 +333,16 @@ function Swap(props) {
   }, [tokenOne, tokenTwo]);
 
   useEffect(() => {
-    const intervalId = setInterval(fetchGas, 12500);
+    const intervalId = setInterval(getBlock, 12500);
     return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
     if (txDetails.to && isConnected) {
+      
       sendTransaction();
     }
-  }, [txDetails, isConnected, sendTransaction]);
+  }, [txDetails]);
 
   useEffect(() => {
     messageApi.destroy();
@@ -346,7 +371,7 @@ function Swap(props) {
         duration: 1.5,
       });
     }
-  }, [isSuccess, txDetails.to, messageApi]);
+  }, [isSuccess]);
 
   const settings = (
     <>
@@ -436,7 +461,7 @@ function Swap(props) {
             placeholder="0"
             value={tokenOneAmount}
             onChange={changeAmount}
-            disabled={!prices}
+            disabled={!price}
           />
           <Input placeholder="0" value={tokenTwoAmount} disabled={true} />
 
@@ -451,6 +476,9 @@ function Swap(props) {
           </div>
 
           <div className="balanceOne">Balance: {tokenOneBalance}</div>
+          <div className="messageOne">You pay</div>
+
+          <div className="valueOne">Value: $</div>
 
           <div className="assetTwo" onClick={() => openModal(2)}>
             <img src={tokenTwo.img} alt="assetOneLogo" className="assetLogo" />
@@ -459,37 +487,63 @@ function Swap(props) {
           </div>
 
           <div className="balanceTwo">Balance: {tokenTwoBalance}</div>
+          <div className="messageTwo">You receive</div>
         </div>
 
-        <div
-          className="swapButton"
-          disabled={!tokenOneAmount || !isConnected}
-          onClick={fetchQuote}
-        >
-          Swap
+        <div className="data">
+          {price
+            ? `1 ${tokenOne.ticker} = ${parseFloat(price.ratio).toFixed(3)} ${
+                tokenTwo.ticker
+              }`
+            : "Fetching Price..."}
         </div>
+
+        <Collapse
+          className="collapse"
+          items={[
+            {
+              key: "1",
+              children: <p>{renderJsonObject(txDetails)}</p>,
+            },
+          ]}
+          expandIconPosition="right"
+        />
+
+        {isConnected ? (
+          <div
+            className="swapButton"
+            disabled={!tokenOneAmount}
+            onClick={fetchQuote}
+          >
+            Swap
+          </div>
+        ) : (
+          <ConnectButton />
+        )}
 
         <Popover
-          content={renderJsonObject(txDetails)}
-          //title="Swap Details"
+          content={renderJsonObject(price)}
+          title="Price Details"
           trigger="click"
           placement="bottom"
         >
-          <button className="swapButton">Show Details</button>
+          <button className="swapButton">Price Details</button>
+        </Popover>
+
+        <Popover
+          content={renderJsonObject(txDetails)}
+          title="Tx Details"
+          trigger="click"
+          placement="bottom"
+        >
+          <button className="swapButton">Tx Details</button>
         </Popover>
 
         <Row gutter={78}>
           <Col>
             <div className="data">
-              {prices && prices.ratio
-                ? `1 ${tokenOne.ticker} = ${parseFloat(prices.ratio).toFixed(
-                    3
-                  )} ${tokenTwo.ticker}`
-                : "Fetching Price..."}
-            </div>
-            <div className="data">
-              {prices && prices.estimatedGas
-                ? `Estimated Gas: ${prices.estimatedGas} gwei`
+              {price
+                ? `Estimated Gas: ${price.estimatedGas} gwei`
                 : "Fetching Gas..."}
             </div>
           </Col>
