@@ -95,6 +95,19 @@ header {
   padding-right: 20px;
 }
 
+.heatmap {
+  width: 95%;
+  background-color: #0e111b;
+  border: 2px solid #21273a;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+  padding: 10px;
+}
+
 .ticker {
   width: 100%;
   display: flex;
@@ -105,6 +118,13 @@ header {
 }
 
 .swap {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.tokens {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -362,4 +382,76 @@ header {
   font-size: 13px;
   font-weight: 300;
   color: #51596f;
+}
+
+.token_panel_container {
+  display: flex;
+  color: rgb(12, 12, 12);
+}
+
+.tokens_box {
+  background-color: white;
+  border-radius: 12px;
+  border: 1px solid #cfd9f0;
+  padding: 2em;
+  height: 300px;
+  width: 420px;
+  overflow: scroll;
+}
+
+.header {
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 2em;
+}
+
+.token_container {
+  display: flex;
+  justify-content: space-between;
+  margin-block: 1.5em;
+  align-items: center;
+}
+
+.image_container {
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+}
+
+
+.image_container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 100%;
+}
+
+.image_placeholder_container {
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+  background: linear-gradient(#ffd27c, #ffaa8f);
+}
+
+
+.token_name_sybol_container {
+  display: flex;
+  column-gap: 0.5rem;
+}
+.token_name_logo {
+  display: flex;
+  font-weight: 600;
+  align-items: center;
+  justify-items: start;
+  gap: 1em;
+}
+
+.token_info {
+  display: flex;
+  gap: 0.5em;
+  font-weight: 700;
+}
+
+.coin_symbol {
+  color: #4e4e4e;
 }

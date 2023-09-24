@@ -1,16 +1,21 @@
+import "../styles/App.css";
 import React from "react";
-import TokensBalancePanel from "./TokenBalances.jsx";
 import Heatmap from "./Heatmap.jsx";
+import TokenBalances from "./TokenBalances.jsx";
+import { useAccount } from "wagmi";
 
 function Tokens() {
+  const { address } = useAccount();
+
   return (
     <>
-      <div className="">
-        <TokensBalancePanel
-          walletAddress={"0x5F793b98817ae4609ad2C3c4D7171518E555ABA3"}
-          chain={"ETH_MAINNET"}
-        />
-        <Heatmap />
+      <div className="tokens">
+        <div className="tokens_panel_container">
+          <TokenBalances walletAddress={address} />
+        </div>
+        <div className="heatmap">
+          <Heatmap />
+        </div>
       </div>
     </>
   );

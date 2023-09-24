@@ -12,13 +12,16 @@ function App() {
     <>
       <div className="App">
         <Header />
-          <Routes>
-            <Route
-              path="/"
-              element={<Swap isConnected={isConnected} address={address} />}
-            />
-            <Route path="/tokens" element={<Tokens />} />
-          </Routes>
+        <Routes>
+          <Route
+            path="/"
+            element={<Swap isConnected={isConnected} address={address} />}
+          />
+          <Route
+            path="/tokens"
+            element={<Tokens address={address} />}
+          />
+        </Routes>
       </div>
     </>
   );

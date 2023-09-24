@@ -9,9 +9,9 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import tokenList from "../tokenList.json";
-import ConnectButton from "./ConnectButton";
+import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
-import TradingViewWidget from "./TradingViewWidget";
+import TradingViewWidget from "./Charts";
 
 import {
   //erc20ABI,
