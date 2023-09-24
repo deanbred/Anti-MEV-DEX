@@ -10,6 +10,8 @@ import {
 } from "@ant-design/icons";
 import tokenList from "../tokenList.json";
 import ConnectButton from "./ConnectButton";
+import Ticker from "./Ticker";
+import TradingViewWidget from "./TradingViewWidget";
 
 import {
   //erc20ABI,
@@ -326,7 +328,7 @@ function Swap(props) {
   useEffect(() => {
     const intervalId = setInterval(getBlock, 12500);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [getBlock]);
 
   useEffect(() => {
     if (txDetails.to && isConnected) {
@@ -432,110 +434,118 @@ function Swap(props) {
           })}
         </div>
       </Modal>
+      <div className="swap">
+        <div className="ticker">
+          <Ticker />
+        </div>
 
-      <div className="tradeBox">
-        <div className="tradeBoxHeader">
-          <h4 className="">AntiMEV Swap</h4>
+        <div className="tradeBox">
+          <div className="tradeBoxHeader">
+            <h4 className="">AntiMEV Swap</h4>
+            <Popover
+              content={settings}
+              title="Settings"
+              trigger="click"
+              placement="bottomRight"
+            >
+              <SettingOutlined className="cog" />
+            </Popover>
+          </div>
+
+          <div className="inputs">
+            <Input
+              placeholder="0"
+              value={tokenOneAmount}
+              onChange={changeAmount}
+              disabled={!price}
+            />
+            <Input placeholder="0" value={tokenTwoAmount} disabled={true} />
+
+            <div className="switchButton" onClick={switchTokens}>
+              <ArrowDownOutlined className="switchArrow" />
+            </div>
+
+            <div className="assetOne" onClick={() => openModal(1)}>
+              <img
+                src={tokenOne.img}
+                alt="assetOneLogo"
+                className="assetLogo"
+              />
+              {tokenOne.ticker}
+              <DownOutlined />
+            </div>
+
+            <div className="balanceOne">Balance: {tokenOneBalance}</div>
+            <div className="messageOne">You pay</div>
+
+            <div className="valueOne">Value: $</div>
+
+            <div className="assetTwo" onClick={() => openModal(2)}>
+              <img
+                src={tokenTwo.img}
+                alt="assetOneLogo"
+                className="assetLogo"
+              />
+              {tokenTwo.ticker}
+              <DownOutlined />
+            </div>
+
+            <div className="balanceTwo">Balance: {tokenTwoBalance}</div>
+            <div className="messageTwo">You receive</div>
+          </div>
+
+          <div className="data">
+            {price
+              ? `1 ${tokenOne.ticker} = ${parseFloat(price.ratio).toFixed(3)} ${
+                  tokenTwo.ticker
+                }`
+              : "Fetching Price..."}
+          </div>
+
+          {isConnected ? (
+            <div
+              className="swapButton"
+              disabled={!tokenOneAmount}
+              onClick={fetchQuote}
+            >
+              Swap
+            </div>
+          ) : (
+            <ConnectButton />
+          )}
+
           <Popover
-            content={settings}
-            title="Settings"
+            content={renderJsonObject(price)}
+            title="Price Details"
             trigger="click"
-            placement="bottomRight"
+            placement="bottom"
           >
-            <SettingOutlined className="cog" />
+            <button className="swapButton">Price Details</button>
           </Popover>
+
+          <Row gutter={78}>
+            <Col>
+              <div className="data">
+                {price
+                  ? `Estimated Gas: ${price.estimatedGas} gwei`
+                  : "Fetching Gas..."}
+              </div>
+            </Col>
+
+            <Col>
+              <div className="data">
+                Block Number:{" "}
+                <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
+                  {blockNumber}
+                </span>
+              </div>
+            </Col>
+          </Row>
         </div>
 
-        <div className="inputs">
-          <Input
-            placeholder="0"
-            value={tokenOneAmount}
-            onChange={changeAmount}
-            disabled={!price}
-          />
-          <Input placeholder="0" value={tokenTwoAmount} disabled={true} />
-
-          <div className="switchButton" onClick={switchTokens}>
-            <ArrowDownOutlined className="switchArrow" />
-          </div>
-
-          <div className="assetOne" onClick={() => openModal(1)}>
-            <img src={tokenOne.img} alt="assetOneLogo" className="assetLogo" />
-            {tokenOne.ticker}
-            <DownOutlined />
-          </div>
-
-          <div className="balanceOne">Balance: {tokenOneBalance}</div>
-          <div className="messageOne">You pay</div>
-
-          <div className="valueOne">Value: $</div>
-
-          <div className="assetTwo" onClick={() => openModal(2)}>
-            <img src={tokenTwo.img} alt="assetOneLogo" className="assetLogo" />
-            {tokenTwo.ticker}
-            <DownOutlined />
-          </div>
-
-          <div className="balanceTwo">Balance: {tokenTwoBalance}</div>
-          <div className="messageTwo">You receive</div>
+        <div className="widget">
+          <TradingViewWidget />
         </div>
-
-        <div className="data">
-          {price
-            ? `1 ${tokenOne.ticker} = ${parseFloat(price.ratio).toFixed(3)} ${
-                tokenTwo.ticker
-              }`
-            : "Fetching Price..."}
-        </div>
-
-        {isConnected ? (
-          <div
-            className="swapButton"
-            disabled={!tokenOneAmount}
-            onClick={fetchQuote}
-          >
-            Swap
-          </div>
-        ) : (
-          <ConnectButton />
-        )}
-
-        <Popover
-          content={renderJsonObject(price)}
-          title="Price Details"
-          trigger="click"
-          placement="bottom"
-        >
-          <button className="swapButton">Price Details</button>
-        </Popover>
-
-        <Popover
-          content={renderJsonObject(txDetails)}
-          title="Tx Details"
-          trigger="click"
-          placement="bottom"
-        >
-          <button className="swapButton">Tx Details</button>
-        </Popover>
-
-        <Row gutter={78}>
-          <Col>
-            <div className="data">
-              {price
-                ? `Estimated Gas: ${price.estimatedGas} gwei`
-                : "Fetching Gas..."}
-            </div>
-          </Col>
-
-          <Col>
-            <div className="data">
-              Block Number:{" "}
-              <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
-                {blockNumber}
-              </span>
-            </div>
-          </Col>
-        </Row>
       </div>
     </>
   );

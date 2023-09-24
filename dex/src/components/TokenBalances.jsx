@@ -16,10 +16,11 @@ export default function TokensBalancePanel({ walletAddress, chain }) {
           method: "POST",
           body: JSON.stringify({
             address: address,
-            chain: chain ? chain : "ETH_GOERLI",
+            chain: chain ? chain : "ETH_MAINNET",
           }),
         }).then((res) => res.json());
         setTokensBalance(fetchedTokensBalance);
+        console.log(fetchedTokensBalance);
       } catch (e) {
         console.log(e);
       }

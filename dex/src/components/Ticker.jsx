@@ -1,22 +1,24 @@
-import React, { useEffect } from 'react';
+// TradingViewWidget.jsx
+import React, { useEffect, useRef, memo } from "react";
 
-function TradingViewWidget() {
+function Ticker() {
+  const container = useRef();
 
   useEffect(() => {
-    // Create script element
-    const scriptEl = document.createElement('script');
-    scriptEl.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
-    scriptEl.type = 'text/javascript';
-    scriptEl.async = true;
-    scriptEl.innerHTML = JSON.stringify({
+    const script = document.createElement("script");
+    script.src =
+      "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
+    script.type = "text/javascript";
+    script.async = true;
+    script.innerHTML = JSON.stringify({
       symbols: [
         { proName: "FOREXCOM:SPXUSD", title: "S&P 500" },
         { proName: "BITSTAMP:BTCUSD", title: "Bitcoin" },
         { proName: "BITSTAMP:ETHUSD", title: "Ethereum" },
-        { proName: "BYBIT:KASUSDT.P", title: "Kaspa" },
-        { proName: "BYBIT:LINKUSDT.P", title: "Link" },
-        { proName: "BYBIT:ARBUSDT.P", title: "Arbitrum" },
-        { proName: "BYBIT:OPUSDT.P", title: "Optimism" },
+        { description: "Kaspa", proName: "BYBIT:KASUSDT.P" },
+        { description: "Link", proName: "BYBIT:LINKUSDT.P" },
+        { description: "Arbitrum", proName: "BYBIT:ARBUSDT.P" },
+        { description: "Optimism", proName: "BYBIT:OPUSDT.P" },
       ],
       showSymbolLogo: true,
       colorTheme: "dark",
@@ -24,23 +26,14 @@ function TradingViewWidget() {
       displayMode: "adaptive",
       locale: "en",
     });
-
-    // Append script element to container
-    const containerEl = document.getElementById('tradingview-widget-container');
-    if (containerEl) containerEl.appendChild(scriptEl);
-
-    // Clean up on component unmount
-    return () => {
-      if (containerEl) containerEl.removeChild(scriptEl);
-    };
+    container.current.appendChild(script);
   }, []);
 
   return (
-    <div id="tradingview-widget-container" className="tradingview-widget-container">
+    <div className="tradingview-widget-container" ref={container}>
       <div className="tradingview-widget-container__widget"></div>
     </div>
   );
 }
 
-export default TradingViewWidget;
-
+export default memo(Ticker);

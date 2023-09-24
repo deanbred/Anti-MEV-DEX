@@ -12,8 +12,8 @@ export default async function handler(req, res) {
 
   // set the settings for Alchemy SDK
   const settings = {
-    apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
-    network: Network.ETH_GOERLI,
+    apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
+    network: Network.ETH_MAINNET,
   };
 
   // create an instance of the Alchemy SDK
@@ -27,6 +27,7 @@ export default async function handler(req, res) {
 
     // fetch the Ethereum balance for the given address
     const ethBalance = await alchemy.core.getBalance(address);
+    console.log(ethBalance);
     const parsedEthBalance = parseInt(ethBalance.toString()) / Math.pow(10, 18);
 
     // create an object representing the Ethereum balance

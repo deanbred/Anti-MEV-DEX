@@ -12,7 +12,6 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { LedgerConnector } from "wagmi/connectors/ledger";
 import { alchemyProvider } from "wagmi/providers/alchemy";
-//import { infuraProvider } from 'wagmi/providers/infura'
 
 const chains = [ mainnet, arbitrum, optimism, goerli, arbitrumGoerli, optimismGoerli];
 const projectId = "fd8d18072056d2a74e2a5a29c946bb47";
@@ -22,7 +21,6 @@ const { publicClient } = configureChains(
   [walletConnectProvider({ projectId })],
   [
     alchemyProvider({ apiKey: process.env.ALCHEMY_KEY }),
-    //[infuraProvider({ apiKey: 'yourInfuraApiKey' })],
   ]
 );
 

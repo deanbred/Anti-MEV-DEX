@@ -14,7 +14,6 @@ function Header() {
           <div className="headerItem">Tokens</div>
         </Link>
       </div>
-
       <div className="rightH">
         <div className="headerItem">
           <w3m-network-button />
