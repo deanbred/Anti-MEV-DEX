@@ -10,19 +10,18 @@ const config = {
 const alchemy = new Alchemy(config);
 
 export default function TokenBalances(props) {
+  const [isLoading, setIsLoading] = useState(true);
   const [balances, setBalances] = useState([]);
   const { address } = props;
-  console.log(`address: ${address}`)
 
   useEffect(() => {
     async function fetchBalances() {
-      const ethBalance = await alchemy.core.getBalance(
-        "0x5F793b98817ae4609ad2C3c4D7171518E555ABA3"
-      );
-      console.log(ethBalance);
+      setIsLoading(true);
+      const ethBalance = await alchemy.core.getBalance(address);
 
       const parsedEthBalance =
         parseInt(ethBalance.toString()) / Math.pow(10, 18);
+      console.log(`EthBalance: ${parsedEthBalance}`);
 
       // create an object representing the Ethereum balance
       const ethBalanceObject = {
@@ -34,9 +33,7 @@ export default function TokenBalances(props) {
         address: "0x",
       };
 
-      const fetchedTokens = await alchemy.core.getTokenBalances(
-        "0x5F793b98817ae4609ad2C3c4D7171518E555ABA3"
-      );
+      const fetchedTokens = await alchemy.core.getTokenBalances(address);
 
       const fetchedTokenBalances = fetchedTokens.tokenBalances.map(
         (token) => token.tokenBalance
@@ -99,34 +96,17 @@ export default function TokenBalances(props) {
       );
 
       setBalances(unifiedBalancedAndMetadata);
+      setIsLoading(false);
     }
 
     fetchBalances();
   }, [address]);
 
-  useEffect(() => {
-    if (address) TokenBalances();
-  }, [address]);
-
-  return (
-    <div className="">
-      <h2>Token Balances</h2>
-      <ul>
-        {balances.map((token) => (
-          <li key={token.address}>
-            <img src={token.logo} height={24} alt={token.name} /> {token.name} (
-            {token.symbol}): {token.balance}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-
-/*   return (
-    <div className={styles.token_panel_container}>
-      <div className={styles.tokens_box}>
+    return (
+    <div className="token_panel_container">
+      <div className="tokens_box">
         {address?.length ? (
-          <div className={styles.header}>
+          <div className="tokens_address">
             {address?.slice(0, 6)}...
             {address?.slice(address.length - 4)}
           </div>
@@ -136,35 +116,33 @@ export default function TokenBalances(props) {
 
         {isLoading
           ? "Loading..."
-          : tokensBalance?.length &&
-            tokensBalance?.map((token, i) => {
+          : balances?.length &&
+            balances?.map((token, i) => {
               const convertedBalance = Math.round(token.balance * 100) / 100;
               return (
-                <div key={i} className={styles.token_container}>
-                  <div className={styles.token_name_logo}>
+                <div key={i} className="token_container">
+                  <div className="token_name_logo">
                     {token.logo ? (
-                      <div className={styles.image_container}>
+                      <div className="image_container">
                         <img src={token.logo} alt={""}></img>
                       </div>
                     ) : (
-                      <div className={styles.image_placeholder_container}></div>
+                      <div className="image_placeholder_container"></div>
                     )}
-                    <div className={styles.coin_name}>
+                    <div className="coin_name">
                       {token.name?.length > 15
                         ? token.name?.substring(0, 15)
                         : token.name}
                     </div>
                   </div>
-                  <div className={styles.token_info}>
-                    <div className={styles.price}>{convertedBalance}</div>
-                    <div className={styles.coin_symbol}>{token.symbol}</div>
+                  <div className="token_info">
+                    <div className="price">{convertedBalance}</div>
+                    <div className="coin_symbol">{token.symbol}</div>
                   </div>
                 </div>
               );
             })}
       </div>
     </div>
-  ); */
-
+  );
 }
-

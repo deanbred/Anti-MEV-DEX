@@ -516,14 +516,14 @@ function Swap(props) {
 
           <Popover
             content={renderJsonObject(price)}
-            title="Price Details"
+            title="Aggregator Details"
             trigger="click"
             placement="bottom"
           >
-            <button className="swapButton">Price Details</button>
+            <button className="swapButton">Show Details</button>
           </Popover>
 
-          <Row gutter={78}>
+          <Row gutter={80}>
             <Col>
               <div className="data">
                 {price

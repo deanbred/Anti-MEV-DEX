@@ -10,9 +10,8 @@ function Tokens() {
   return (
     <>
       <div className="tokens">
-        <div className="tokens_panel_container">
-          <TokenBalances walletAddress={address} />
-        </div>
+        <h3 className="tokenTitle">My Balances</h3>
+        <TokenBalances address={address} />
         <div className="heatmap">
           <Heatmap />
         </div>

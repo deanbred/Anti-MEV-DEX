@@ -11,6 +11,19 @@ header {
   padding-right: 50px;
 }
 
+.tokens_title {
+  font-size: 28px;
+  color: white;
+  margin-top: 0px;
+  margin-bottom: 8px;
+}
+
+.tokens_address {
+  font-size: 24px;
+  margin-top: 0px;
+  margin-bottom: 8px;
+}
+
 .logo {
   width: 40px;
   height: 40px;
@@ -37,10 +50,10 @@ header {
 }
 
 .headerItem {
-  padding: 10px;
-  padding-left: 15px;
-  padding-right: 15px;
-  border-radius: 5px;
+  padding: 8px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
   font-weight: 500;
   transition: 0.3s;
   display: flex;
@@ -49,6 +62,7 @@ header {
 
 .headerItem:hover {
   background-color: rgb(34, 42, 58);
+  border: 1px solid #cfd9f0;
   cursor: pointer;
 }
 
@@ -65,9 +79,9 @@ header {
 }
 
 .tradeBox {
-  width: 400px;
+  width: 440px;
   background-color: #0e111b;
-  border: 2px solid #21273a;
+  border: 1px solid #cfd9f0;
   min-height: 300px;
   border-radius: 15px;
   display: flex;
@@ -81,14 +95,14 @@ header {
 .widget {
   width: 580px;
   background-color: #0e111b;
-  border: 2px solid #21273a;
+  border: 1px solid #cfd9f0;
   min-height: 300px;
   border-radius: 15px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 20px;
   padding-top: 10px;
   padding-bottom: 10px;
   padding-left: 20px;
@@ -98,18 +112,19 @@ header {
 .heatmap {
   width: 95%;
   background-color: #0e111b;
-  border: 2px solid #21273a;
+  border: 1px solid #cfd9f0;
   border-radius: 15px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 25px;
   padding: 10px;
 }
 
 .ticker {
   width: 100%;
+  border: 1px solid #cfd9f0;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -282,16 +297,22 @@ header {
   font-size: 13px;
 }
 
-.data{
+.data {
   gap: 5px;
   font-weight: semi-bold;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 @keyframes flash {
-  0% {opacity: 1;}
-  50% {opacity: 0;}
-  100% {opacity: 1;}
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .flashing {
@@ -390,16 +411,18 @@ header {
 }
 
 .tokens_box {
-  background-color: white;
-  border-radius: 12px;
+  background-color: #0e111b;
+  color: white;
+  border-radius: 15px;
   border: 1px solid #cfd9f0;
-  padding: 2em;
-  height: 300px;
-  width: 420px;
-  overflow: scroll;
+  padding: 1em;
+  height: 400px;
+  width: 540px;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
-.header {
+.tokens_header {
   font-weight: 700;
   font-size: 18px;
   margin-bottom: 2em;
@@ -418,7 +441,6 @@ header {
   border-radius: 100%;
 }
 
-
 .image_container img {
   width: 100%;
   height: 100%;
@@ -433,8 +455,7 @@ header {
   background: linear-gradient(#ffd27c, #ffaa8f);
 }
 
-
-.token_name_sybol_container {
+.token_name_symbol_container {
   display: flex;
   column-gap: 0.5rem;
 }
