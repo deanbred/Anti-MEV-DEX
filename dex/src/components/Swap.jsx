@@ -1,6 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-//import BigNumber from "https://cdn.skypack.dev/bignumber.js";
-
 import React, { useState, useEffect } from "react";
 import { Input, Popover, Radio, Modal, message, Col, Row } from "antd";
 import {
@@ -14,17 +12,16 @@ import Ticker from "./Ticker";
 import Charts from "./Charts";
 
 import {
-  //erc20ABI,
+  erc20ABI,
   usePrepareSendTransaction,
   useSendTransaction,
   useWaitForTransaction,
 } from "wagmi";
 
 import { Alchemy, Network, Utils } from "alchemy-sdk";
+import { ethers } from "ethers";
+import Web3 from "web3";
 import qs from "qs";
-//import { ethers } from "ethers";
-//import axios from "axios";
-//import Web3 from "web3";
 
 const config = {
   apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
@@ -254,38 +251,39 @@ export default function Swap(props) {
     }
   }
 
-  async function executeSwap() {
-    /*       var proxy = quoteJSON.allowanceTarget;
-      var amountstr = amount.toString();
-      const ERC20Contract = new ethers.Contract(
-        tokenOne.address,
-        erc20ABI,
-        address
-      );
-      const approval = await ERC20Contract.approve(proxy, amountstr);
-      await approval.wait(); */
-    /*       const web3 = new Web3(connection);
-      const provider = new ethers.providers.Web3Provider(connection);
-      const signer = provider.getSigner();
-      const userWallet = await signer.getAddress();
+/*   async function executeSwap() {
+    // const web3 = new Web3(connection);
+    // const provider = new ethers.providers.Web3Provider(connection);
+    // const signer = provider.getSigner();
+    // const userWallet = await signer.getAddress();
 
-      const txParams = {
-        ...quoteJSON,
-        from: address,
-        to: quoteJSON.to,
-        value: quoteJSON.value.toString(16),
-        gasPrice: null,
-        gas: quoteJSON.gas,
-        value: new BigNumber(quote.value).toString(16), // Convert value to hexadecimal
-        gas: new BigNumber(quote.gas).toString(16), // Convert gas to hexadecimal
-        gasPrice: new BigNumber(quote.gasPrice).toString(16), // Convert gasPrice to hexadecimal
-      };
+    const ERC20Contract = new ethers.Contract(
+      tokenOne.address,
+      erc20ABI,
+      address
+    );
+    
+    // approve allowance
+    // var proxy = txDetails.allowanceTarget;
+    // var amountstr = amount.toString();
+    // const approval = await ERC20Contract.approve(proxy, amountstr);
+    // await approval.wait();
 
-      await window.ethereum.request({
-        method: "eth_sendTransaction",
-        params: [txParams],
-      }); */
-  }
+    const txParams = {
+      ...txDetails,
+      from: address,
+      to: txDetails.to,
+      value: txDetails.value,
+      gas: txDetails.gas,
+      gasPrice: txDetails.gasPrice,
+    };
+    console.log(`txParams: ${JSON.stringify(txParams)}`);
+
+    // await window.ethereum.request({
+    //   method: "eth_sendTransaction",
+    //   params: [txParams],
+    // });
+  } */
 
   /*   async function fetchDexSwap() {
     const allowance = await axios.get(

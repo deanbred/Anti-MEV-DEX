@@ -9,7 +9,7 @@ const config = {
 
 const alchemy = new Alchemy(config);
 
-export default function TokenBalances(props) {
+export default function Balances(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [balances, setBalances] = useState([]);
   const { address } = props;
@@ -104,17 +104,15 @@ export default function TokenBalances(props) {
   return (
     <div className="token_panel_container">
       <div className="tokens_box">
-        <h3 className="tokens_title">My Balances</h3>
-
-        {address?.length ? (
-          <div className="tokens_address">
-            {address?.slice(0, 6)}...
-            {address?.slice(address.length - 4)}
-          </div>
-        ) : (
-          ""
-        )}
-
+          <h3 className="tokens_title">My Balances</h3>
+          {address?.length ? (
+            <div className="tokens_address">
+              {address?.slice(0, 6)}...
+              {address?.slice(address.length - 4)}
+            </div>
+          ) : (
+            ""
+          )}
         {isLoading
           ? "Loading..."
           : balances?.length &&
