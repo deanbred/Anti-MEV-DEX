@@ -1,7 +1,6 @@
-// TradingViewWidget.jsx
-import React, { useEffect, useRef, memo } from "react";
+import React, { useEffect, useRef } from "react";
 
-function Ticker() {
+export default function Ticker() {
   const container = useRef();
 
   useEffect(() => {
@@ -35,5 +34,3 @@ function Ticker() {
     </div>
   );
 }
-
-export default memo(Ticker);

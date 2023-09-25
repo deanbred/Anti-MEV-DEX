@@ -2,6 +2,7 @@ import "../styles/App.css";
 import React from "react";
 import Heatmap from "./Heatmap.jsx";
 import TokenBalances from "./TokenBalances.jsx";
+import MarketWidget from "./Market";
 import { useAccount } from "wagmi";
 
 function Tokens() {
@@ -10,10 +11,12 @@ function Tokens() {
   return (
     <>
       <div className="tokens">
-        <h3 className="tokenTitle">My Balances</h3>
         <TokenBalances address={address} />
         <div className="heatmap">
           <Heatmap />
+        </div>
+        <div className="market">
+          <MarketWidget />
         </div>
       </div>
     </>

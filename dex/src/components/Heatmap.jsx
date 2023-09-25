@@ -1,7 +1,6 @@
-// TradingViewWidget.jsx
-import React, { useEffect, useRef, memo } from "react";
+import React, { useEffect, useRef } from "react";
 
-function Heatmap() {
+export default function Heatmap() {
   const container = useRef();
 
   useEffect(() => {
@@ -24,7 +23,7 @@ function Heatmap() {
           "hasSymbolTooltip": true,
           "width": "100%",
           "height": "100%"
-        }`;
+      }`;
     container.current.appendChild(script);
   }, []);
 
@@ -34,5 +33,3 @@ function Heatmap() {
     </div>
   );
 }
-
-export default memo(Heatmap);

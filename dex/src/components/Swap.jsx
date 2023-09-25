@@ -11,7 +11,7 @@ import {
 import tokenList from "../tokenList.json";
 import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
-import TradingViewWidget from "./Charts";
+import Charts from "./Charts";
 
 import {
   //erc20ABI,
@@ -523,7 +523,7 @@ function Swap(props) {
             <button className="swapButton">Show Details</button>
           </Popover>
 
-          <Row gutter={80}>
+          <Row gutter={140}>
             <Col>
               <div className="data">
                 {price
@@ -534,7 +534,7 @@ function Swap(props) {
 
             <Col>
               <div className="data">
-                Block Number:{" "}
+                Block:{" "}
                 <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
                   {blockNumber}
                 </span>
@@ -543,8 +543,8 @@ function Swap(props) {
           </Row>
         </div>
 
-        <div className="widget">
-          <TradingViewWidget />
+        <div className="chart">
+          <Charts />
         </div>
       </div>
     </>
