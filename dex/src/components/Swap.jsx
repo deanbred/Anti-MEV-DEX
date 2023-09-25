@@ -35,7 +35,7 @@ const alchemy = new Alchemy(config);
 var zeroxapi = "https://api.0x.org";
 //var zeroxapi = "https://goerli.api.0x.org/";
 
-function Swap(props) {
+export default function Swap(props) {
   const { address, isConnected } = props;
   const [messageApi, contextHolder] = message.useMessage();
   const [slippage, setSlippage] = useState(2.5);
@@ -550,5 +550,3 @@ function Swap(props) {
     </>
   );
 }
-
-export default Swap;

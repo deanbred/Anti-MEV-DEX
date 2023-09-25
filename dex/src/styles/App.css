@@ -117,7 +117,8 @@ header {
 }
 
 .heatmap {
-  width: 95%;
+  width: 90%;
+  height: 600px;
   background-color: #0e111b;
   border: 1px solid #cfd9f0;
   border-radius: 15px;
@@ -130,7 +131,8 @@ header {
 }
 
 .market {
-  width: 95%;
+  width: 90%;
+  height: 600px;
   background-color: #0e111b;
   border: 1px solid #cfd9f0;
   border-radius: 15px;
@@ -149,7 +151,7 @@ header {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  margin-bottom: 60px;
+  margin-bottom: 20px;
 }
 
 .swap {

@@ -21,7 +21,6 @@ export default function TokenBalances(props) {
 
       const parsedEthBalance =
         parseInt(ethBalance.toString()) / Math.pow(10, 18);
-      console.log(`EthBalance: ${parsedEthBalance}`);
 
       // create an object representing the Ethereum balance
       const ethBalanceObject = {

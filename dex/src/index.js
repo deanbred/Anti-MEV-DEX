@@ -43,11 +43,9 @@ createWeb3Modal({ wagmiConfig, projectId, chains, themeMode: "dark" });
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
     <WagmiConfig config={wagmiConfig}>
       <BrowserRouter>
         <App />
       </BrowserRouter>
     </WagmiConfig>
-  </React.StrictMode>
 );
