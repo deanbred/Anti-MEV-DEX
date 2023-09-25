@@ -2,7 +2,7 @@ import "../styles/App.css";
 import React from "react";
 import Heatmap from "./Heatmap.jsx";
 import Balances from "./Balances.jsx";
-import MarketWidget from "./Market";
+import Market from "./Market";
 import { useAccount } from "wagmi";
 
 function Tokens() {
@@ -16,7 +16,7 @@ function Tokens() {
           <Heatmap />
         </div>
         <div className="market">
-          <MarketWidget />
+          <Market />
         </div>
       </div>
     </>
