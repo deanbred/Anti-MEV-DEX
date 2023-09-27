@@ -12,15 +12,17 @@ import Ticker from "./Ticker";
 import Charts from "./Charts";
 
 import {
+  useAccount,
+  useConnect,
   erc20ABI,
   usePrepareSendTransaction,
   useSendTransaction,
   useWaitForTransaction,
 } from "wagmi";
 
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import { ethers } from "ethers";
-import Web3 from "web3";
 import qs from "qs";
 
 const config = {
@@ -34,6 +36,9 @@ var zeroxapi = "https://api.0x.org";
 
 export default function Swap(props) {
   const { address, isConnected } = props;
+  const { connector } = useAccount();
+  const { connect, connectors } = useConnect();
+
   const [messageApi, contextHolder] = message.useMessage();
   const [slippage, setSlippage] = useState(2.5);
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
@@ -249,41 +254,49 @@ export default function Swap(props) {
     } catch (error) {
       console.error("Error fetching quote:", error);
     }
+    executeSwap();
   }
 
-/*   async function executeSwap() {
-    // const web3 = new Web3(connection);
-    // const provider = new ethers.providers.Web3Provider(connection);
-    // const signer = provider.getSigner();
-    // const userWallet = await signer.getAddress();
+  async function executeSwap() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    console.log(provider);
+
+    const signer = provider.getSigner();
+    console.log(signer);
 
     const ERC20Contract = new ethers.Contract(
       tokenOne.address,
       erc20ABI,
-      address
+      signer
     );
-    
-    // approve allowance
-    // var proxy = txDetails.allowanceTarget;
-    // var amountstr = amount.toString();
-    // const approval = await ERC20Contract.approve(proxy, amountstr);
-    // await approval.wait();
+
+    const allowance = await ERC20Contract.allowance(tokenOne.address, address);
+    console.log(`allowance: ${allowance}`);
+
+    const amount = ethers.utils.parseUnits(tokenOneAmount, tokenOne.decimals);
+
+    const approval = await ERC20Contract.approve(
+      txDetails.allowanceTarget,
+      amount
+    );
+    await approval.wait();
+    console.log(`approval: ${JSON.stringify(approval)}`);
 
     const txParams = {
       ...txDetails,
       from: address,
       to: txDetails.to,
       value: txDetails.value,
-      gas: txDetails.gas,
+      gas: null, // txDetails.gas,
       gasPrice: txDetails.gasPrice,
     };
     console.log(`txParams: ${JSON.stringify(txParams)}`);
 
-    // await window.ethereum.request({
-    //   method: "eth_sendTransaction",
-    //   params: [txParams],
-    // });
-  } */
+    /*      await window.ethereum.request({
+       method: "eth_sendTransaction",
+       params: [txParams],
+     }); */
+  }
 
   /*   async function fetchDexSwap() {
     const allowance = await axios.get(
@@ -330,7 +343,7 @@ export default function Swap(props) {
 
   useEffect(() => {
     if (txDetails.to && isConnected) {
-      sendTransaction();
+      //sendTransaction();
     }
   }, [txDetails]);
 

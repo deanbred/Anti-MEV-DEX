@@ -6,22 +6,37 @@ import { BrowserRouter } from "react-router-dom";
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { walletConnectProvider } from "@web3modal/wagmi";
 import { WagmiConfig, configureChains, createConfig } from "wagmi";
-import { mainnet, arbitrum, optimism, goerli, arbitrumGoerli, optimismGoerli } from "wagmi/chains";
+import {
+  mainnet,
+  arbitrum,
+  optimism,
+  goerli,
+  arbitrumGoerli,
+  optimismGoerli,
+} from "wagmi/chains";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { LedgerConnector } from "wagmi/connectors/ledger";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 
-const chains = [ mainnet, arbitrum, optimism, goerli, arbitrumGoerli, optimismGoerli];
+const chains = [
+  mainnet,
+  arbitrum,
+  optimism,
+  goerli,
+  arbitrumGoerli,
+  optimismGoerli,
+];
 const projectId = "fd8d18072056d2a74e2a5a29c946bb47";
+
+const alchemyKey = process.env.ALCHEMY_KEY;
+console.log(`Alchemy key: ${alchemyKey}`);
 
 const { publicClient } = configureChains(
   chains,
   [walletConnectProvider({ projectId })],
-  [
-    alchemyProvider({ apiKey: process.env.ALCHEMY_KEY }),
-  ]
+  [alchemyProvider({ apiKey: process.env.ALCHEMY_KEY })]
 );
 
 const wagmiConfig = createConfig({
@@ -43,9 +58,9 @@ createWeb3Modal({ wagmiConfig, projectId, chains, themeMode: "dark" });
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-    <WagmiConfig config={wagmiConfig}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </WagmiConfig>
+  <WagmiConfig config={wagmiConfig}>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </WagmiConfig>
 );
