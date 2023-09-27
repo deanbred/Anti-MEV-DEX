@@ -30,14 +30,12 @@ const chains = [
 ];
 const projectId = "fd8d18072056d2a74e2a5a29c946bb47";
 
-const alchemyKey = process.env.ALCHEMY_KEY;
-console.log(`Alchemy key: ${alchemyKey}`);
-
 const { publicClient } = configureChains(
   chains,
   [walletConnectProvider({ projectId })],
-  [alchemyProvider({ apiKey: process.env.ALCHEMY_KEY })]
+  [alchemyProvider({ apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T" })]
 );
+console.log(`Public client: ${publicClient}`);
 
 const wagmiConfig = createConfig({
   autoConnect: true,

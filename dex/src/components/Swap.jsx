@@ -258,29 +258,32 @@ export default function Swap(props) {
   }
 
   async function executeSwap() {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    console.log(provider);
-
-    const signer = provider.getSigner();
-    console.log(signer);
-
-    const ERC20Contract = new ethers.Contract(
-      tokenOne.address,
-      erc20ABI,
-      signer
-    );
-
-    const allowance = await ERC20Contract.allowance(tokenOne.address, address);
-    console.log(`allowance: ${allowance}`);
-
-    const amount = ethers.utils.parseUnits(tokenOneAmount, tokenOne.decimals);
-
-    const approval = await ERC20Contract.approve(
-      txDetails.allowanceTarget,
-      amount
-    );
-    await approval.wait();
-    console.log(`approval: ${JSON.stringify(approval)}`);
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      console.log(provider);
+  
+      const signer = provider.getSigner();
+      console.log(signer);
+  
+      const ERC20Contract = new ethers.Contract(
+        tokenOne.address,
+        erc20ABI,
+        signer
+      );
+  
+      const allowance = await ERC20Contract.allowance(tokenOne.address, address);
+      console.log(`allowance: ${allowance}`);
+  
+      const amount = ethers.utils.parseUnits(tokenOneAmount, tokenOne.decimals);
+      const approval = await ERC20Contract.approve(
+        txDetails.allowanceTarget,
+        amount
+      );
+      await approval.wait();
+      console.log(`approval: ${JSON.stringify(approval)}`);
+    } catch (error) {
+      console.error(error);
+    }
 
     const txParams = {
       ...txDetails,
