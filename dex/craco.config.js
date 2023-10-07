@@ -6,9 +6,13 @@ module.exports = {
           {
             test: /\.m?js$/,
             resolve: {
-              fullySpecified: false,
+              fallback: {
+                path: false,
+                os: false,
+                crypto: false,
+                stream: false,
+              },
             },
-            
           },
         ],
       },

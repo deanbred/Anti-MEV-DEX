@@ -12,15 +12,12 @@ import Ticker from "./Ticker";
 import Charts from "./Charts";
 
 import {
-  useAccount,
-  useConnect,
   erc20ABI,
   usePrepareSendTransaction,
   useSendTransaction,
   useWaitForTransaction,
 } from "wagmi";
 
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import { ethers } from "ethers";
 import qs from "qs";
@@ -35,9 +32,21 @@ var zeroxapi = "https://api.0x.org";
 //var zeroxapi = "https://goerli.api.0x.org/";
 
 export default function Swap(props) {
-  const { address, isConnected } = props;
-  const { connector } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { address, connector, isConnected, client } = props;
+
+/*   for (let key in connector) {
+    console.log(key);
+  }
+  for (let key in client) {
+    console.log(`Client Key: ${key}, Value: ${client[key]}`);
+  } */
+
+  const properties = Object.getOwnPropertyNames(client.chain);
+  console.log(`client.chain properties: ${properties}`);
+  console.log(`address: ${address}`);
+  console.log(`isConnected: ${isConnected}`);
+  console.log(`Chain:${client.chain.name} Id:${client.chain.id}`);
+  //console.log(`client: ${qs.stringify(client)}`);
 
   const [messageApi, contextHolder] = message.useMessage();
   const [slippage, setSlippage] = useState(2.5);
@@ -59,7 +68,7 @@ export default function Swap(props) {
     value: null,
   });
 
-  const { prep } = usePrepareSendTransaction({
+  const { config } = usePrepareSendTransaction({
     to: txDetails?.to, // The address of the contract to send call data to, in this case 0x Exchange Proxy
     data: txDetails?.data, // The call data required to be sent to the to contract address.
   });
@@ -144,6 +153,7 @@ export default function Swap(props) {
       let tokenAddress = [tokenOne.address];
       let data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
+      console.log(`data: ${JSON.stringify(data)}`);
       data.tokenBalances.find((item) => {
         let balance = Number(
           Utils.formatUnits(item.tokenBalance, "ether")
@@ -194,6 +204,11 @@ export default function Swap(props) {
         takerAddress: address,
       };
 
+      const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
+        params
+      )}, ${headers}`;
+      console.log(`query: ${query}`);
+
       const response = await fetch(
         zeroxapi + `/swap/v1/price?${qs.stringify(params)}`,
         { headers }
@@ -224,7 +239,7 @@ export default function Swap(props) {
     try {
       console.log("Fetching Quote...");
 
-      let amount = 100 * 10 ** 18;
+      let amount = 100 * 10 ** 18; // tokenOneAmount ? tokenOneAmount : 100 * 10 ** 18;
       const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
       const params = {
         sellToken: tokenOne.address,
@@ -261,25 +276,28 @@ export default function Swap(props) {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       console.log(provider);
-  
+
       const signer = provider.getSigner();
       console.log(signer);
-  
+
       const ERC20Contract = new ethers.Contract(
         tokenOne.address,
         erc20ABI,
         signer
       );
-  
-      const allowance = await ERC20Contract.allowance(tokenOne.address, address);
+
+      const allowance = await ERC20Contract.allowance(
+        tokenOne.address,
+        address
+      );
       console.log(`allowance: ${allowance}`);
-  
+
       const amount = ethers.utils.parseUnits(tokenOneAmount, tokenOne.decimals);
       const approval = await ERC20Contract.approve(
         txDetails.allowanceTarget,
         amount
       );
-      await approval.wait();
+      await approval.wait(1);
       console.log(`approval: ${JSON.stringify(approval)}`);
     } catch (error) {
       console.error(error);
@@ -290,15 +308,15 @@ export default function Swap(props) {
       from: address,
       to: txDetails.to,
       value: txDetails.value,
-      gas: null, // txDetails.gas,
-      gasPrice: txDetails.gasPrice,
+      gas: txDetails.gas,
+      gasPrice: null,
     };
     console.log(`txParams: ${JSON.stringify(txParams)}`);
 
-    /*      await window.ethereum.request({
-       method: "eth_sendTransaction",
-       params: [txParams],
-     }); */
+    await window.ethereum.request({
+      method: "eth_sendTransaction",
+      params: [txParams],
+    });
   }
 
   /*   async function fetchDexSwap() {

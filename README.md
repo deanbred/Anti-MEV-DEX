@@ -7,7 +7,7 @@ Goerli Sources: https://goerli.api.0x.org/swap/v1/sources.
 ### Liquidity sources on Goerli 
 0x, MultiHop, SushiSwap, Uniswap, Uniswap_V2, Uniswap_V3
 
-      //curl --location --request GET 'https://api.0x.org/swap/v1/quote?buyToken=DAI&sellToken=ETH&sellAmount=100000&excludedSources=Kyber' --header '0x-api-key: 0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d'
+      //curl --location --request GET 'https://goerli.api.0x.org/swap/v1/quote?buyToken=0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984&sellToken=0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6&sellAmount=100000&excludedSources=Kyber' --header '0x-api-key: 0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d'
 
        const quote = await axiosInstance.get(`${zeroxapi}/swap/v1/quote`, {
         params: params,
