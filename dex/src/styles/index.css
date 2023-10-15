@@ -27,8 +27,8 @@ code {
   color: white !important;
   border-width: 0px !important;
   height: 96px !important;
-  margin-bottom: 5px;
-  font-size: 35px;
+  margin-bottom: 8px;
+  font-size: 36px;
   border-radius: 12px !important;
 }
 
@@ -42,10 +42,12 @@ code {
 
 .ant-popover-title {
   color: white !important;
+  font-size: 22px !important;
 }
 
 .ant-popover-inner-content {
   color: white !important;
+  font-size: 16px !important;
 }
 
 .ant-popover-inner {
@@ -93,8 +95,9 @@ code {
 
 .ant-modal-title {
   color: white !important;
-  padding-top: 17px !important;
-  margin-left: 20px !important;
+  padding-top: 16px !important;
+  margin-left: 22px !important;
+  font-size: 22px !important;
 }
 
 .ant-modal-close-icon {

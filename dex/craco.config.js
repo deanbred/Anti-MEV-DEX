@@ -11,6 +11,7 @@ module.exports = {
                 os: false,
                 crypto: false,
                 stream: false,
+                assert: false,
               },
             },
           },

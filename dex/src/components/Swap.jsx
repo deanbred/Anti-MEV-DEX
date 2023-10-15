@@ -21,6 +21,9 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 
+import { LimitOrder, OrderStatus, SignatureType } from "@0x/protocol-utils";
+import { BigNumber, hexUtils } from "@0x/utils";
+
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import { ethers } from "ethers";
 import qs from "qs";
@@ -42,7 +45,7 @@ const MAX_ALLOWANCE =
 export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
 
-/*   const properties = Object.getOwnPropertyNames(client.chain);
+  /*   const properties = Object.getOwnPropertyNames(client.chain);
   console.log(`client.chain properties: ${properties}`);
   console.log(`address: ${address}`);
   console.log(`isConnected: ${isConnected}`);
@@ -76,6 +79,10 @@ export default function Swap(props) {
 
   const { data, sendTransaction } = useSendTransaction(config);
 
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  });
+
   /*   const { data, sendTransaction } = useSendTransaction({
     request: {
       from: address,
@@ -83,21 +90,17 @@ export default function Swap(props) {
       data: String(txDetails.data),
       value: String(txDetails.value),
     },
-  }); */
-
-  const { isLoading, isSuccess } = useWaitForTransaction({
-    hash: data?.hash,
   });
 
   // 1. Read from erc20, does spender (0x Exchange Proxy) have allowance?
-  /*   const { data: allowance, readContract, refetch } = useContractRead({
+    const { data: allowance, readContract, refetch } = useContractRead({
     address: tokenOne.address,
     abi: erc20ABI,
     functionName: "allowance",
     args: [address, exchangeProxy],
-  }); */
+  }); 
 
-  /*   // 2. (only if no allowance): write to erc20, approve 0x Exchange Proxy to spend max integer
+  // 2. (only if no allowance): write to erc20, approve 0x Exchange Proxy to spend max integer
   const { config2 } = usePrepareContractWrite({
     address: tokenOne.address,
     abi: erc20ABI,
@@ -119,15 +122,12 @@ export default function Swap(props) {
   }); */
 
   function handleSlippageChange(e) {
-    setSlippage(e.target.value);
-  }
-
-  const handleCustomSlippageChange = (e) => {
-    const customSlippage = parseFloat(e.target.value);
-    if (!isNaN(customSlippage)) {
-      setSlippage(customSlippage);
+    const parsedSlippage = parseFloat(e.target.value);
+    if (!isNaN(parsedSlippage)) {
+      setSlippage(parsedSlippage);
+      console.log(`slippage: ${parsedSlippage}`);
     }
-  };
+  }
 
   function changeAmount(e) {
     setTokenOneAmount(e.target.value);
@@ -287,6 +287,7 @@ export default function Swap(props) {
         //takerAddress: address,
         feeRecipient: "0xc2657176e213DDF18646eFce08F36D656aBE3396", //dev
         buyTokenPercentageFee: 0.015,
+        slippagePercentage: slippage / 100,
       };
 
       const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
@@ -356,6 +357,37 @@ export default function Swap(props) {
     sendTransaction && sendTransaction();
   }
 
+ async function createLimitOrder() {
+    try {
+      console.log("Creating Limit Order...");
+
+/*       const randomExpiration = new BigNumber(Date.now() + TEN_MINUTES_MS)
+        .div(ONE_SECOND_MS)
+        .integerValue(BigNumber.ROUND_CEIL);
+      const pool = hexUtils.leftPad(1);
+
+      // Create the order
+      const limitOrder = new LimitOrder({
+        chainId: NETWORK_CONFIGS.chainId,
+        verifyingContract: exchangeProxyAddress,
+        maker,
+        taker,
+        makerToken: zrxTokenAddress,
+        takerToken: etherTokenAddress,
+        makerAmount: makerAssetAmount,
+        takerAmount: takerAssetAmount,
+        takerTokenFeeAmount: ZERO,
+        sender: NULL_ADDRESS,
+        feeRecipient: NULL_ADDRESS,
+        expiry: randomExpiration,
+        pool,
+        salt: new BigNumber(Date.now()),
+      }); */
+    } catch (error) {
+      console.error(error);
+    }
+  } 
+
   useEffect(() => {
     fetchPrices(tokenList[0].address, tokenList[1].address);
   }, []);
@@ -371,7 +403,7 @@ export default function Swap(props) {
 
   useEffect(() => {
     if (txDetails.to && isConnected) {
-      //sendTransaction && sendTransaction();
+      sendTransaction && sendTransaction();
     }
   }, [txDetails.to]);
 
@@ -407,22 +439,14 @@ export default function Swap(props) {
 
   const settings = (
     <>
-      <div>Slippage Tolerance</div>
-      <div>
-        <Radio.Group value={slippage} onChange={handleSlippageChange}>
-          <Radio.Button value={0.5}>0.5%</Radio.Button>
-          <Radio.Button value={2.5}>2.5%</Radio.Button>
-          <Radio.Button value={5}>5.0%</Radio.Button>
-        </Radio.Group>
-        <div>
-          <Input
-            placeholder="Custom slippage"
-            style={{ width: 250 }}
-            addonAfter="%"
-            onChange={handleCustomSlippageChange}
-          />
-        </div>
-      </div>
+      <Radio.Group value={slippage} onChange={handleSlippageChange}>
+        <Radio.Button value={0.5}>0.5%</Radio.Button>
+        <Radio.Button value={2.5}>2.5%</Radio.Button>
+        <Radio.Button value={5}>5.0%</Radio.Button>
+        <Radio.Button value={10}>10.0%</Radio.Button>
+        <Radio.Button value={25}>25.0%</Radio.Button>
+        <Radio.Button value={50}>50.0%</Radio.Button>
+      </Radio.Group>
     </>
   );
 
@@ -493,13 +517,27 @@ export default function Swap(props) {
             <img src={tokenTwo.img} alt="assetOneLogo" className="assetLogo" />
             {tokenTwo.ticker}
           </div>
+
           <ul>
             <li>Estimated Price Impact: {txDetails.estimatedPriceImpact} %</li>
             <li>Estimated Gas: {txDetails.estimatedGas} gwei</li>
             <li>Protocol Fee: {txDetails.protocolFee}</li>
+            <li>Gross Price: {(txDetails.grossPrice * 1).toFixed(5)}</li>
+            <li>
+              SellTokenToEthRate:{" "}
+              {(txDetails.sellTokenToEthRate * 1).toFixed(3)}
+            </li>
+            <li>
+              BuyTokenToEthRate: {(txDetails.buyTokenToEthRate * 1).toFixed(3)}
+            </li>
+            <li>Max Slippage: {slippage} %</li>
           </ul>
         </div>
-        <div className="executeButton" disabled={!txDetails} onClick={executeSwap}>
+        <div
+          className="executeButton"
+          disabled={!txDetails}
+          onClick={executeSwap}
+        >
           Execute Swap
         </div>
       </Modal>
@@ -514,7 +552,7 @@ export default function Swap(props) {
             <h4 className="">AntiMEV Swap</h4>
             <Popover
               content={settings}
-              title="Settings"
+              title="Slippage"
               trigger="click"
               placement="bottomRight"
             >
@@ -546,7 +584,7 @@ export default function Swap(props) {
             </div>
 
             <div className="balanceOne">Balance: {tokenOneBalance}</div>
-            <div className="messageOne">You pay</div>
+            <div className="messageOne">You send</div>
 
             <div className="valueOne">Value: $</div>
 
@@ -582,11 +620,19 @@ export default function Swap(props) {
               disabled={!tokenOneAmount}
               onClick={fetchQuote}
             >
-              Swap
+              Market Swap
             </div>
           ) : (
             <ConnectButton />
           )}
+
+          <div
+            className="swapButton"
+            disabled={!tokenOneAmount}
+            onClick={createLimitOrder}
+          >
+            Limit Order
+          </div>
 
           <Popover
             content={renderJsonObject(price)}
