@@ -176,9 +176,26 @@ header {
   border-radius: 8px;
   position: absolute;
   top: 86px;
-  left: 180px;
+  left: 210px;
   color: #5f6783;
   border: 3px solid #0e111b;
+  font-size: 12px;
+  transition: 0.3s;
+}
+
+.maxButton {
+  background-color: #3a4157;
+  width: 36px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  border-radius: 8px;
+  position: absolute;
+  top: 74px;
+  left: 310px;
+  color: white;
+  border: 2px solid #0e111b;
   font-size: 12px;
   transition: 0.3s;
 }

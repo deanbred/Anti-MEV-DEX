@@ -4,6 +4,42 @@
 
 Goerli Sources: https://goerli.api.0x.org/swap/v1/sources.
 
+  // Switch to Goerli Testnet
+  await window.ethereum.request({
+    method: "wallet_switchEthereumChain",
+    params: [{ chainId: "0x5" }],
+  });
+
+  const executeSwap = async (quote: any) => {
+  const txParams = {
+    ...quote,
+    value: new BigNumber(quote.value).toString(16), // Convert value to hexadecimal
+    gas: new BigNumber(quote.gas).toString(16), // Convert gas to hexadecimal
+    gasPrice: new BigNumber(quote.gasPrice).toString(16), // Convert gasPrice to hexadecimal
+  };
+
+  // Execute trade directly with Metamask
+  try {
+    const txHash = await window.ethereum.request({
+      method: "eth_sendTransaction",
+      params: [txParams],
+    });
+
+    // Show transaction result
+    // Add link to Etherscan
+    const etherscanLink = `https://goerli.etherscan.io/tx/${txHash}`;
+    const a = document.createElement("a");
+    a.href = etherscanLink;
+    a.innerText = etherscanLink;
+    a.target = "_blank";
+    a.rel = "noreferrer noopener";
+    document.body.prepend(a);
+  } catch (err) {
+    console.error(err);
+    alert(err);
+  }
+};
+
 ### Liquidity sources on Goerli 
 0x, MultiHop, SushiSwap, Uniswap, Uniswap_V2, Uniswap_V3
 

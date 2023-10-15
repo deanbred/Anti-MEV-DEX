@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { Input, Popover, Radio, Modal, message, Col, Row } from "antd";
+import { Input, Popover, Radio, Modal, message, Col, Row, Button } from "antd";
 import {
   ArrowDownOutlined,
   DownOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import tokenList from "../tokenList.json";
+import tokenList from "../tokenListGoerli.json";
 import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
@@ -24,29 +24,27 @@ import qs from "qs";
 
 const config = {
   apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
-  network: Network.ETH_MAINNET,
+  //network: Network.ETH_MAINNET,
+  //apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
+  network: Network.ETH_GOERLI,
 };
 
 const alchemy = new Alchemy(config);
-var zeroxapi = "https://api.0x.org";
-//var zeroxapi = "https://goerli.api.0x.org/";
+//var zeroxapi = "https://api.0x.org";
+var zeroxapi = "https://goerli.api.0x.org/";
 
 export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
 
 /*   for (let key in connector) {
     console.log(key);
-  }
-  for (let key in client) {
-    console.log(`Client Key: ${key}, Value: ${client[key]}`);
   } */
 
   const properties = Object.getOwnPropertyNames(client.chain);
-  console.log(`client.chain properties: ${properties}`);
+  //console.log(`client.chain properties: ${properties}`);
   console.log(`address: ${address}`);
   console.log(`isConnected: ${isConnected}`);
   console.log(`Chain:${client.chain.name} Id:${client.chain.id}`);
-  //console.log(`client: ${qs.stringify(client)}`);
 
   const [messageApi, contextHolder] = message.useMessage();
   const [slippage, setSlippage] = useState(2.5);
@@ -62,25 +60,27 @@ export default function Swap(props) {
   const [blockNumber, setBlockNumber] = useState(null);
   const [price, setPrice] = useState(null);
   const [txDetails, setTxDetails] = useState({
-    from: null,
-    to: null,
-    data: null,
-    value: null,
+    //from: null,
+    //to: null,
+    //data: null,
+    //value: null,
   });
 
   const { config } = usePrepareSendTransaction({
-    to: txDetails?.to, // The address of the contract to send call data to, in this case 0x Exchange Proxy
-    data: txDetails?.data, // The call data required to be sent to the to contract address.
+    to: txDetails?.to, // send call data to 0x Exchange Proxy
+    data: txDetails?.data,
   });
 
-  const { data, sendTransaction } = useSendTransaction({
+  const { data, sendTransaction } = useSendTransaction(config);
+
+  /*   const { data, sendTransaction } = useSendTransaction({
     request: {
       from: address,
       to: String(txDetails.to),
       data: String(txDetails.data),
       value: String(txDetails.value),
     },
-  });
+  }); */
 
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
@@ -100,7 +100,7 @@ export default function Swap(props) {
   function changeAmount(e) {
     setTokenOneAmount(e.target.value);
     if (e.target.value && price) {
-      setTokenTwoAmount((e.target.value * price.ratio).toFixed(2));
+      setTokenTwoAmount((e.target.value * price.ratio).toFixed(3));
     } else {
       setTokenTwoAmount(null);
     }
@@ -134,6 +134,11 @@ export default function Swap(props) {
       fetchPrices(tokenOne.address, tokenList[i].address);
     }
     setIsOpen(false);
+  }
+
+  function setMax() {
+    setTokenOneAmount(tokenOneBalance);
+    setTokenTwoAmount((tokenOneBalance * price.ratio).toFixed(3));
   }
 
   async function getBlock() {
@@ -195,7 +200,7 @@ export default function Swap(props) {
     try {
       console.log("Fetching price...");
 
-      const amount = tokenOneAmount ? tokenOneAmount : 100 * 10 ** 18;
+      const amount = tokenOneAmount ? tokenOneAmount : 10 * 10 ** 18;
       const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
       let params = {
         sellToken: one,
@@ -206,7 +211,7 @@ export default function Swap(props) {
 
       const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
         params
-      )}, ${headers}`;
+      )}, ${qs.stringify(headers)}`;
       console.log(`query: ${query}`);
 
       const response = await fetch(
@@ -221,7 +226,7 @@ export default function Swap(props) {
       const priceJSON = await response.json();
       console.log(`priceJSON: ${JSON.stringify(priceJSON)}`);
 
-      const res = {
+      const data = {
         ...priceJSON,
         tokenOneAmount: priceJSON.sellAmount,
         tokenTwoAmount: priceJSON.buyAmount,
@@ -229,7 +234,7 @@ export default function Swap(props) {
         estimatedGas: priceJSON.estimatedGas,
       };
 
-      setPrice(res);
+      setPrice(data);
     } catch (error) {
       console.error("Error fetching price:", error);
     }
@@ -239,13 +244,21 @@ export default function Swap(props) {
     try {
       console.log("Fetching Quote...");
 
-      let amount = 100 * 10 ** 18; // tokenOneAmount ? tokenOneAmount : 100 * 10 ** 18;
+      let amount = tokenOneAmount ? tokenOneAmount : 10 * 10 ** 18;
+      amount = ethers.utils.parseUnits(amount, tokenOne.decimals);
+      console.log(`amount: ${amount}`);
       const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
       const params = {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
         sellAmount: amount.toString(),
       };
+
+      const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
+        params
+      )}, ${qs.stringify(headers)}`;
+      console.log(`query: ${query}`);
+
       const response = await fetch(
         zeroxapi + `/swap/v1/quote?${qs.stringify(params)}`,
         { headers }
@@ -258,18 +271,17 @@ export default function Swap(props) {
       const quoteJSON = await response.json();
       console.log(`quoteJSON: ${JSON.stringify(quoteJSON)}`);
 
-      const res = {
+      const quote = {
         from: address,
         to: quoteJSON.to,
         data: quoteJSON.data,
         value: quoteJSON.value,
         ...quoteJSON,
       };
-      setTxDetails(res);
+      setTxDetails(quote);
     } catch (error) {
       console.error("Error fetching quote:", error);
     }
-    executeSwap();
   }
 
   async function executeSwap() {
@@ -303,21 +315,24 @@ export default function Swap(props) {
       console.error(error);
     }
 
-    const txParams = {
+    sendTransaction();
+  }
+
+  /*   const txParams = {
       ...txDetails,
-      from: address,
-      to: txDetails.to,
-      value: txDetails.value,
-      gas: txDetails.gas,
-      gasPrice: null,
+      value: new BigNumber(txDetails.value).toString(16), // Convert value to hexadecimal
+      gas: new BigNumber(txDetails.gas).toString(16), // Convert gas to hexadecimal
+      gasPrice: new BigNumber(txDetails.gasPrice).toString(16), // Convert gasPrice to hexadecimal
     };
     console.log(`txParams: ${JSON.stringify(txParams)}`);
 
-    await window.ethereum.request({
+    const txHash = await window.ethereum.request({
       method: "eth_sendTransaction",
       params: [txParams],
     });
-  }
+
+    const etherscanLink = `https://goerli.etherscan.io/tx/${txHash}`;
+    console.log(`etherscanLink: ${etherscanLink}`); */
 
   /*   async function fetchDexSwap() {
     const allowance = await axios.get(
@@ -344,7 +359,7 @@ export default function Swap(props) {
     );
 
     let decimals = Number(`1E${tokenTwo.decimals}`);
-    setTokenTwoAmount((Number(tx.data.toTokenAmount) / decimals).toFixed(2));
+    setTokenTwoAmount((Number(tx.data.toTokenAmount) / decimals).toFixed(3));
 
     setTxDetails(tx.data.tx);
   } */
@@ -512,6 +527,10 @@ export default function Swap(props) {
 
             <div className="valueOne">Value: $</div>
 
+            <Button className="maxButton" onClick={setMax}>
+              MAX
+            </Button>
+
             <div className="assetTwo" onClick={() => openModal(2)}>
               <img
                 src={tokenTwo.img}
@@ -545,6 +564,14 @@ export default function Swap(props) {
           ) : (
             <ConnectButton />
           )}
+
+          <div
+            className="swapButton"
+            disabled={!txDetails}
+            onClick={executeSwap}
+          >
+            Execute
+          </div>
 
           <Popover
             content={renderJsonObject(price)}
