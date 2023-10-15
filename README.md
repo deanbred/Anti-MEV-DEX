@@ -40,6 +40,36 @@ Goerli Sources: https://goerli.api.0x.org/swap/v1/sources.
   }
 };
 
+  /*   async function fetchOneInch() {
+    const allowance = await axios.get(
+      `https://api.1inch.io/v5.0/1/approve/allowance?tokenAddress=${tokenOne.address}&walletAddress=${address}`
+    );
+
+    if (allowance.data.allowance === "0") {
+      const approve = await axios.get(
+        `https://api.1inch.io/v5.0/1/approve/transaction?tokenAddress=${tokenOne.address}`
+      );
+
+      setTxDetails(approve.data);
+      console.log("not approved");
+      return;
+    }
+
+    const tx = await axios.get(
+      `https://api.1inch.io/v5.0/1/swap?fromTokenAddress=${
+        tokenOne.address
+      }&toTokenAddress=${tokenTwo.address}&amount=${tokenOneAmount.padEnd(
+        tokenOne.decimals + tokenOneAmount.length,
+        "0"
+      )}&fromAddress=${address}&slippage=${slippage}`
+    );
+
+    let decimals = Number(`1E${tokenTwo.decimals}`);
+    setTokenTwoAmount((Number(tx.data.toTokenAmount) / decimals).toFixed(3));
+
+    setTxDetails(tx.data.tx);
+  } */
+
 ### Liquidity sources on Goerli 
 0x, MultiHop, SushiSwap, Uniswap, Uniswap_V2, Uniswap_V3
 

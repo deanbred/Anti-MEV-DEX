@@ -36,7 +36,7 @@ var zeroxapi = "https://goerli.api.0x.org/";
 export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
 
-/*   for (let key in connector) {
+  /*   for (let key in connector) {
     console.log(key);
   } */
 
@@ -315,54 +315,8 @@ export default function Swap(props) {
       console.error(error);
     }
 
-    sendTransaction();
+    sendTransaction && sendTransaction();
   }
-
-  /*   const txParams = {
-      ...txDetails,
-      value: new BigNumber(txDetails.value).toString(16), // Convert value to hexadecimal
-      gas: new BigNumber(txDetails.gas).toString(16), // Convert gas to hexadecimal
-      gasPrice: new BigNumber(txDetails.gasPrice).toString(16), // Convert gasPrice to hexadecimal
-    };
-    console.log(`txParams: ${JSON.stringify(txParams)}`);
-
-    const txHash = await window.ethereum.request({
-      method: "eth_sendTransaction",
-      params: [txParams],
-    });
-
-    const etherscanLink = `https://goerli.etherscan.io/tx/${txHash}`;
-    console.log(`etherscanLink: ${etherscanLink}`); */
-
-  /*   async function fetchDexSwap() {
-    const allowance = await axios.get(
-      `https://api.1inch.io/v5.0/1/approve/allowance?tokenAddress=${tokenOne.address}&walletAddress=${address}`
-    );
-
-    if (allowance.data.allowance === "0") {
-      const approve = await axios.get(
-        `https://api.1inch.io/v5.0/1/approve/transaction?tokenAddress=${tokenOne.address}`
-      );
-
-      setTxDetails(approve.data);
-      console.log("not approved");
-      return;
-    }
-
-    const tx = await axios.get(
-      `https://api.1inch.io/v5.0/1/swap?fromTokenAddress=${
-        tokenOne.address
-      }&toTokenAddress=${tokenTwo.address}&amount=${tokenOneAmount.padEnd(
-        tokenOne.decimals + tokenOneAmount.length,
-        "0"
-      )}&fromAddress=${address}&slippage=${slippage}`
-    );
-
-    let decimals = Number(`1E${tokenTwo.decimals}`);
-    setTokenTwoAmount((Number(tx.data.toTokenAmount) / decimals).toFixed(3));
-
-    setTxDetails(tx.data.tx);
-  } */
 
   useEffect(() => {
     fetchPrices(tokenList[0].address, tokenList[1].address);
@@ -370,7 +324,7 @@ export default function Swap(props) {
 
   useEffect(() => {
     fetchBalances();
-  }, [tokenOne, tokenTwo]);
+  }, [tokenOne, tokenTwo, isSuccess]);
 
   useEffect(() => {
     const intervalId = setInterval(getBlock, 12500);
@@ -379,9 +333,9 @@ export default function Swap(props) {
 
   useEffect(() => {
     if (txDetails.to && isConnected) {
-      //sendTransaction();
+      //sendTransaction && sendTransaction();
     }
-  }, [txDetails]);
+  }, [txDetails.to]);
 
   useEffect(() => {
     messageApi.destroy();
@@ -401,8 +355,9 @@ export default function Swap(props) {
       messageApi.open({
         type: "success",
         content: "Transaction Successful",
-        duration: 1.5,
+        duration: 2.0,
       });
+      fetchBalances();
     } else if (txDetails.to) {
       messageApi.open({
         type: "error",
