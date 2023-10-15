@@ -13,6 +13,9 @@ import Charts from "./Charts";
 
 import {
   erc20ABI,
+  useContractRead,
+  usePrepareContractWrite,
+  useContractWrite,
   usePrepareSendTransaction,
   useSendTransaction,
   useWaitForTransaction,
@@ -32,19 +35,18 @@ const config = {
 const alchemy = new Alchemy(config);
 //var zeroxapi = "https://api.0x.org";
 var zeroxapi = "https://goerli.api.0x.org/";
+const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
+const MAX_ALLOWANCE =
+  115792089237316195423570985008687907853269984665640564039457584007913129639935n;
 
 export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
 
-  /*   for (let key in connector) {
-    console.log(key);
-  } */
-
-  const properties = Object.getOwnPropertyNames(client.chain);
-  //console.log(`client.chain properties: ${properties}`);
+/*   const properties = Object.getOwnPropertyNames(client.chain);
+  console.log(`client.chain properties: ${properties}`);
   console.log(`address: ${address}`);
   console.log(`isConnected: ${isConnected}`);
-  console.log(`Chain:${client.chain.name} Id:${client.chain.id}`);
+  console.log(`Chain:${client.chain.name} Id:${client.chain.id}`); */
 
   const [messageApi, contextHolder] = message.useMessage();
   const [slippage, setSlippage] = useState(2.5);
@@ -55,6 +57,7 @@ export default function Swap(props) {
   const [tokenOneBalance, setTokenOneBalance] = useState(null);
   const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
   const [blockNumber, setBlockNumber] = useState(null);
@@ -85,6 +88,35 @@ export default function Swap(props) {
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
   });
+
+  // 1. Read from erc20, does spender (0x Exchange Proxy) have allowance?
+  /*   const { data: allowance, readContract, refetch } = useContractRead({
+    address: tokenOne.address,
+    abi: erc20ABI,
+    functionName: "allowance",
+    args: [address, exchangeProxy],
+  }); */
+
+  /*   // 2. (only if no allowance): write to erc20, approve 0x Exchange Proxy to spend max integer
+  const { config2 } = usePrepareContractWrite({
+    address: tokenOne.address,
+    abi: erc20ABI,
+    functionName: "approve",
+    args: [exchangeProxy, MAX_ALLOWANCE],
+  });
+
+  const {
+    data: writeContractResult,
+    writeAsync: approveAsync,
+    error,
+  } = useContractWrite(config2);
+
+  const { isLoading: isApproving } = useWaitForTransaction({
+    hash: writeContractResult ? writeContractResult.hash : undefined,
+    onSuccess(data) {
+      refetch();
+    },
+  }); */
 
   function handleSlippageChange(e) {
     setSlippage(e.target.value);
@@ -252,6 +284,9 @@ export default function Swap(props) {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
         sellAmount: amount.toString(),
+        //takerAddress: address,
+        feeRecipient: "0xc2657176e213DDF18646eFce08F36D656aBE3396", //dev
+        buyTokenPercentageFee: 0.015,
       };
 
       const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
@@ -282,10 +317,13 @@ export default function Swap(props) {
     } catch (error) {
       console.error("Error fetching quote:", error);
     }
+    setIsSwapModalOpen(true);
   }
 
   async function executeSwap() {
     try {
+      setIsSwapModalOpen(false);
+
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       console.log(provider);
 
@@ -436,6 +474,36 @@ export default function Swap(props) {
           })}
         </div>
       </Modal>
+
+      <Modal
+        open={isSwapModalOpen}
+        footer={null}
+        onCancel={() => setIsSwapModalOpen(false)}
+        title="Review Swap"
+      >
+        <div className="modalContent">
+          <div className="assetReview">
+            Send: {(txDetails.sellAmount / 10 ** tokenOne.decimals).toFixed(3)}
+            <img src={tokenOne.img} alt="assetOneLogo" className="assetLogo" />
+            {tokenOne.ticker}
+          </div>
+          <div className="assetReview">
+            Recieve:{" "}
+            {(txDetails.buyAmount / 10 ** tokenTwo.decimals).toFixed(3)}
+            <img src={tokenTwo.img} alt="assetOneLogo" className="assetLogo" />
+            {tokenTwo.ticker}
+          </div>
+          <ul>
+            <li>Estimated Price Impact: {txDetails.estimatedPriceImpact} %</li>
+            <li>Estimated Gas: {txDetails.estimatedGas} gwei</li>
+            <li>Protocol Fee: {txDetails.protocolFee}</li>
+          </ul>
+        </div>
+        <div className="executeButton" disabled={!txDetails} onClick={executeSwap}>
+          Execute Swap
+        </div>
+      </Modal>
+
       <div className="swap">
         <div className="ticker">
           <Ticker />
@@ -500,7 +568,7 @@ export default function Swap(props) {
             <div className="messageTwo">You receive</div>
           </div>
 
-          <div className="data">
+          <div className="convert">
             {price
               ? `1 ${tokenOne.ticker} = ${parseFloat(price.ratio).toFixed(3)} ${
                   tokenTwo.ticker
@@ -520,14 +588,6 @@ export default function Swap(props) {
             <ConnectButton />
           )}
 
-          <div
-            className="swapButton"
-            disabled={!txDetails}
-            onClick={executeSwap}
-          >
-            Execute
-          </div>
-
           <Popover
             content={renderJsonObject(price)}
             title="Aggregator Details"
@@ -537,7 +597,7 @@ export default function Swap(props) {
             <button className="swapButton">Show Details</button>
           </Popover>
 
-          <Row gutter={140}>
+          <Row gutter={190}>
             <Col>
               <div className="data">
                 {price
