@@ -5,7 +5,7 @@ import Balances from "./Balances.jsx";
 import Market from "./Market";
 import { useAccount } from "wagmi";
 
-function Tokens() {
+export default function Tokens() {
   const { address } = useAccount();
 
   return (
@@ -22,5 +22,3 @@ function Tokens() {
     </>
   );
 }
-
-export default Tokens;

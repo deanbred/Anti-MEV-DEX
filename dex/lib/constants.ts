@@ -5,9 +5,7 @@ export const MAX_ALLOWANCE =
 
 export const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
 
-/* type Token = {
-  address: Address;
-}; */
+
 
 interface Token {
   name: string;
