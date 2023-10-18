@@ -5,7 +5,7 @@ export const MAX_ALLOWANCE =
 
 export const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
 
-
+export const devWallet = "0xd577F7b3359862A4178667347F4415d5682B4E85"
 
 interface Token {
   name: string;

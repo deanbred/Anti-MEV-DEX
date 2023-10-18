@@ -49,7 +49,7 @@ const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const NULL_BYTES = "0x";
 const ZERO = new BigNumber(0);
 
-export default function Swap(props) {
+export default function Limit(props) {
   const { address, connector, isConnected, client } = props;
 
   /*   const properties = Object.getOwnPropertyNames(client.chain);
@@ -593,17 +593,9 @@ export default function Swap(props) {
         <div className="ticker">
           <Ticker />
         </div>
-        <div
-          className="tradeBox"
-          /*         style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundPosition: "top center",
-          //backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-        }} */
-        >
+        <div className="tradeBox">
           <div className="tradeBoxHeader">
-            <h4 className="">AntiMEV</h4>
+          <h4 className="">AntiMEV</h4>
             <Link to="/" className="link">
             <div className="headerItem">Market</div>
           </Link>

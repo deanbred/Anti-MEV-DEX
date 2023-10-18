@@ -3,12 +3,13 @@ import "./styles/App.css";
 import Header from "./components/Header";
 import Swap from "./components/Swap";
 import Tokens from "./components/Tokens";
+import Limit from "./components/Limit";
 import { Routes, Route } from "react-router-dom";
 import { useAccount, usePublicClient } from "wagmi";
 
 function App() {
   const { address, connector, isConnected } = useAccount();
-  const publicClient = usePublicClient()
+  const publicClient = usePublicClient();
 
   return (
     <>
@@ -26,6 +27,17 @@ function App() {
               />
             }
           />
+          <Route
+            path="/limit"
+            element={
+              <Limit
+                address={address}
+                connector={connector}
+                isConnected={isConnected}
+                client={publicClient}
+              />
+            }
+          />
           <Route path="/tokens" element={<Tokens address={address} />} />
         </Routes>
       </div>
@@ -34,4 +46,3 @@ function App() {
 }
 
 export default App;
-
