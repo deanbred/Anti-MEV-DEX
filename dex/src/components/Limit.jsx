@@ -7,11 +7,11 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import backgroundImage from "../images/bg_blk.jpg";
 import tokenList from "../tokenListGoerli.json";
 import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
+import Logo from "../logo.png";
 
 import {
   erc20ABI,
@@ -595,13 +595,15 @@ export default function Limit(props) {
         </div>
         <div className="tradeBox">
           <div className="tradeBoxHeader">
-          <h4 className="">AntiMEV</h4>
-            <Link to="/" className="link">
-            <div className="headerItem">Market</div>
-          </Link>
-          <Link to="/limit" className="link">
-            <div className="headerItem">Limit</div>
-          </Link>
+            <div className="leftH">
+              <img src={Logo} alt="logo" className="logo" />
+              <Link to="/" className="link">
+                <div className="headerItem opacity">Market</div>
+              </Link>
+              <Link to="/limit" className="link">
+                <div className="">Limit</div>
+              </Link>
+            </div>
             <Popover
               content={settings}
               title="Slippage"
