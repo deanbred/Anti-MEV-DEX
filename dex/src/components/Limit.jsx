@@ -1,11 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { Input, Popover, Radio, Modal, message, Col, Row, Button } from "antd";
-import {
-  ArrowDownOutlined,
-  DownOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
+import { DownOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import tokenList from "../tokenListGoerli.json";
 import ConnectButton from "./Connect";
@@ -39,7 +35,9 @@ const config = {
 
 const alchemy = new Alchemy(config);
 //var zeroxapi = "https://api.0x.org";
+//var zeroxapi = "https://polygon.api.0x.org/";
 var zeroxapi = "https://goerli.api.0x.org/";
+
 const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
 const devWallet = "0xd577F7b3359862A4178667347F4415d5682B4E85";
 const MAX_ALLOWANCE =
@@ -73,6 +71,7 @@ export default function Limit(props) {
   const [changeToken, setChangeToken] = useState(1);
   const [blockNumber, setBlockNumber] = useState(null);
   const [price, setPrice] = useState(null);
+  const [limitPrice, setLimitPrice] = useState(null);
   const [txDetails, setTxDetails] = useState({
     from: null,
     to: null,
@@ -141,15 +140,13 @@ export default function Limit(props) {
     }
   }
 
-  function switchTokens() {
-    setPrice(null);
-    setTokenOneAmount(null);
-    setTokenTwoAmount(null);
-    const one = tokenOne;
-    const two = tokenTwo;
-    setTokenOne(two);
-    setTokenTwo(one);
-    fetchPrices(two.address, one.address);
+  function changePrice(e) {
+    setLimitPrice(e.target.value);
+    if (e.target.value && tokenOneAmount) {
+      setTokenTwoAmount((e.target.value * tokenOneAmount).toFixed(3));
+    } else {
+      setTokenTwoAmount(null);
+    }
   }
 
   function openModal(asset) {
@@ -361,11 +358,12 @@ export default function Limit(props) {
   }
 
   async function createLimitOrder() {
+    //approval here?
     try {
       console.log("Creating Limit Order...");
       setIsLimitModalOpen(true);
 
-      const randomExpiration = new BigNumber(Date.now() + 600000)
+      const expiration = new BigNumber(Date.now() + 600000)
         .div(1000)
         .integerValue(BigNumber.ROUND_CEIL);
       const pool = hexUtils.leftPad(1);
@@ -383,7 +381,7 @@ export default function Limit(props) {
         takerTokenFeeAmount: ZERO,
         sender: NULL_ADDRESS,
         feeRecipient: devWallet,
-        expiry: randomExpiration,
+        expiry: expiration,
         pool,
         salt: new BigNumber(Date.now()),
       });
@@ -621,11 +619,12 @@ export default function Limit(props) {
               onChange={changeAmount}
               disabled={!price}
             />
-            <Input placeholder="0" value={tokenTwoAmount} disabled={true} />
-
-            <div className="switchButton" onClick={switchTokens}>
-              <ArrowDownOutlined className="switchArrow" />
-            </div>
+            <Input
+              placeholder="0"
+              value={limitPrice}
+              onChange={changePrice}
+              disabled={!price}
+            />
 
             <div className="assetOne" onClick={() => openModal(1)}>
               <img
@@ -638,7 +637,7 @@ export default function Limit(props) {
             </div>
 
             <div className="balanceOne">Balance: {tokenOneBalance}</div>
-            <div className="messageOne">You send</div>
+            <div className="messageOne">Amount</div>
 
             <div className="valueOne">Value: $</div>
 
@@ -646,47 +645,40 @@ export default function Limit(props) {
               MAX
             </Button>
 
-            <div className="assetTwo" onClick={() => openModal(2)}>
-              <img
-                src={tokenTwo.img}
-                alt="assetOneLogo"
-                className="assetLogo"
-              />
-              {tokenTwo.ticker}
-              <DownOutlined />
-            </div>
-
-            <div className="balanceTwo">Balance: {tokenTwoBalance}</div>
-            <div className="messageTwo">You receive</div>
+            <div className="messageTwo">Limit Price</div>
           </div>
 
           <div className="convert">
-            {price
-              ? `1 ${tokenOne.ticker} = ${parseFloat(price.ratio).toFixed(3)} ${
-                  tokenTwo.ticker
-                }`
-              : "Fetching Price..."}
+            {price ? (
+              <ul>
+                <li>
+                  1 {tokenOne.ticker} = {parseFloat(price.ratio).toFixed(3)}{" "}
+                  {tokenTwo.ticker}
+                </li>
+                <li>Price Impact: {price.estimatedPriceImpact} %</li>
+                <li>Protocol Fee: {price.protocolFee}</li>{" "}
+                <li>
+                  SellTokenToEthRate:
+                  {(price.sellTokenToEthRate * 1).toFixed(3)}
+                </li>
+                <li>Estimated Gas: {price.estimatedGas} gwei</li>
+              </ul>
+            ) : (
+              "Fetching Price..."
+            )}
           </div>
 
           {isConnected ? (
-            <div
+            <button
               className="swapButton"
-              disabled={!tokenOneAmount}
-              onClick={fetchQuote}
+              disabled={!tokenOneAmount || !limitPrice}
+              onClick={createLimitOrder}
             >
-              Market Swap
-            </div>
+              Place Limit Order
+            </button>
           ) : (
             <ConnectButton />
           )}
-
-          <div
-            className="swapButton"
-            disabled={!tokenOneAmount}
-            onClick={createLimitOrder}
-          >
-            Limit Order
-          </div>
 
           <Popover
             content={renderJsonObject(price)}

@@ -23,7 +23,6 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 
-import { LimitOrder, OrderStatus, SignatureType } from "@0x/protocol-utils";
 import { BigNumber, hexUtils } from "@0x/utils";
 
 import { Alchemy, Network, Utils } from "alchemy-sdk";
@@ -39,14 +38,14 @@ const config = {
 
 const alchemy = new Alchemy(config);
 //var zeroxapi = "https://api.0x.org";
+
+//var zeroxapi = "https://polygon.api.0x.org/";
+//var zeroxapi = "https://arbitrum.api.0x.org/";
+//var zeroxapi = "https://optimism.api.0x.org/";
 var zeroxapi = "https://goerli.api.0x.org/";
-const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
-const devWallet = "0xd577F7b3359862A4178667347F4415d5682B4E85";
+
 const MAX_ALLOWANCE =
   115792089237316195423570985008687907853269984665640564039457584007913129639935n;
-const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
-const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
-const NULL_BYTES = "0x";
 const ZERO = new BigNumber(0);
 
 export default function Swap(props) {
@@ -68,7 +67,6 @@ export default function Swap(props) {
   const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
-  const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
   const [blockNumber, setBlockNumber] = useState(null);
@@ -360,38 +358,6 @@ export default function Swap(props) {
     sendTransaction && sendTransaction();
   }
 
-  async function createLimitOrder() {
-    try {
-      console.log("Creating Limit Order...");
-      setIsLimitModalOpen(true);
-
-      const randomExpiration = new BigNumber(Date.now() + 600000)
-        .div(1000)
-        .integerValue(BigNumber.ROUND_CEIL);
-      const pool = hexUtils.leftPad(1);
-
-      // Create the order
-      const limitOrder = new LimitOrder({
-        chainId: client.chain.id,
-        verifyingContract: exchangeProxy,
-        maker: address,
-        taker: NULL_ADDRESS,
-        makerToken: tokenOne.address,
-        takerToken: tokenTwo.address,
-        makerAmount: tokenOneAmount,
-        takerAmount: tokenTwoAmount,
-        takerTokenFeeAmount: ZERO,
-        sender: NULL_ADDRESS,
-        feeRecipient: devWallet,
-        expiry: randomExpiration,
-        pool,
-        salt: new BigNumber(Date.now()),
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   useEffect(() => {
     fetchPrices(tokenList[0].address, tokenList[1].address);
   }, []);
@@ -546,49 +512,6 @@ export default function Swap(props) {
         </div>
       </Modal>
 
-      <Modal
-        open={isLimitModalOpen}
-        footer={null}
-        onCancel={() => setIsLimitModalOpen(false)}
-        title="Limit Order"
-      >
-        <div className="modalContent">
-          <div className="assetReview">
-            Send: {(txDetails.sellAmount / 10 ** tokenOne.decimals).toFixed(3)}
-            <img src={tokenOne.img} alt="assetOneLogo" className="assetLogo" />
-            {tokenOne.ticker}
-          </div>
-          <div className="assetReview">
-            Recieve:{" "}
-            {(txDetails.buyAmount / 10 ** tokenTwo.decimals).toFixed(3)}
-            <img src={tokenTwo.img} alt="assetOneLogo" className="assetLogo" />
-            {tokenTwo.ticker}
-          </div>
-
-          <ul>
-            <li>Estimated Price Impact: {txDetails.estimatedPriceImpact} %</li>
-            <li>Estimated Gas: {txDetails.estimatedGas} gwei</li>
-            <li>Protocol Fee: {txDetails.protocolFee}</li>
-            <li>Gross Price: {(txDetails.grossPrice * 1).toFixed(5)}</li>
-            <li>
-              SellTokenToEthRate:{" "}
-              {(txDetails.sellTokenToEthRate * 1).toFixed(3)}
-            </li>
-            <li>
-              BuyTokenToEthRate: {(txDetails.buyTokenToEthRate * 1).toFixed(3)}
-            </li>
-            <li>Max Slippage: {slippage} %</li>
-          </ul>
-        </div>
-        <div
-          className="executeButton"
-          disabled={!txDetails}
-          onClick={createLimitOrder}
-        >
-          Create Limit Order
-        </div>
-      </Modal>
-
       <div className="swap">
         <div className="ticker">
           <Ticker />
@@ -687,14 +610,6 @@ export default function Swap(props) {
           ) : (
             <ConnectButton />
           )}
-
-          <div
-            className="swapButton"
-            disabled={!tokenOneAmount}
-            onClick={createLimitOrder}
-          >
-            Limit Order
-          </div>
 
           <Popover
             content={renderJsonObject(price)}
