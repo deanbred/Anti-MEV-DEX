@@ -285,9 +285,9 @@ export default function Limit(props) {
         buyToken: tokenTwo.address,
         sellAmount: amount.toString(),
         //takerAddress: address,
-        feeRecipient: "0xc2657176e213DDF18646eFce08F36D656aBE3396", //dev
-        buyTokenPercentageFee: 0.015,
-        slippagePercentage: slippage / 100,
+        //feeRecipient: "0xc2657176e213DDF18646eFce08F36D656aBE3396", //dev
+        //buyTokenPercentageFee: 0.015,
+        //slippagePercentage: slippage / 100,
       };
 
       const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
@@ -358,7 +358,6 @@ export default function Limit(props) {
   }
 
   async function createLimitOrder() {
-    //approval here?
     try {
       console.log("Creating Limit Order...");
       setIsLimitModalOpen(true);
@@ -385,6 +384,7 @@ export default function Limit(props) {
         pool,
         salt: new BigNumber(Date.now()),
       });
+    console.log(`limitOrder: ${limitOrder}`);
     } catch (error) {
       console.error(error);
     }
@@ -502,49 +502,6 @@ export default function Limit(props) {
       </Modal>
 
       <Modal
-        open={isSwapModalOpen}
-        footer={null}
-        onCancel={() => setIsSwapModalOpen(false)}
-        title="Review Swap"
-      >
-        <div className="modalContent">
-          <div className="assetReview">
-            Send: {(txDetails.sellAmount / 10 ** tokenOne.decimals).toFixed(3)}
-            <img src={tokenOne.img} alt="assetOneLogo" className="assetLogo" />
-            {tokenOne.ticker}
-          </div>
-          <div className="assetReview">
-            Recieve:{" "}
-            {(txDetails.buyAmount / 10 ** tokenTwo.decimals).toFixed(3)}
-            <img src={tokenTwo.img} alt="assetOneLogo" className="assetLogo" />
-            {tokenTwo.ticker}
-          </div>
-
-          <ul>
-            <li>Estimated Price Impact: {txDetails.estimatedPriceImpact} %</li>
-            <li>Estimated Gas: {txDetails.estimatedGas} gwei</li>
-            <li>Protocol Fee: {txDetails.protocolFee}</li>
-            <li>Gross Price: {(txDetails.grossPrice * 1).toFixed(5)}</li>
-            <li>
-              SellTokenToEthRate:{" "}
-              {(txDetails.sellTokenToEthRate * 1).toFixed(3)}
-            </li>
-            <li>
-              BuyTokenToEthRate: {(txDetails.buyTokenToEthRate * 1).toFixed(3)}
-            </li>
-            <li>Max Slippage: {slippage} %</li>
-          </ul>
-        </div>
-        <div
-          className="executeButton"
-          disabled={!txDetails}
-          onClick={executeSwap}
-        >
-          Execute Swap
-        </div>
-      </Modal>
-
-      <Modal
         open={isLimitModalOpen}
         footer={null}
         onCancel={() => setIsLimitModalOpen(false)}
@@ -639,7 +596,7 @@ export default function Limit(props) {
             <div className="balanceOne">Balance: {tokenOneBalance}</div>
             <div className="messageOne">Amount</div>
 
-            <div className="valueOne">Value: $</div>
+            <div className="valueOne">Value: $840.22</div>
 
             <Button className="maxButton" onClick={setMax}>
               MAX

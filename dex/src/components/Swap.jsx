@@ -8,6 +8,7 @@ import {
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import tokenList from "../tokenListGoerli.json";
+import { getContractAddressesForChainOrThrow } from "@0x/contract-addresses";
 import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
@@ -22,8 +23,7 @@ import {
   useSendTransaction,
   useWaitForTransaction,
 } from "wagmi";
-
-import { BigNumber, hexUtils } from "@0x/utils";
+import bgImage from "../styles/circuit.jpg";
 
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import { ethers } from "ethers";
@@ -38,7 +38,6 @@ const config = {
 
 const alchemy = new Alchemy(config);
 //var zeroxapi = "https://api.0x.org";
-
 //var zeroxapi = "https://polygon.api.0x.org/";
 //var zeroxapi = "https://arbitrum.api.0x.org/";
 //var zeroxapi = "https://optimism.api.0x.org/";
@@ -46,16 +45,17 @@ var zeroxapi = "https://goerli.api.0x.org/";
 
 const MAX_ALLOWANCE =
   115792089237316195423570985008687907853269984665640564039457584007913129639935n;
-const ZERO = new BigNumber(0);
 
 export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
 
-  /*   const properties = Object.getOwnPropertyNames(client.chain);
-  console.log(`client.chain properties: ${properties}`);
+  //const properties = Object.getOwnPropertyNames(client.chain);
+  //console.log(`client.chain properties: ${properties}`);
   console.log(`address: ${address}`);
   console.log(`isConnected: ${isConnected}`);
-  console.log(`Chain:${client.chain.name} Id:${client.chain.id}`); */
+  console.log(`Chain:${client.chain.name} Id:${client.chain.id}`);
+  console.log(`nativeCurrency: ${JSON.stringify(client.chain.nativeCurrency)}`);
+  //console.log(`contracts: ${JSON.stringify(client.chain.contracts)}`);
 
   const [messageApi, contextHolder] = message.useMessage();
   const [slippage, setSlippage] = useState(1.5);
@@ -71,6 +71,7 @@ export default function Swap(props) {
   const [changeToken, setChangeToken] = useState(1);
   const [blockNumber, setBlockNumber] = useState(null);
   const [price, setPrice] = useState(null);
+  const [ethPrice, setEthPrice] = useState(null);
   const [txDetails, setTxDetails] = useState({
     from: null,
     to: null,
@@ -168,7 +169,6 @@ export default function Swap(props) {
     }
     setIsOpen(false);
   }
-
   function setMax() {
     setTokenOneAmount(tokenOneBalance);
     setTokenTwoAmount((tokenOneBalance * price.ratio).toFixed(3));
@@ -183,6 +183,42 @@ export default function Swap(props) {
       console.error("Failed to get block:", error);
     } finally {
       setIsFetching(false);
+    }
+  }
+
+  async function getEthPrice() {
+    try {
+      console.log("Fetching ETH price...");
+
+      const amount = 1 * 10 ** 18;
+      const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
+      let params = {
+        sellToken: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
+        buyToken: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+        sellAmount: amount.toString(),
+        //takerAddress: address,
+      };
+
+      const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
+        params
+      )}, ${qs.stringify(headers)}`;
+      console.log(`query: ${query}`);
+
+      const response = await fetch(
+        zeroxapi + `/swap/v1/price?${qs.stringify(params)}`,
+        { headers }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const priceETH = await response.json();
+      console.log(`priceETH: ${JSON.stringify(priceETH)}`);
+
+      setEthPrice(priceETH.price);
+    } catch (error) {
+      console.error("Error fetching price:", error);
     }
   }
 
@@ -239,7 +275,7 @@ export default function Swap(props) {
         sellToken: one,
         buyToken: two,
         sellAmount: amount.toString(),
-        takerAddress: address,
+        //takerAddress: address,
       };
 
       const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
@@ -286,7 +322,7 @@ export default function Swap(props) {
         buyToken: tokenTwo.address,
         sellAmount: amount.toString(),
         //takerAddress: address,
-        feeRecipient: "0xc2657176e213DDF18646eFce08F36D656aBE3396", //dev
+        feeRecipient: "0xd577F7b3359862A4178667347F4415d5682B4E85", //dev
         buyTokenPercentageFee: 0.015,
         slippagePercentage: slippage / 100,
       };
@@ -370,6 +406,11 @@ export default function Swap(props) {
     const intervalId = setInterval(getBlock, 12500);
     return () => clearInterval(intervalId);
   }, [getBlock]);
+
+  useEffect(() => {
+    const intervalId2 = setInterval(getEthPrice, 12500);
+    return () => clearInterval(intervalId2);
+  }, [getEthPrice]);
 
   useEffect(() => {
     if (txDetails.to && isConnected) {
@@ -512,22 +553,28 @@ export default function Swap(props) {
         </div>
       </Modal>
 
-      <div className="swap">
-        <div className="ticker">
-          <Ticker />
-        </div>
-        <div
-          className="tradeBox"
-          /*         style={{
-          backgroundImage: `url(${backgroundImage})`,
+      <div
+        className="swap"
+        style={{
+          backgroundImage: `url(${bgImage})`,
           backgroundPosition: "top center",
           //backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
-        }} */
-        >
+        }}
+      >
+        <div className="ticker">
+          <Ticker />
+        </div>
+        <div className="tradeBox">
           <div className="tradeBoxHeader">
             <div className="leftH">
-              <img src={Logo} alt="logo" height={48} width={48} className="logo" />             
+              <img
+                src={Logo}
+                alt="logo"
+                height={48}
+                width={48}
+                className="logo"
+              />
               <Link to="/" className="link">
                 <div className="">Market</div>
               </Link>
@@ -571,7 +618,13 @@ export default function Swap(props) {
             <div className="balanceOne">Balance: {tokenOneBalance}</div>
             <div className="messageOne">You send</div>
 
-            <div className="valueOne">Value: $</div>
+            <div className="valueOne">
+              {price && ethPrice && tokenOneAmount
+                ? `Value: $${parseFloat(
+                    tokenOneAmount * (ethPrice / price.sellTokenToEthRate)
+                  ).toFixed(2)}`
+                : "Value:"}
+            </div>
 
             <Button className="maxButton" onClick={setMax}>
               MAX
