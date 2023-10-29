@@ -15,9 +15,9 @@ export default function Tokens() {
         <div className="heatmap">
           <Heatmap />
         </div>
-        <div className="market">
+{/*         <div className="market">
           <Market />
-        </div>
+        </div> */}
       </div>
     </>
   );

@@ -43,9 +43,6 @@ const alchemy = new Alchemy(config);
 //var zeroxapi = "https://optimism.api.0x.org/";
 var zeroxapi = "https://goerli.api.0x.org/";
 
-const MAX_ALLOWANCE =
-  115792089237316195423570985008687907853269984665640564039457584007913129639935n;
-
 export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
 
@@ -54,7 +51,7 @@ export default function Swap(props) {
   console.log(`address: ${address}`);
   console.log(`isConnected: ${isConnected}`);
   console.log(`Chain:${client.chain.name} Id:${client.chain.id}`);
-  console.log(`nativeCurrency: ${JSON.stringify(client.chain.nativeCurrency)}`);
+  //console.log(`nativeCurrency: ${JSON.stringify(client.chain.nativeCurrency)}`);
   //console.log(`contracts: ${JSON.stringify(client.chain.contracts)}`);
 
   const [messageApi, contextHolder] = message.useMessage();
@@ -169,6 +166,7 @@ export default function Swap(props) {
     }
     setIsOpen(false);
   }
+
   function setMax() {
     setTokenOneAmount(tokenOneBalance);
     setTokenTwoAmount((tokenOneBalance * price.ratio).toFixed(3));
@@ -693,9 +691,9 @@ export default function Swap(props) {
           </Row>
         </div>
 
-        <div className="chart">
+{/*         <div className="chart">
           <Charts />
-        </div>
+        </div> */}
       </div>
     </>
   );
