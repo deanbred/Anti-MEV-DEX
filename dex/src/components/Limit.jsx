@@ -3,11 +3,10 @@ import React, { useState, useEffect } from "react";
 import { Input, Popover, Radio, Modal, message, Col, Row, Button } from "antd";
 import { DownOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import tokenList from "../tokenListGoerli.json";
 import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
-import Logo from "../logo.png";
+import Logo from "../icon.png";
 
 import {
   erc20ABI,
@@ -22,6 +21,7 @@ import {
 import { LimitOrder, OrderStatus, SignatureType } from "@0x/protocol-utils";
 import { BigNumber, hexUtils } from "@0x/utils";
 
+import tokenList from "../constants/tokenListGoerli.json";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import { ethers } from "ethers";
 import qs from "qs";
@@ -50,12 +50,6 @@ const ZERO = new BigNumber(0);
 export default function Limit(props) {
   const { address, connector, isConnected, client } = props;
 
-  /*   const properties = Object.getOwnPropertyNames(client.chain);
-  console.log(`client.chain properties: ${properties}`);
-  console.log(`address: ${address}`);
-  console.log(`isConnected: ${isConnected}`);
-  console.log(`Chain:${client.chain.name} Id:${client.chain.id}`); */
-
   const [messageApi, contextHolder] = message.useMessage();
   const [slippage, setSlippage] = useState(1.5);
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
@@ -65,13 +59,13 @@ export default function Limit(props) {
   const [tokenOneBalance, setTokenOneBalance] = useState(null);
   const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
   const [blockNumber, setBlockNumber] = useState(null);
   const [price, setPrice] = useState(null);
   const [limitPrice, setLimitPrice] = useState(null);
+  const [finalize, setFinalize] = useState(false);
   const [txDetails, setTxDetails] = useState({
     from: null,
     to: null,
@@ -318,12 +312,12 @@ export default function Limit(props) {
     } catch (error) {
       console.error("Error fetching quote:", error);
     }
-    setIsSwapModalOpen(true);
+    setIsLimitModalOpen(true);
   }
 
   async function executeSwap() {
     try {
-      setIsSwapModalOpen(false);
+      setIsLimitModalOpen(false);
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       console.log(provider);

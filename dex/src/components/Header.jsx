@@ -1,5 +1,5 @@
 import React from "react";
-import Logo from "../logo.png";
+import Logo from "../icon.png";
 import { Link } from "react-router-dom";
 
 function Header() {
@@ -15,10 +15,10 @@ function Header() {
         </Link>
       </div>
       <div className="rightH">
-        <div className="headerItem">
+        <div className="">
           <w3m-network-button />
         </div>
-        <div className="headerItem">
+        <div className="">
           <w3m-account-button />
         </div>
       </div>

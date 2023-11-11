@@ -12,9 +12,11 @@ header {
 }
 
 .logo {
-  width: 48px;
-  height: 48px;
-  padding-top: 4px;
+  width: 42px;
+  height: 42px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+
 }
 
 .eth {
@@ -40,7 +42,6 @@ header {
   padding: 6px;
   padding-left: 10px;
   padding-right: 10px;
-
   border-radius: 8px;
   font-weight: 500;
   transition: 0.3s;
@@ -50,7 +51,6 @@ header {
 
 .headerItem:hover {
   border: 1px solid rgb(255, 255, 255);
-  border-radius: 8px;
   cursor: pointer;
   opacity: 1;
 }
@@ -133,7 +133,6 @@ header {
 .ticker {
   width: 99%;
   border: 1px solid #cfd9f0;
-  background-color: rgb(0, 0, 0);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -405,7 +404,7 @@ header {
 }
 
 .swapButton[disabled] {
-  background-color: rgb(41, 41, 41);
+  background-color: rgb(40, 40, 40);
   opacity: 0.4;
   color: rgb(255, 255, 255);
 }
@@ -424,7 +423,7 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #243056;
+  background-color: rgb(40, 40, 40);
   width: calc(80%);
   height: 55px;
   font-size: 20px;
@@ -448,6 +447,8 @@ header {
 
 .modalContent {
   border-top: 2px solid #363e54;
+  background-color: rgb(40, 40, 40);
+
   padding-top: 20px;
   margin-top: 20px;
   display: flex;
@@ -467,7 +468,7 @@ header {
 
 .tokenChoice:hover {
   cursor: pointer;
-  background-color: #1f2639;
+  background-color: rgb(148, 148, 148);
 }
 
 .tokenName {

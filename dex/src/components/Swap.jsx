@@ -7,12 +7,11 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import tokenList from "../tokenListGoerli.json";
-import { getContractAddressesForChainOrThrow } from "@0x/contract-addresses";
 import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
-import Logo from "../logo.png";
+import Logo from "../icon.png";
+import bgImage from "../styles/circuit.jpg";
 
 import {
   erc20ABI,
@@ -23,34 +22,47 @@ import {
   useSendTransaction,
   useWaitForTransaction,
 } from "wagmi";
-import bgImage from "../styles/circuit.jpg";
 
+import tokenList from "../constants/tokenListGoerli.json";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import { ethers } from "ethers";
 import qs from "qs";
 
-const config = {
+const alchemyConfig = {
   apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
   //network: Network.ETH_MAINNET,
   //apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
   network: Network.ETH_GOERLI,
 };
+const alchemy = new Alchemy(alchemyConfig);
 
-const alchemy = new Alchemy(config);
 //var zeroxapi = "https://api.0x.org";
 //var zeroxapi = "https://polygon.api.0x.org/";
 //var zeroxapi = "https://arbitrum.api.0x.org/";
 //var zeroxapi = "https://optimism.api.0x.org/";
 var zeroxapi = "https://goerli.api.0x.org/";
 
+const MAX_ALLOWANCE =
+  115792089237316195423570985008687907853269984665640564039457584007913129639935n;
+const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
+
 export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
 
-  //const properties = Object.getOwnPropertyNames(client.chain);
-  //console.log(`client.chain properties: ${properties}`);
+  // If client.chain.name is equal to "ETH" then filter tokenList for tokens with tokens.chainId === 1
+  // If client.chain.name is equal to "Polygon" then filter tokenList for tokens with tokens.extensions.bridgeInfo === 137 
+  // If client.chain.name is equal to "Arbitrum" then filter tokenList for tokens with tokens.extensions.bridgeInfo === 42161
+  // If client.chain.name is equal to "Optimism" then filter tokenList for tokens with tokens.extensions.bridgeInfo === 10
+  // If client.chain.name is equal to "Goerli" then filter tokenList for tokens with tokens.chainId === 5
+
+
+  //const currentChainTokenList = tokenList?.filter(tokens => tokens.chainId === client.chain || tokens.extensions.bridgeInfo === client.chain);
+  
   console.log(`address: ${address}`);
   console.log(`isConnected: ${isConnected}`);
   console.log(`Chain:${client.chain.name} Id:${client.chain.id}`);
+  //const properties = Object.getOwnPropertyNames(client.chain);
+  //console.log(`client.chain properties: ${properties}`);
   //console.log(`nativeCurrency: ${JSON.stringify(client.chain.nativeCurrency)}`);
   //console.log(`contracts: ${JSON.stringify(client.chain.contracts)}`);
 
@@ -69,6 +81,7 @@ export default function Swap(props) {
   const [blockNumber, setBlockNumber] = useState(null);
   const [price, setPrice] = useState(null);
   const [ethPrice, setEthPrice] = useState(null);
+  const [finalize, setFinalize] = useState(false);
   const [txDetails, setTxDetails] = useState({
     from: null,
     to: null,
@@ -77,30 +90,35 @@ export default function Swap(props) {
     gasPrice: null,
   });
 
-  const { config } = usePrepareSendTransaction({
+  const { sendConfig } = usePrepareSendTransaction({
     from: txDetails?.from,
     to: txDetails?.to, // send call data to 0x Exchange Proxy
     data: txDetails?.data,
     value: txDetails?.value,
     gasPrice: txDetails?.gasPrice,
+    allowanceTarget: txDetails?.allowanceTarget,
   });
 
-  const { data, sendTransaction } = useSendTransaction(config);
+  const { data, sendTransaction } = useSendTransaction(sendConfig);
 
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
   });
 
-  /* 1. Read from erc20, does spender (0x Exchange Proxy) have allowance?
-    const { data: allowance, readContract, refetch } = useContractRead({
+  // 1. Read from erc20, does spender (0x Exchange Proxy) have allowance?
+/*   const {
+    data: allowance,
+    readContract,
+    refetch,
+  } = useContractRead({
     address: tokenOne.address,
     abi: erc20ABI,
     functionName: "allowance",
     args: [address, exchangeProxy],
-  }); 
+  });
 
   // 2. (only if no allowance): write to erc20, approve 0x Exchange Proxy to spend max integer
-  const { config2 } = usePrepareContractWrite({
+  const { config } = usePrepareContractWrite({
     address: tokenOne.address,
     abi: erc20ABI,
     functionName: "approve",
@@ -111,7 +129,7 @@ export default function Swap(props) {
     data: writeContractResult,
     writeAsync: approveAsync,
     error,
-  } = useContractWrite(config2);
+  } = useContractWrite(config);
 
   const { isLoading: isApproving } = useWaitForTransaction({
     hash: writeContractResult ? writeContractResult.hash : undefined,
@@ -358,6 +376,7 @@ export default function Swap(props) {
 
   async function executeSwap() {
     try {
+      console.log("Executing Swap...");
       setIsSwapModalOpen(false);
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -485,10 +504,6 @@ export default function Swap(props) {
         onCancel={() => setIsOpen(false)}
         title="Select a token"
       >
-        {/*         <div className="modalContent">
-          Paste in a token address or select from the list below
-          <Input placeholder="0x..." value={newToken} onChange={addTokenList} />
-        </div> */}
         <div className="modalContent">
           {tokenList?.map((e, i) => {
             return (
@@ -691,9 +706,9 @@ export default function Swap(props) {
           </Row>
         </div>
 
-{/*         <div className="chart">
+        <div className="chart">
           <Charts />
-        </div> */}
+        </div>
       </div>
     </>
   );

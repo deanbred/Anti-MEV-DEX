@@ -79,19 +79,20 @@ code {
 }
 
 .ant-modal-content {
-  background-color: #0e111b !important;
+  background-color: rgb(69, 69, 69) !important;
   color: white !important;
   padding: 0px !important;
 }
 
 .ant-modal {
-  border: 1px solid #363e54;
+  background-color: rgb(48, 48, 48) !important;
+  border: 1px solid rgb(255, 255, 255) !important;
   width: 400px !important;
   border-radius: 10px;
 }
 
 .ant-modal-header {
-  background-color: #0e111b !important;
+  background-color: rgb(69, 69, 69) !important;
 }
 
 .ant-modal-title {
@@ -102,7 +103,7 @@ code {
 }
 
 .ant-modal-close-icon {
-  color: #363e54 !important;
+  color: rgb(255,255,255) !important;
   transition: 0.3s;
 }
 

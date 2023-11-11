@@ -11,11 +11,17 @@ export default function Tokens() {
   return (
     <>
       <div className="tokens">
-        <Balances address={address} />
+        {address ? (
+          <Balances address={address} />
+        ) : (
+          <div className="connect-wallet">
+            Connect wallet to see token balances
+          </div>
+        )}
         <div className="heatmap">
           <Heatmap />
         </div>
-{/*         <div className="market">
+        {/* <div className="market">
           <Market />
         </div> */}
       </div>
