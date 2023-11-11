@@ -65,7 +65,6 @@ export default function Limit(props) {
   const [blockNumber, setBlockNumber] = useState(null);
   const [price, setPrice] = useState(null);
   const [limitPrice, setLimitPrice] = useState(null);
-  const [finalize, setFinalize] = useState(false);
   const [txDetails, setTxDetails] = useState({
     from: null,
     to: null,

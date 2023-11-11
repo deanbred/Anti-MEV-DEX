@@ -228,7 +228,7 @@ header {
 .assetReview {
   width: 80%;
   height: 40px;
-  background-color: #3a4157;
+  background-color: rgb(69,69,69);
   border-radius: 100px;
   display: flex;
   margin: auto;
@@ -423,12 +423,12 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgb(40, 40, 40);
+  background-color: rgb(69,69,69);
   width: calc(80%);
   height: 55px;
   font-size: 20px;
   border-radius: 12px;
-  color: #5981f3;
+  color: rgb(255, 255, 255);
   font-weight: bold;
   transition: 0.3s;
   margin: auto;
@@ -437,7 +437,7 @@ header {
 
 .executeButton:hover {
   cursor: pointer;
-  background-color: #3b4874;
+  background-color: rgb(148,148,148);
 }
 
 .tokenLogo {
@@ -446,8 +446,8 @@ header {
 }
 
 .modalContent {
-  border-top: 2px solid #363e54;
-  background-color: rgb(40, 40, 40);
+  border-top: 1px solid rgb(255, 255, 255);
+  background-color: rgb(0,0,0);
 
   padding-top: 20px;
   margin-top: 20px;

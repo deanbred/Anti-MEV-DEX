@@ -23,24 +23,24 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 
-import tokenList from "../constants/tokenListGoerli.json";
+import tokenList from "../constants/tokenList.json";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import { ethers } from "ethers";
 import qs from "qs";
 
 const alchemyConfig = {
   apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
-  //network: Network.ETH_MAINNET,
+  network: Network.ETH_MAINNET,
   //apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
-  network: Network.ETH_GOERLI,
+  //network: Network.ETH_GOERLI,
 };
 const alchemy = new Alchemy(alchemyConfig);
 
-//var zeroxapi = "https://api.0x.org";
+var zeroxapi = "https://api.0x.org";
 //var zeroxapi = "https://polygon.api.0x.org/";
 //var zeroxapi = "https://arbitrum.api.0x.org/";
 //var zeroxapi = "https://optimism.api.0x.org/";
-var zeroxapi = "https://goerli.api.0x.org/";
+//var zeroxapi = "https://goerli.api.0x.org/";
 
 const MAX_ALLOWANCE =
   115792089237316195423570985008687907853269984665640564039457584007913129639935n;
@@ -50,14 +50,13 @@ export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
 
   // If client.chain.name is equal to "ETH" then filter tokenList for tokens with tokens.chainId === 1
-  // If client.chain.name is equal to "Polygon" then filter tokenList for tokens with tokens.extensions.bridgeInfo === 137 
+  // If client.chain.name is equal to "Polygon" then filter tokenList for tokens with tokens.extensions.bridgeInfo === 137
   // If client.chain.name is equal to "Arbitrum" then filter tokenList for tokens with tokens.extensions.bridgeInfo === 42161
   // If client.chain.name is equal to "Optimism" then filter tokenList for tokens with tokens.extensions.bridgeInfo === 10
   // If client.chain.name is equal to "Goerli" then filter tokenList for tokens with tokens.chainId === 5
 
-
   //const currentChainTokenList = tokenList?.filter(tokens => tokens.chainId === client.chain || tokens.extensions.bridgeInfo === client.chain);
-  
+
   console.log(`address: ${address}`);
   console.log(`isConnected: ${isConnected}`);
   console.log(`Chain:${client.chain.name} Id:${client.chain.id}`);
@@ -81,7 +80,6 @@ export default function Swap(props) {
   const [blockNumber, setBlockNumber] = useState(null);
   const [price, setPrice] = useState(null);
   const [ethPrice, setEthPrice] = useState(null);
-  const [finalize, setFinalize] = useState(false);
   const [txDetails, setTxDetails] = useState({
     from: null,
     to: null,
@@ -105,8 +103,45 @@ export default function Swap(props) {
     hash: data?.hash,
   });
 
+  /*   async function CheckAllowanceAndApprove(token, address, exchangeProxy) {
+    const { data: allowance, refetch } = useContractRead({
+      address: token.address,
+      abi: erc20ABI,
+      functionName: "allowance",
+      args: [address, exchangeProxy],
+    });
+
+    if (allowance === "0") {
+      const { config } = usePrepareContractWrite({
+        address: token.address,
+        abi: erc20ABI,
+        functionName: "approve",
+        args: [exchangeProxy, MAX_ALLOWANCE],
+      });
+
+      const {
+        data: writeContractResult,
+        writeAsync: approveAsync,
+        error,
+      } = useContractWrite(config);
+
+      const { isLoading: isApproving } = useWaitForTransaction({
+        hash: writeContractResult ? writeContractResult.hash : undefined,
+        onSuccess(data) {
+          refetch();
+        },
+      });
+
+      await approveAsync();
+
+      if (error) {
+        return <div>Something went wrong: {error.message}</div>;
+      }
+    }
+  } */
+
   // 1. Read from erc20, does spender (0x Exchange Proxy) have allowance?
-/*   const {
+  /*   const {
     data: allowance,
     readContract,
     refetch,
@@ -337,7 +372,7 @@ export default function Swap(props) {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
         sellAmount: amount.toString(),
-        //takerAddress: address,
+        takerAddress: address,
         feeRecipient: "0xd577F7b3359862A4178667347F4415d5682B4E85", //dev
         buyTokenPercentageFee: 0.015,
         slippagePercentage: slippage / 100,
@@ -397,18 +432,20 @@ export default function Swap(props) {
       );
       console.log(`allowance: ${allowance}`);
 
-      const amount = ethers.utils.parseUnits(tokenOneAmount, tokenOne.decimals);
-      const approval = await ERC20Contract.approve(
-        txDetails.allowanceTarget,
-        amount
-      );
-      await approval.wait(1);
-      console.log(`approval: ${JSON.stringify(approval)}`);
+      if (allowance.eq(0)) {
+        const approval = await ERC20Contract.approve(
+          txDetails.allowanceTarget,
+          MAX_ALLOWANCE
+        );
+
+        await approval.wait(1);
+        console.log(`approval: ${JSON.stringify(approval)}`);
+      }
+
+      sendTransaction && sendTransaction();
     } catch (error) {
       console.error(error);
     }
-
-    sendTransaction && sendTransaction();
   }
 
   useEffect(() => {
