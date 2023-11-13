@@ -12,6 +12,7 @@ import Ticker from "./Ticker";
 import Charts from "./Charts";
 import Logo from "../icon.png";
 import bgImage from "../styles/circuit.jpg";
+import qs from "qs";
 
 import {
   erc20ABI,
@@ -23,24 +24,17 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 
-import tokenList from "../constants/tokenList.json";
+import tokenList from "../constants/tokenList2.json";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import { ethers } from "ethers";
-import qs from "qs";
 
 const alchemyConfig = {
   apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
-  network: Network.ETH_MAINNET,
+  //network: Network.ETH_MAINNET,
   //apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
-  //network: Network.ETH_GOERLI,
+  network: Network.ETH_GOERLI,
 };
 const alchemy = new Alchemy(alchemyConfig);
-
-var zeroxapi = "https://api.0x.org";
-//var zeroxapi = "https://polygon.api.0x.org/";
-//var zeroxapi = "https://arbitrum.api.0x.org/";
-//var zeroxapi = "https://optimism.api.0x.org/";
-//var zeroxapi = "https://goerli.api.0x.org/";
 
 const MAX_ALLOWANCE =
   115792089237316195423570985008687907853269984665640564039457584007913129639935n;
@@ -49,30 +43,22 @@ const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
 export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
 
-  // If client.chain.name is equal to "ETH" then filter tokenList for tokens with tokens.chainId === 1
-  // If client.chain.name is equal to "Polygon" then filter tokenList for tokens with tokens.extensions.bridgeInfo === 137
-  // If client.chain.name is equal to "Arbitrum" then filter tokenList for tokens with tokens.extensions.bridgeInfo === 42161
-  // If client.chain.name is equal to "Optimism" then filter tokenList for tokens with tokens.extensions.bridgeInfo === 10
-  // If client.chain.name is equal to "Goerli" then filter tokenList for tokens with tokens.chainId === 5
-
-  //const currentChainTokenList = tokenList?.filter(tokens => tokens.chainId === client.chain || tokens.extensions.bridgeInfo === client.chain);
-
   console.log(`address: ${address}`);
   console.log(`isConnected: ${isConnected}`);
   console.log(`Chain:${client.chain.name} Id:${client.chain.id}`);
-  //const properties = Object.getOwnPropertyNames(client.chain);
-  //console.log(`client.chain properties: ${properties}`);
-  //console.log(`nativeCurrency: ${JSON.stringify(client.chain.nativeCurrency)}`);
-  //console.log(`contracts: ${JSON.stringify(client.chain.contracts)}`);
 
   const [messageApi, contextHolder] = message.useMessage();
-  const [slippage, setSlippage] = useState(1.5);
-  const [tokenOneAmount, setTokenOneAmount] = useState(null);
-  const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
+
+  const [currentTokenList, setCurrentTokenList] = useState(tokenList);
+  console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
+  
   const [tokenOne, setTokenOne] = useState(tokenList[0]);
   const [tokenTwo, setTokenTwo] = useState(tokenList[1]);
+  const [tokenOneAmount, setTokenOneAmount] = useState(null);
+  const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
   const [tokenOneBalance, setTokenOneBalance] = useState(null);
-  const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
+  const [tokenTwoBalance, setTokenTwoBalance] = useState(null); 
+
   const [isOpen, setIsOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -80,6 +66,11 @@ export default function Swap(props) {
   const [blockNumber, setBlockNumber] = useState(null);
   const [price, setPrice] = useState(null);
   const [ethPrice, setEthPrice] = useState(null);
+  const [slippage, setSlippage] = useState(1.5);
+  const [finalize, setFinalize] = useState(false);
+  const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
+  console.log(`zeroxapi: ${zeroxapi}`);
+
   const [txDetails, setTxDetails] = useState({
     from: null,
     to: null,
@@ -88,7 +79,7 @@ export default function Swap(props) {
     gasPrice: null,
   });
 
-  const { sendConfig } = usePrepareSendTransaction({
+  const { config } = usePrepareSendTransaction({
     from: txDetails?.from,
     to: txDetails?.to, // send call data to 0x Exchange Proxy
     data: txDetails?.data,
@@ -97,81 +88,11 @@ export default function Swap(props) {
     allowanceTarget: txDetails?.allowanceTarget,
   });
 
-  const { data, sendTransaction } = useSendTransaction(sendConfig);
+  const { data, sendTransaction } = useSendTransaction(config);
 
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
   });
-
-  /*   async function CheckAllowanceAndApprove(token, address, exchangeProxy) {
-    const { data: allowance, refetch } = useContractRead({
-      address: token.address,
-      abi: erc20ABI,
-      functionName: "allowance",
-      args: [address, exchangeProxy],
-    });
-
-    if (allowance === "0") {
-      const { config } = usePrepareContractWrite({
-        address: token.address,
-        abi: erc20ABI,
-        functionName: "approve",
-        args: [exchangeProxy, MAX_ALLOWANCE],
-      });
-
-      const {
-        data: writeContractResult,
-        writeAsync: approveAsync,
-        error,
-      } = useContractWrite(config);
-
-      const { isLoading: isApproving } = useWaitForTransaction({
-        hash: writeContractResult ? writeContractResult.hash : undefined,
-        onSuccess(data) {
-          refetch();
-        },
-      });
-
-      await approveAsync();
-
-      if (error) {
-        return <div>Something went wrong: {error.message}</div>;
-      }
-    }
-  } */
-
-  // 1. Read from erc20, does spender (0x Exchange Proxy) have allowance?
-  /*   const {
-    data: allowance,
-    readContract,
-    refetch,
-  } = useContractRead({
-    address: tokenOne.address,
-    abi: erc20ABI,
-    functionName: "allowance",
-    args: [address, exchangeProxy],
-  });
-
-  // 2. (only if no allowance): write to erc20, approve 0x Exchange Proxy to spend max integer
-  const { config } = usePrepareContractWrite({
-    address: tokenOne.address,
-    abi: erc20ABI,
-    functionName: "approve",
-    args: [exchangeProxy, MAX_ALLOWANCE],
-  });
-
-  const {
-    data: writeContractResult,
-    writeAsync: approveAsync,
-    error,
-  } = useContractWrite(config);
-
-  const { isLoading: isApproving } = useWaitForTransaction({
-    hash: writeContractResult ? writeContractResult.hash : undefined,
-    onSuccess(data) {
-      refetch();
-    },
-  }); */
 
   function handleSlippageChange(e) {
     const parsedSlippage = parseFloat(e.target.value);
@@ -239,24 +160,17 @@ export default function Swap(props) {
 
   async function getEthPrice() {
     try {
-      console.log("Fetching ETH price...");
-
       const amount = 1 * 10 ** 18;
       const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
       let params = {
-        sellToken: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-        buyToken: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+        sellToken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        buyToken: "0x6b175474e89094c44da98b954eedeac495271d0f",
         sellAmount: amount.toString(),
         //takerAddress: address,
       };
 
-      const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
-        params
-      )}, ${qs.stringify(headers)}`;
-      console.log(`query: ${query}`);
-
       const response = await fetch(
-        zeroxapi + `/swap/v1/price?${qs.stringify(params)}`,
+        `https://api.0x.org/swap/v1/price?${qs.stringify(params)}`,
         { headers }
       );
 
@@ -265,7 +179,7 @@ export default function Swap(props) {
       }
 
       const priceETH = await response.json();
-      console.log(`priceETH: ${JSON.stringify(priceETH)}`);
+      console.log(`priceETH: ${JSON.stringify(priceETH.price)}`);
 
       setEthPrice(priceETH.price);
     } catch (error) {
@@ -372,7 +286,7 @@ export default function Swap(props) {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
         sellAmount: amount.toString(),
-        takerAddress: address,
+        //takerAddress: address,
         feeRecipient: "0xd577F7b3359862A4178667347F4415d5682B4E85", //dev
         buyTokenPercentageFee: 0.015,
         slippagePercentage: slippage / 100,
@@ -442,11 +356,34 @@ export default function Swap(props) {
         console.log(`approval: ${JSON.stringify(approval)}`);
       }
 
+      finalize && setFinalize(true);
       sendTransaction && sendTransaction();
     } catch (error) {
       console.error(error);
     }
   }
+
+  useEffect(() => {
+    if (client.chain.id) {
+      const filteredTokenList = tokenList.filter(
+        (token) => token.chainId === client.chain.id
+      );
+      setCurrentTokenList(filteredTokenList);
+
+      if (client.chain.id === 1) {
+        setZeroxapi("https://api.0x.org");
+      } else if (client.chain.id === 42161) {
+        setZeroxapi("https://arbitrum.api.0x.org/");
+      } else if (client.chain.id === 10) {
+        setZeroxapi("https://optimism.api.0x.org/");
+      } else if (client.chain.id === 5) {
+        setZeroxapi("https://goerli.api.0x.org/");
+      }
+    }
+    console.log(
+      `tokenList: ${JSON.stringify(currentTokenList)}`
+    );
+  }, [client.chain.id]);
 
   useEffect(() => {
     fetchPrices(tokenList[0].address, tokenList[1].address);
@@ -470,7 +407,7 @@ export default function Swap(props) {
     if (txDetails.to && isConnected) {
       sendTransaction && sendTransaction();
     }
-  }, [txDetails.to]);
+  }, [txDetails]);
 
   useEffect(() => {
     messageApi.destroy();
@@ -549,10 +486,10 @@ export default function Swap(props) {
                 key={i}
                 onClick={() => modifyToken(i)}
               >
-                <img src={e.img} alt={e.ticker} className="tokenLogo" />
+                <img src={e.logoURI} alt={e.symbol} className="tokenLogo" />
                 <div className="tokenChoiceNames">
                   <div className="tokenName">{e.name}</div>
-                  <div className="tokenTicker">{e.ticker}</div>
+                  <div className="tokenTicker">{e.symbol}</div>
                 </div>
               </div>
             );
@@ -569,14 +506,22 @@ export default function Swap(props) {
         <div className="modalContent">
           <div className="assetReview">
             Send: {(txDetails.sellAmount / 10 ** tokenOne.decimals).toFixed(3)}
-            <img src={tokenOne.img} alt="assetOneLogo" className="assetLogo" />
-            {tokenOne.ticker}
+            <img
+              src={tokenOne.logoURI}
+              alt="assetOneLogo"
+              className="assetLogo"
+            />
+            {tokenOne.symbol}
           </div>
           <div className="assetReview">
             Recieve:{" "}
             {(txDetails.buyAmount / 10 ** tokenTwo.decimals).toFixed(3)}
-            <img src={tokenTwo.img} alt="assetOneLogo" className="assetLogo" />
-            {tokenTwo.ticker}
+            <img
+              src={tokenTwo.logoURI}
+              alt="assetOneLogo"
+              className="assetLogo"
+            />
+            {tokenTwo.symbol}
           </div>
 
           <ul>
@@ -657,11 +602,11 @@ export default function Swap(props) {
 
             <div className="assetOne" onClick={() => openModal(1)}>
               <img
-                src={tokenOne.img}
+                src={tokenOne.logoURI}
                 alt="assetOneLogo"
                 className="assetLogo"
               />
-              {tokenOne.ticker}
+              {tokenOne.symbol}
               <DownOutlined />
             </div>
 
@@ -682,11 +627,11 @@ export default function Swap(props) {
 
             <div className="assetTwo" onClick={() => openModal(2)}>
               <img
-                src={tokenTwo.img}
+                src={tokenTwo.logoURI}
                 alt="assetOneLogo"
                 className="assetLogo"
               />
-              {tokenTwo.ticker}
+              {tokenTwo.symbol}
               <DownOutlined />
             </div>
 
@@ -696,8 +641,8 @@ export default function Swap(props) {
 
           <div className="convert">
             {price
-              ? `1 ${tokenOne.ticker} = ${parseFloat(price.ratio).toFixed(3)} ${
-                  tokenTwo.ticker
+              ? `1 ${tokenOne.symbol} = ${parseFloat(price.ratio).toFixed(3)} ${
+                  tokenTwo.symbol
                 }`
               : "Fetching Price..."}
           </div>

@@ -17,7 +17,6 @@
     "@web3modal/wagmi": "^3.0.0-beta.4",
     "alchemy-sdk": "^2.10.0",
     "antd": "^5.1.5",
-    "babel-preset-react-app": "^10.0.1",
     "dotenv": "^16.3.1",
     "ethers": "^5.7.2",
     "json-rpc-engine": "^6.1.0",
@@ -42,7 +41,8 @@
     "@testing-library/dom": "^9.3.3",
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^14.5.1"
+    "@testing-library/user-event": "^14.5.1",
+    "babel-preset-react-app": "^10.0.1"
   },
   "scripts": {
     "start": "GENERATE_SOURCEMAP=false craco start",
