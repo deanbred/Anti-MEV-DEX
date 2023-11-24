@@ -24,17 +24,10 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 
-import tokenList from "../constants/tokenList2.json";
+import tokenList from "../constants/tokenList.json";
+// Eth:1 BSC:56 Polygon:137 Arbitrum:42161 Optimism:10 Avalanche:43114 Goerli:5
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import { ethers } from "ethers";
-
-const alchemyConfig = {
-  apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
-  //network: Network.ETH_MAINNET,
-  //apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
-  network: Network.ETH_GOERLI,
-};
-const alchemy = new Alchemy(alchemyConfig);
 
 const MAX_ALLOWANCE =
   115792089237316195423570985008687907853269984665640564039457584007913129639935n;
@@ -45,31 +38,55 @@ export default function Swap(props) {
 
   console.log(`address: ${address}`);
   console.log(`isConnected: ${isConnected}`);
-  console.log(`Chain:${client.chain.name} Id:${client.chain.id}`);
+  console.log(`chainId:${client.chain.id} ${client.chain.name}`);
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const alchemyKeys = {
+    1: {
+      apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
+      network: Network.ETH_MAINNET,
+    },
+    5: {
+      apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
+      network: Network.ETH_GOERLI,
+    },
+    42161: {
+      apiKey: "aMlUHixH5lTM_ksIFZfJeTZm1N1nRVAO",
+      network: Network.ARB_MAINNET,
+    },
+    421613: {
+      apiKey: "PLaTiZe1BmgkCydWULIS2cxDoGISMWLK",
+      network: Network.ARB_GOERLI,
+    },
+  };
+
+  const alchemyConfig = alchemyKeys[client.chain.id];
+  console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
+  const alchemy = new Alchemy(alchemyConfig);
+
+  const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
+  console.log(`zeroxapi: ${zeroxapi}`);
 
   const [currentTokenList, setCurrentTokenList] = useState(tokenList);
-  console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
-  
+  //console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
+
   const [tokenOne, setTokenOne] = useState(tokenList[0]);
   const [tokenTwo, setTokenTwo] = useState(tokenList[1]);
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
   const [tokenOneBalance, setTokenOneBalance] = useState(null);
-  const [tokenTwoBalance, setTokenTwoBalance] = useState(null); 
+  const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
   const [isFetching, setIsFetching] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
   const [blockNumber, setBlockNumber] = useState(null);
   const [price, setPrice] = useState(null);
   const [ethPrice, setEthPrice] = useState(null);
+  const [estimatedGas, setEstimatedGas] = useState(null);
   const [slippage, setSlippage] = useState(1.5);
   const [finalize, setFinalize] = useState(false);
-  const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
-  console.log(`zeroxapi: ${zeroxapi}`);
 
   const [txDetails, setTxDetails] = useState({
     from: null,
@@ -132,11 +149,11 @@ export default function Swap(props) {
     setTokenOneAmount(null);
     setTokenTwoAmount(null);
     if (changeToken === 1) {
-      setTokenOne(tokenList[i]);
-      fetchPrices(tokenList[i].address, tokenTwo.address);
+      setTokenOne(currentTokenList[i]);
+      fetchPrices(currentTokenList[i].address, tokenTwo.address);
     } else {
-      setTokenTwo(tokenList[i]);
-      fetchPrices(tokenOne.address, tokenList[i].address);
+      setTokenTwo(currentTokenList[i]);
+      fetchPrices(tokenOne.address, currentTokenList[i].address);
     }
     setIsOpen(false);
   }
@@ -151,6 +168,11 @@ export default function Swap(props) {
     try {
       const blockNumber = await alchemy.core.getBlockNumber();
       setBlockNumber(blockNumber);
+      console.log(`Block Number: ${blockNumber}`);
+
+      const estimatedGas = await alchemy.core.estimateGas({ to: address });
+      setEstimatedGas(estimatedGas);
+      console.log(`Estimated Gas: ${estimatedGas}`);
     } catch (error) {
       console.error("Failed to get block:", error);
     } finally {
@@ -160,28 +182,12 @@ export default function Swap(props) {
 
   async function getEthPrice() {
     try {
-      const amount = 1 * 10 ** 18;
-      const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
-      let params = {
-        sellToken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        buyToken: "0x6b175474e89094c44da98b954eedeac495271d0f",
-        sellAmount: amount.toString(),
-        //takerAddress: address,
-      };
-
       const response = await fetch(
-        `https://api.0x.org/swap/v1/price?${qs.stringify(params)}`,
-        { headers }
+        "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=PCIG1T3NFQI4F4F5ZJ5W2B6RNAVZSGYZ9Q"
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const priceETH = await response.json();
-      console.log(`priceETH: ${JSON.stringify(priceETH.price)}`);
-
-      setEthPrice(priceETH.price);
+      const data = await response.json();
+      setEthPrice(data.result.ethusd);
+      console.log(`ETH PRICE: ${ethPrice}`);
     } catch (error) {
       console.error("Error fetching price:", error);
     }
@@ -192,7 +198,7 @@ export default function Swap(props) {
       let tokenAddress = [tokenOne.address];
       let data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
-      console.log(`data: ${JSON.stringify(data)}`);
+      console.log(`Token Balances: ${JSON.stringify(data)}`);
       data.tokenBalances.find((item) => {
         let balance = Number(
           Utils.formatUnits(item.tokenBalance, "ether")
@@ -235,7 +241,7 @@ export default function Swap(props) {
       console.log("Fetching price...");
 
       const amount = tokenOneAmount ? tokenOneAmount : 10 * 10 ** 18;
-      const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
+      const headers = { "0x-api-key": "6b47fa57-3614-4aa2-bd99-a86e006b9d3f" };
       let params = {
         sellToken: one,
         buyToken: two,
@@ -281,14 +287,14 @@ export default function Swap(props) {
       let amount = tokenOneAmount ? tokenOneAmount : 10 * 10 ** 18;
       amount = ethers.utils.parseUnits(amount, tokenOne.decimals);
       console.log(`amount: ${amount}`);
-      const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
+      const headers = { "0x-api-key": "6b47fa57-3614-4aa2-bd99-a86e006b9d3f" };
       const params = {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
         sellAmount: amount.toString(),
         //takerAddress: address,
         feeRecipient: "0xd577F7b3359862A4178667347F4415d5682B4E85", //dev
-        buyTokenPercentageFee: 0.015,
+        buyTokenPercentageFee: 0.01,
         slippagePercentage: slippage / 100,
       };
 
@@ -369,6 +375,8 @@ export default function Swap(props) {
         (token) => token.chainId === client.chain.id
       );
       setCurrentTokenList(filteredTokenList);
+      setTokenOne(currentTokenList[0]);
+      setTokenTwo(currentTokenList[1]);
 
       if (client.chain.id === 1) {
         setZeroxapi("https://api.0x.org");
@@ -380,14 +388,12 @@ export default function Swap(props) {
         setZeroxapi("https://goerli.api.0x.org/");
       }
     }
-    console.log(
-      `tokenList: ${JSON.stringify(currentTokenList)}`
-    );
+    console.log(`tokenList: ${JSON.stringify(currentTokenList)}`);
   }, [client.chain.id]);
 
   useEffect(() => {
-    fetchPrices(tokenList[0].address, tokenList[1].address);
-  }, []);
+    //fetchPrices(tokenOne.address, tokenTwo.address);
+  }, [tokenOne, tokenTwo]);
 
   useEffect(() => {
     fetchBalances();
@@ -479,7 +485,7 @@ export default function Swap(props) {
         title="Select a token"
       >
         <div className="modalContent">
-          {tokenList?.map((e, i) => {
+          {currentTokenList?.map((e, i) => {
             return (
               <div
                 className="tokenChoice"
@@ -592,7 +598,7 @@ export default function Swap(props) {
               placeholder="0"
               value={tokenOneAmount}
               onChange={changeAmount}
-              disabled={!price}
+              disabled={!isConnected}
             />
             <Input placeholder="0" value={tokenTwoAmount} disabled={true} />
 
@@ -671,8 +677,8 @@ export default function Swap(props) {
           <Row gutter={190}>
             <Col>
               <div className="data">
-                {price
-                  ? `Estimated Gas: ${price.estimatedGas} gwei`
+                {estimatedGas
+                  ? `Estimated Gas: ${estimatedGas} gwei`
                   : "Fetching Gas..."}
               </div>
             </Col>
@@ -688,9 +694,7 @@ export default function Swap(props) {
           </Row>
         </div>
 
-        <div className="chart">
-          <Charts />
-        </div>
+        <div className="chart">{<Charts />}</div>
       </div>
     </>
   );

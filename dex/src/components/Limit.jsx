@@ -21,22 +21,18 @@ import {
 import { LimitOrder, OrderStatus, SignatureType } from "@0x/protocol-utils";
 import { BigNumber, hexUtils } from "@0x/utils";
 
-import tokenList from "../constants/tokenListGoerli.json";
+import tokenList from "../constants/tokenList.json";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import { ethers } from "ethers";
 import qs from "qs";
 
 const config = {
   apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
-  //network: Network.ETH_MAINNET,
+  network: Network.ETH_MAINNET,
   //apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
-  network: Network.ETH_GOERLI,
+  //network: Network.ETH_GOERLI,
 };
-
 const alchemy = new Alchemy(config);
-//var zeroxapi = "https://api.0x.org";
-//var zeroxapi = "https://polygon.api.0x.org/";
-var zeroxapi = "https://goerli.api.0x.org/";
 
 const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
 const devWallet = "0xd577F7b3359862A4178667347F4415d5682B4E85";
@@ -52,19 +48,28 @@ export default function Limit(props) {
 
   const [messageApi, contextHolder] = message.useMessage();
   const [slippage, setSlippage] = useState(1.5);
+
+  const [currentTokenList, setCurrentTokenList] = useState(tokenList);
+  //console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
+
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
   const [tokenOne, setTokenOne] = useState(tokenList[0]);
   const [tokenTwo, setTokenTwo] = useState(tokenList[1]);
   const [tokenOneBalance, setTokenOneBalance] = useState(null);
   const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
+
   const [isOpen, setIsOpen] = useState(false);
   const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
   const [blockNumber, setBlockNumber] = useState(null);
   const [price, setPrice] = useState(null);
+  const [ethPrice, setEthPrice] = useState(null);
   const [limitPrice, setLimitPrice] = useState(null);
+  const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
+  console.log(`zeroxapi: ${zeroxapi}`);
+
   const [txDetails, setTxDetails] = useState({
     from: null,
     to: null,
@@ -178,12 +183,25 @@ export default function Limit(props) {
     }
   }
 
+  async function getEthPrice() {
+    try {
+      const response = await fetch(
+        "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=PCIG1T3NFQI4F4F5ZJ5W2B6RNAVZSGYZ9Q"
+      );
+      const data = await response.json();
+      setEthPrice(data.result.ethusd);
+      console.log(`ETH PRICE: ${ethPrice}`);
+    } catch (error) {
+      console.error("Error fetching price:", error);
+    }
+  }
+
   async function fetchBalances() {
     try {
       let tokenAddress = [tokenOne.address];
       let data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
-      console.log(`data: ${JSON.stringify(data)}`);
+      console.log(`Token Balances: ${JSON.stringify(data)}`);
       data.tokenBalances.find((item) => {
         let balance = Number(
           Utils.formatUnits(item.tokenBalance, "ether")
@@ -226,7 +244,7 @@ export default function Limit(props) {
       console.log("Fetching price...");
 
       const amount = tokenOneAmount ? tokenOneAmount : 10 * 10 ** 18;
-      const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
+      const headers = { "0x-api-key": "6b47fa57-3614-4aa2-bd99-a86e006b9d3f" };
       let params = {
         sellToken: one,
         buyToken: two,
@@ -272,14 +290,14 @@ export default function Limit(props) {
       let amount = tokenOneAmount ? tokenOneAmount : 10 * 10 ** 18;
       amount = ethers.utils.parseUnits(amount, tokenOne.decimals);
       console.log(`amount: ${amount}`);
-      const headers = { "0x-api-key": "0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d" };
+      const headers = { "0x-api-key": "6b47fa57-3614-4aa2-bd99-a86e006b9d3f" };
       const params = {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
         sellAmount: amount.toString(),
         //takerAddress: address,
         //feeRecipient: "0xc2657176e213DDF18646eFce08F36D656aBE3396", //dev
-        //buyTokenPercentageFee: 0.015,
+        //buyTokenPercentageFee: 0.01,
         //slippagePercentage: slippage / 100,
       };
 
@@ -377,14 +395,36 @@ export default function Limit(props) {
         pool,
         salt: new BigNumber(Date.now()),
       });
-    console.log(`limitOrder: ${limitOrder}`);
+      console.log(`limitOrder: ${limitOrder}`);
     } catch (error) {
       console.error(error);
     }
   }
 
   useEffect(() => {
-    fetchPrices(tokenList[0].address, tokenList[1].address);
+    if (client.chain.id) {
+      const filteredTokenList = tokenList.filter(
+        (token) => token.chainId === client.chain.id
+      );
+      setCurrentTokenList(filteredTokenList);
+      setTokenOne(currentTokenList[0]);
+      setTokenTwo(currentTokenList[1]);
+
+      if (client.chain.id === 1) {
+        setZeroxapi("https://api.0x.org");
+      } else if (client.chain.id === 42161) {
+        setZeroxapi("https://arbitrum.api.0x.org/");
+      } else if (client.chain.id === 10) {
+        setZeroxapi("https://optimism.api.0x.org/");
+      } else if (client.chain.id === 5) {
+        setZeroxapi("https://goerli.api.0x.org/");
+      }
+    }
+    console.log(`tokenList: ${JSON.stringify(currentTokenList)}`);
+  }, [client.chain.id]);
+
+  useEffect(() => {
+    //fetchPrices(tokenList[0].address, tokenList[1].address);
   }, []);
 
   useEffect(() => {
@@ -483,10 +523,10 @@ export default function Limit(props) {
                 key={i}
                 onClick={() => modifyToken(i)}
               >
-                <img src={e.img} alt={e.ticker} className="tokenLogo" />
+                <img src={e.logoURI} alt={e.symbol} className="tokenLogo" />
                 <div className="tokenChoiceNames">
                   <div className="tokenName">{e.name}</div>
-                  <div className="tokenTicker">{e.ticker}</div>
+                  <div className="tokenTicker">{e.symbol}</div>
                 </div>
               </div>
             );
@@ -503,14 +543,22 @@ export default function Limit(props) {
         <div className="modalContent">
           <div className="assetReview">
             Send: {(txDetails.sellAmount / 10 ** tokenOne.decimals).toFixed(3)}
-            <img src={tokenOne.img} alt="assetOneLogo" className="assetLogo" />
-            {tokenOne.ticker}
+            <img
+              src={tokenOne.logoURI}
+              alt="assetOneLogo"
+              className="assetLogo"
+            />
+            {tokenOne.symbol}
           </div>
           <div className="assetReview">
             Recieve:{" "}
             {(txDetails.buyAmount / 10 ** tokenTwo.decimals).toFixed(3)}
-            <img src={tokenTwo.img} alt="assetOneLogo" className="assetLogo" />
-            {tokenTwo.ticker}
+            <img
+              src={tokenTwo.logoURI}
+              alt="assetOneLogo"
+              className="assetLogo"
+            />
+            {tokenTwo.symbol}
           </div>
 
           <ul>
@@ -578,11 +626,11 @@ export default function Limit(props) {
 
             <div className="assetOne" onClick={() => openModal(1)}>
               <img
-                src={tokenOne.img}
+                src={tokenOne.logoURI}
                 alt="assetOneLogo"
                 className="assetLogo"
               />
-              {tokenOne.ticker}
+              {tokenOne.symbol}
               <DownOutlined />
             </div>
 
@@ -602,8 +650,8 @@ export default function Limit(props) {
             {price ? (
               <ul>
                 <li>
-                  1 {tokenOne.ticker} = {parseFloat(price.ratio).toFixed(3)}{" "}
-                  {tokenTwo.ticker}
+                  1 {tokenOne.symbol} = {parseFloat(price.ratio).toFixed(3)}{" "}
+                  {tokenTwo.symbol}
                 </li>
                 <li>Price Impact: {price.estimatedPriceImpact} %</li>
                 <li>Protocol Fee: {price.protocolFee}</li>{" "}
