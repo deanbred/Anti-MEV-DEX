@@ -72,7 +72,7 @@ header {
 }
 
 .tradeBox {
-  width: 500px;
+  width: 460px;
   background-color: #000000;
   border: 1px solid #cfd9f0;
   min-height: 300px;
@@ -86,7 +86,7 @@ header {
 }
 
 .chart {
-  width: 580px;
+  width: 480px;
   background-color: #0e111b;
   border: 1px solid #cfd9f0;
   min-height: 300px;
@@ -182,7 +182,7 @@ header {
   border-radius: 8px;
   position: absolute;
   top: 86px;
-  left: 235px;
+  left: 200px;
   color: rgb(255, 255, 255);
   border: 1px solid rgb(0, 0, 0);
   font-size: 14px;
@@ -205,7 +205,7 @@ header {
   border-radius: 8px;
   position: absolute;
   top: 71px;
-  left: 344px;
+  left: 305px;
   color: white;
   border: none;
   font-size: 12px;
@@ -279,7 +279,7 @@ header {
   min-width: 80px;
   height: 24px;
   top: 2px;
-  right: 400px;
+  right: 370px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -292,7 +292,7 @@ header {
   min-width: 80px;
   height: 24px;
   top: 72px;
-  right: 390px;
+  right: 370px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -335,7 +335,7 @@ header {
   min-width: 80px;
   height: 24px;
   top: 102px;
-  right: 400px;
+  right: 370px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -526,7 +526,7 @@ header {
   border-radius: 15px;
   border: 1px solid #cfd9f0;
   height: 600px;
-  width: 600px;
+  width: 500px;
   overflow-y: auto;
   padding-left: 20px;
   padding-right: 20px;

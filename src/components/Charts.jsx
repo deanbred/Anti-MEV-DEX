@@ -31,7 +31,7 @@ export default function Charts() {
         "TradingView" in window
       ) {
         new window.TradingView.widget({
-          width: 600,
+          width: 480,
           height: 400,
           symbol: "BYBIT:LINKUSDT.P",
           interval: "15",
