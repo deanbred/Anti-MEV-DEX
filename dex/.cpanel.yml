@@ -1,9 +1,0 @@
----
-deployment:
-  tasks:
-    - export DEPLOYPATH=/home2/gmussyco/public_html/DEX
-    - /bin/cp -R build/static $DEPLOYPATH
-    - /bin/cp -R build/static/css $DEPLOYPATH
-    - /bin/cp -R build/static/js $DEPLOYPATH
-    - /bin/cp build /*.* $DEPLOYPATH
-    - /bin/cp build /*.* $DEPLOYPATH
