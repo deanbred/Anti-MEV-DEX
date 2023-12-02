@@ -295,10 +295,10 @@ export default function Limit(props) {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
         sellAmount: amount.toString(),
-        //takerAddress: address,
-        //feeRecipient: "0xc2657176e213DDF18646eFce08F36D656aBE3396", //dev
-        //buyTokenPercentageFee: 0.01,
-        //slippagePercentage: slippage / 100,
+        takerAddress: address,
+        feeRecipient: "0xc2657176e213DDF18646eFce08F36D656aBE3396", //dev
+        buyTokenPercentageFee: 0.01,
+        slippagePercentage: slippage / 100,
       };
 
       const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
@@ -424,8 +424,8 @@ export default function Limit(props) {
   }, [client.chain.id]);
 
   useEffect(() => {
-    //fetchPrices(tokenList[0].address, tokenList[1].address);
-  }, []);
+    fetchPrices(tokenOne.address, tokenTwo.address);
+  }, [tokenOne, tokenTwo]);
 
   useEffect(() => {
     fetchBalances();
@@ -615,13 +615,13 @@ export default function Limit(props) {
               placeholder="0"
               value={tokenOneAmount}
               onChange={changeAmount}
-              disabled={!price}
+              disabled={true}
             />
             <Input
               placeholder="0"
               value={limitPrice}
               onChange={changePrice}
-              disabled={!price}
+              disabled={true}
             />
 
             <div className="assetOne" onClick={() => openModal(1)}>

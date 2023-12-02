@@ -62,6 +62,9 @@ export default function Swap(props) {
   const alchemyConfig = alchemyKeys[client.chain.id];
   console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
   const alchemy = new Alchemy(alchemyConfig);
+  const [isFetching, setIsFetching] = useState(false);
+  const [blockNumber, setBlockNumber] = useState(null);
+  const [estimatedGas, setEstimatedGas] = useState(null);
 
   const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
   console.log(`zeroxapi: ${zeroxapi}`);
@@ -79,12 +82,9 @@ export default function Swap(props) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
-  const [isFetching, setIsFetching] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
-  const [blockNumber, setBlockNumber] = useState(null);
   const [price, setPrice] = useState(null);
   const [ethPrice, setEthPrice] = useState(null);
-  const [estimatedGas, setEstimatedGas] = useState(null);
   const [slippage, setSlippage] = useState(1.5);
   const [finalize, setFinalize] = useState(false);
 
@@ -292,7 +292,7 @@ export default function Swap(props) {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
         sellAmount: amount.toString(),
-        //takerAddress: address,
+        takerAddress: address,
         feeRecipient: "0xd577F7b3359862A4178667347F4415d5682B4E85", //dev
         buyTokenPercentageFee: 0.01,
         slippagePercentage: slippage / 100,
@@ -392,7 +392,7 @@ export default function Swap(props) {
   }, [client.chain.id]);
 
   useEffect(() => {
-    //fetchPrices(tokenOne.address, tokenTwo.address);
+    fetchPrices(tokenOne.address, tokenTwo.address);
   }, [tokenOne, tokenTwo]);
 
   useEffect(() => {
