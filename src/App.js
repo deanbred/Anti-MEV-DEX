@@ -6,7 +6,6 @@ import Tokens from "./components/Tokens";
 import Limit from "./components/Limit";
 import { Routes, Route } from "react-router-dom";
 import { useAccount, usePublicClient } from "wagmi";
-import { connected } from "process";
 
 function App() {
   const { address, connector, isConnected } = useAccount();

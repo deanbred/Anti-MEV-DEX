@@ -1,6 +1,7 @@
 {
   "name": "dex",
   "version": "0.1.0",
+  "homepage": "https://antimev.io",
   "private": true,
   "dependencies": {
     "@0x/contract-addresses": "^8.12.0",
