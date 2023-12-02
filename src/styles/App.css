@@ -72,7 +72,7 @@ header {
 }
 
 .tradeBox {
-  width: 100%;
+  width: 90%;
   max-width: 460px;
   background-color: #000000;
   border: 1px solid #cfd9f0;
@@ -87,7 +87,7 @@ header {
 }
 
 .chart {
-  width: 100%;
+  width: 90%;
   width: 480px;
   background-color: #0e111b;
   border: 1px solid #cfd9f0;
@@ -197,23 +197,7 @@ header {
   border: 1px solid rgb(255, 255, 255);
 }
 
-.maxButton {
-  background-color: rgb(0, 0, 0);
-  width: 38px;
-  height: 22px;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-  border-radius: 8px;
-  position: absolute;
-  top: 71px;
-  left: 305px;
-  color: white;
-  border: none;
-  font-size: 12px;
-  font-weight: bold;
-  transition: 0.3s;
-}
+
 
 .dollarAmount {
   position: absolute;
@@ -263,12 +247,38 @@ header {
   cursor: pointer;
 }
 
+.align {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.maxButton {
+  background-color: rgb(0, 0, 0);
+  width: 38px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  border-radius: 8px;
+  position: absolute;
+  top: 71px;
+  left: 300px;
+  color: white;
+  border: none;
+  font-size: 12px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
 .balanceOne {
   position: absolute;
-  min-width: 80px;
-  height: 24px;
   top: 70px;
   right: 20px;
+
+  min-width: 80px;
+  height: 24px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -591,4 +601,111 @@ header {
 
 .coin_symbol {
   color: rgb(255, 255, 255);
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .tradeBox {
+    width: 85%;
+    max-width: 460px;
+    background-color: #000000;
+    border: 1px solid #cfd9f0;
+    min-height: 300px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+  
+  .messageOne {
+    position: absolute;
+    min-width: 80px;
+    height: 24px;
+    top: 2px;
+    right: 340px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: semi-bold;
+    font-size: 15px;
+  }
+
+  .messageTwo {
+    position: absolute;
+    min-width: 80px;
+    height: 24px;
+    top: 102px;
+    right: 340px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: semi-bold;
+    font-size: 15px;
+  }
+
+  .maxButton {
+    background-color: rgb(0, 0, 0);
+    width: 38px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    border-radius: 8px;
+    position: absolute;
+    top: 71px;
+    left: 280px;
+    color: white;
+    border: none;
+    font-size: 12px;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+  
+  .valueOne {
+    position: absolute;
+    min-width: 80px;
+    height: 24px;
+    top: 72px;
+    right: 340px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: semi-bold;
+    font-size: 14px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    margin-bottom: 120px;
+    max-width: 320px;
+    text-align: center;
+  }
+
+  .card {
+    padding: 1rem 1.5rem;
+  }
+
+  .card h2 {
+    margin-bottom: 0.5rem;
+  }
+
+  .center {
+    padding: 8rem 0 6rem;
+  }
+
+  .center::before {
+    transform: none;
+    height: 300px;
+  }
+
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {
+  .grid {
+    grid-template-columns: repeat(2, 50%);
+  }
 }

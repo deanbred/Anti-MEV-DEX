@@ -616,20 +616,21 @@ export default function Swap(props) {
               <DownOutlined />
             </div>
 
-            <div className="balanceOne">Balance: {tokenOneBalance}</div>
-            <div className="messageOne">You send</div>
+            <div className="align">
+              <Button className="maxButton" onClick={setMax}>
+                MAX
+              </Button>
+              <div className="balanceOne">Balance: {tokenOneBalance}</div>
+              <div className="messageOne">You send</div>
 
-            <div className="valueOne">
-              {price && ethPrice && tokenOneAmount
-                ? `Value: $${parseFloat(
-                    tokenOneAmount * (ethPrice / price.sellTokenToEthRate)
-                  ).toFixed(2)}`
-                : "Value:"}
+              <div className="valueOne">
+                {price && ethPrice && tokenOneAmount
+                  ? `Value: $${parseFloat(
+                      tokenOneAmount * (ethPrice / price.sellTokenToEthRate)
+                    ).toFixed(2)}`
+                  : "Value:"}
+              </div>
             </div>
-
-            <Button className="maxButton" onClick={setMax}>
-              MAX
-            </Button>
 
             <div className="assetTwo" onClick={() => openModal(2)}>
               <img
