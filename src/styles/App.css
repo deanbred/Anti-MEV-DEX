@@ -605,6 +605,24 @@ header {
 
 /* Mobile */
 @media (max-width: 700px) {
+
+  header {
+    height: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 50px;
+  }
+
+  .logo {
+    width: 36px;
+    height: 36px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  
+  }
+
   .tradeBox {
     width: 85%;
     max-width: 460px;
@@ -625,7 +643,7 @@ header {
     min-width: 80px;
     height: 24px;
     top: 2px;
-    right: 340px;
+    right: 310px;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -638,7 +656,7 @@ header {
     min-width: 80px;
     height: 24px;
     top: 102px;
-    right: 340px;
+    right: 310px;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -656,7 +674,7 @@ header {
     border-radius: 8px;
     position: absolute;
     top: 71px;
-    left: 280px;
+    left: 260px;
     color: white;
     border: none;
     font-size: 12px;
@@ -669,7 +687,7 @@ header {
     min-width: 80px;
     height: 24px;
     top: 72px;
-    right: 340px;
+    right: 310px;
     display: flex;
     align-items: center;
     gap: 5px;
