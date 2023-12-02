@@ -7,3 +7,4 @@ deployment:
     - /bin/cp -R build/static/js $DEPLOYPATH
     - /bin/cp -R build/static/media $DEPLOYPATH
     - /bin/cp build/*.* $DEPLOYPATH
+    - /bin/cp src/icon.png $DEPLOYPATH
