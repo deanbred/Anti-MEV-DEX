@@ -25,7 +25,7 @@ import {
 } from "wagmi";
 
 import tokenList from "../constants/tokenList.json";
-// Eth:1 BSC:56 Polygon:137 Arbitrum:42161 Optimism:10 Avalanche:43114 Goerli:5
+// Eth:1 BSC:56 Polygon:137 Arbitrum:42161 Optimism:10 Avax:43114 Goerli:5
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 import { ethers } from "ethers";
 
