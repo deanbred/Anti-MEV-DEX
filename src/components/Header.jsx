@@ -6,7 +6,7 @@ function Header() {
   return (
     <header>
       <div className="leftH">
-        <img src={Logo} alt="logo" height={64} width={64} className="" />
+        <img src={Logo} alt="logo" height={64} width={64} className="icon" />
         <Link to="/" className="link">
           <div className="headerItem">Swap</div>
         </Link>
