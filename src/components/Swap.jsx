@@ -594,6 +594,7 @@ export default function Swap(props) {
           </div>
 
           <div className="inputs">
+
             <Input
               placeholder="0"
               value={tokenOneAmount}
@@ -607,6 +608,7 @@ export default function Swap(props) {
             </div>
 
             <div className="assetOne" onClick={() => openModal(1)}>
+
               <img
                 src={tokenOne.logoURI}
                 alt="assetOneLogo"
@@ -617,11 +619,12 @@ export default function Swap(props) {
             </div>
 
             <div className="align">
+
               <Button className="maxButton" onClick={setMax}>
                 MAX
               </Button>
-              <div className="balanceOne">Balance: {tokenOneBalance}</div>
               <div className="messageOne">You send</div>
+              <div className="balanceOne">Balance: {tokenOneBalance}</div>
 
               <div className="valueOne">
                 {price && ethPrice && tokenOneAmount
@@ -642,8 +645,8 @@ export default function Swap(props) {
               <DownOutlined />
             </div>
 
-            <div className="balanceTwo">Balance: {tokenTwoBalance}</div>
             <div className="messageTwo">You receive</div>
+            <div className="balanceTwo">Balance: {tokenTwoBalance}</div>
           </div>
 
           <div className="convert">

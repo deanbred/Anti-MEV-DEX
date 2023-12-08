@@ -184,7 +184,7 @@ header {
   border-radius: 8px;
   position: absolute;
   top: 86px;
-  left: 200px;
+  margin-left: 46%;
   color: rgb(255, 255, 255);
   border: 1px solid rgb(0, 0, 0);
   font-size: 14px;
@@ -198,7 +198,6 @@ header {
 }
 
 
-
 .dollarAmount {
   position: absolute;
   top: 75px;
@@ -209,6 +208,8 @@ header {
 
 .inputs {
   position: relative;
+  //display: flex;
+  //flex-direction: column;
 }
 
 .assetReview {
@@ -264,7 +265,7 @@ header {
   border-radius: 8px;
   position: absolute;
   top: 71px;
-  left: 300px;
+  right: 105px;
   color: white;
   border: none;
   font-size: 12px;
@@ -291,9 +292,26 @@ header {
   min-width: 80px;
   height: 24px;
   top: 2px;
-  right: 370px;
+  //right: 370px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  margin: auto;
+  gap: 5px;
+  font-weight: semi-bold;
+  font-size: 15px;
+}
+
+.messageTwo {
+  position: absolute;
+  min-width: 80px;
+  height: 24px;
+  top: 102px;
+  //right: 370px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
   gap: 5px;
   font-weight: semi-bold;
   font-size: 15px;
@@ -304,9 +322,11 @@ header {
   min-width: 80px;
   height: 24px;
   top: 72px;
-  right: 370px;
+  //right: 370px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  margin: auto;
   gap: 5px;
   font-weight: semi-bold;
   font-size: 14px;
@@ -340,19 +360,6 @@ header {
   gap: 5px;
   font-weight: semi-bold;
   font-size: 14px;
-}
-
-.messageTwo {
-  position: absolute;
-  min-width: 80px;
-  height: 24px;
-  top: 102px;
-  right: 370px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-weight: semi-bold;
-  font-size: 15px;
 }
 
 .convert {
@@ -638,7 +645,7 @@ header {
     padding-right: 30px;
   }
   
-  .messageOne {
+/*   .messageOne {
     position: absolute;
     min-width: 80px;
     height: 24px;
@@ -649,9 +656,9 @@ header {
     gap: 5px;
     font-weight: semi-bold;
     font-size: 15px;
-  }
+  } */
 
-  .messageTwo {
+/*   .messageTwo {
     position: absolute;
     min-width: 80px;
     height: 24px;
@@ -662,9 +669,9 @@ header {
     gap: 5px;
     font-weight: semi-bold;
     font-size: 15px;
-  }
+  } */
 
-  .maxButton {
+/*   .maxButton {
     background-color: rgb(0, 0, 0);
     width: 38px;
     height: 22px;
@@ -680,9 +687,9 @@ header {
     font-size: 12px;
     font-weight: bold;
     transition: 0.3s;
-  }
+  } */
   
-  .valueOne {
+/*   .valueOne {
     position: absolute;
     min-width: 80px;
     height: 24px;
@@ -693,7 +700,7 @@ header {
     gap: 5px;
     font-weight: semi-bold;
     font-size: 14px;
-  }
+  } */
 
   .grid {
     grid-template-columns: 1fr;
