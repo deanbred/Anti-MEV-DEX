@@ -43,16 +43,18 @@ code {
 
 .ant-popover-title {
   color: white !important;
-  font-size: 22px !important;
+  font-size: 20px !important;
 }
 
 .ant-popover-inner-content {
   color: white !important;
   font-size: 16px !important;
+  width: 100% !important;
+  max-width: 460px !important;
 }
 
 .ant-popover-inner {
-  min-width: 260px !important;
+  min-width: 220px !important;
   min-height: 140px !important;
   border: 1px solid #21273a;
   background-color: rgb(69, 69, 69) !important;
