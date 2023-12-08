@@ -610,7 +610,7 @@ header {
 /* Mobile */
 @media (max-width: 740px) {
   header {
-    height: 100px;
+    height: 80px;
     display: flex;
     justify-content: space-between;
     align-items: center;
