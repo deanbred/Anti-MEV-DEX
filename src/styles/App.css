@@ -87,7 +87,7 @@ header {
 
 .chart {
   width: 90%;
-  width: 480px;
+  max-width: 480px;
   background-color: #0e111b;
   border: 1px solid #cfd9f0;
   min-height: 300px;
@@ -104,28 +104,28 @@ header {
 }
 
 .heatmap {
-  width: 90%;
+  width: 100%;
+  max-width: 800px;
   height: 600px;
   background-color: rgb(100, 100, 100);
   border: 1px solid #cfd9f0;
   border-radius: 15px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
   margin-top: 25px;
   padding: 10px;
 }
 
 .market {
-  width: 90%;
+  width: 100%;
+  max-width: 800px;
   height: 600px;
   background-color: rgb(100, 100, 100);
   border: 1px solid #cfd9f0;
   border-radius: 15px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
   margin-top: 25px;
   padding: 10px;
@@ -501,10 +501,12 @@ header {
 }
 
 .token_panel_container {
+  width: 100%;
+  max-width: 600px;
   display: flex;
+  align-items: center;
   color: rgb(12, 12, 12);
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 10px;
 }
 
 .tokens_title {
@@ -542,7 +544,7 @@ header {
   border-radius: 15px;
   border: 1px solid #cfd9f0;
   height: 600px;
-  width: 500px;
+  width: 100%;
   overflow-y: auto;
   padding-left: 20px;
   padding-right: 20px;
@@ -610,12 +612,11 @@ header {
 /* Mobile */
 @media (max-width: 740px) {
   header {
-    height: 80px;
+    height: 65px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding-left: 10px;
-    //padding-right: 50px;
   }
 
   .headerItem {
@@ -636,7 +637,6 @@ header {
   .icon {
     width: 52px;
     height: 52px;
-    //padding-right: 10px;
   }
 
   .logo {
@@ -647,76 +647,14 @@ header {
   }
 
   .tradeBox {
-    width: 85%;
+    width: 90%;
     max-width: 460px;
-    background-color: #000000;
-    border: 1px solid #cfd9f0;
-    min-height: 300px;
-    border-radius: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    padding-left: 30px;
-    padding-right: 30px;
   }
 
-  /*   .messageOne {
-    position: absolute;
-    min-width: 80px;
-    height: 24px;
-    top: 2px;
-    right: 310px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-weight: semi-bold;
-    font-size: 15px;
-  } */
-
-  /*   .messageTwo {
-    position: absolute;
-    min-width: 80px;
-    height: 24px;
-    top: 102px;
-    right: 310px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-weight: semi-bold;
-    font-size: 15px;
-  } */
-
-  /*   .maxButton {
-    background-color: rgb(0, 0, 0);
-    width: 38px;
-    height: 22px;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    border-radius: 8px;
-    position: absolute;
-    top: 71px;
-    left: 260px;
-    color: white;
-    border: none;
-    font-size: 12px;
-    font-weight: bold;
-    transition: 0.3s;
-  } */
-
-  /*   .valueOne {
-    position: absolute;
-    min-width: 80px;
-    height: 24px;
-    top: 72px;
-    right: 310px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-weight: semi-bold;
-    font-size: 14px;
-  } */
+  .chart {
+    width: 90%;
+    max-width: 480px;
+  }
 
   .grid {
     grid-template-columns: 1fr;
