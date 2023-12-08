@@ -18,9 +18,9 @@ export default function Tokens() {
             Connect wallet to see token balances
           </div>
         )}
-        <div className="heatmap">
+{/*         <div className="heatmap">
           <Heatmap />
-        </div>
+        </div> */}
         <div className="market">
           <Market />
         </div> 
