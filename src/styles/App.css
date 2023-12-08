@@ -265,7 +265,7 @@ header {
   border-radius: 8px;
   position: absolute;
   top: 71px;
-  right: 105px;
+  right: 120px;
   color: white;
   border: none;
   font-size: 12px;
@@ -296,7 +296,6 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: auto;
   gap: 5px;
   font-weight: semi-bold;
   font-size: 15px;
@@ -308,10 +307,10 @@ header {
   height: 24px;
   top: 102px;
   //right: 370px;
+  margin-left: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: auto;
   gap: 5px;
   font-weight: semi-bold;
   font-size: 15px;
@@ -613,13 +612,29 @@ header {
 /* Mobile */
 @media (max-width: 700px) {
 
+
   header {
     height: 100px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding-left: 10px;
-    padding-right: 50px;
+    //padding-right: 50px;
+  }
+
+  .headerItem {
+    //padding: 6px;
+    //padding-left: 10px;
+    //padding-right: 10px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+  }
+
+  .networkButton {
+    display: none;
   }
 
   .logo {

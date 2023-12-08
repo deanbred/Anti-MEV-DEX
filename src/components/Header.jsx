@@ -15,7 +15,7 @@ function Header() {
         </Link>
       </div>
       <div className="rightH">
-        <div className="">
+        <div className="networkButton">
           <w3m-network-button />
         </div>
         <div className="">
