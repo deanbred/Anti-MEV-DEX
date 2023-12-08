@@ -619,9 +619,10 @@ header {
   }
 
   .headerItem {
-    //padding: 6px;
+    padding: 3px;
     //padding-left: 10px;
     //padding-right: 10px;
+    font-size: 18px;
     border-radius: 8px;
     font-weight: 500;
     transition: 0.3s;
@@ -646,13 +647,11 @@ header {
   }
 
   .tradeBox {
-    width: 90%;
-    max-width: 460px;
+    width: 100%;
   }
 
   .chart {
-    width: 90%;
-    max-width: 480px;
+    width: 100%;
   }
 
   .grid {
@@ -680,9 +679,9 @@ header {
   }
 }
 
-/* Tablet and Smaller Desktop */
-@media (min-width: 701px) and (max-width: 1120px) {
-  .grid {
-    grid-template-columns: repeat(2, 50%);
+/* Smaller Mobile */
+@media (min-width: 360px) and (max-width: 600px) {
+  .tradeBox {
+    width: 400px;
   }
 }
