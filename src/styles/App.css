@@ -132,11 +132,12 @@ header {
 }
 
 .ticker {
-  width: 99%;
+  width: 100%;
+
   border: 1px solid #cfd9f0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  //justify-content: center;
   align-items: center;
   margin-bottom: 25px;
 }
@@ -289,13 +290,12 @@ header {
   min-width: 80px;
   height: 24px;
   top: 2px;
-  //right: 370px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
   font-weight: semi-bold;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .messageTwo {
@@ -303,14 +303,13 @@ header {
   min-width: 80px;
   height: 24px;
   top: 102px;
-  //right: 370px;
   margin-left: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
   font-weight: semi-bold;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .valueOne {
@@ -318,7 +317,6 @@ header {
   min-width: 80px;
   height: 24px;
   top: 72px;
-  //right: 370px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -361,14 +359,14 @@ header {
 .convert {
   padding-top: 3px;
   font-weight: semi-bold;
-  font-size: 16px;
+  font-size: 17px;
 }
 
 .data {
   padding-bottom: 4px;
   gap: 5px;
   font-weight: semi-bold;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 @keyframes flash {
@@ -608,8 +606,8 @@ header {
   color: rgb(255, 255, 255);
 }
 
-/* Mobile */
-@media (max-width: 740px) {
+/* LargebMobile */
+@media (max-width: 720px) {
   header {
     height: 65px;
     display: flex;
@@ -620,18 +618,12 @@ header {
 
   .headerItem {
     padding: 3px;
-    //padding-left: 10px;
-    //padding-right: 10px;
     font-size: 18px;
     border-radius: 8px;
     font-weight: 500;
     transition: 0.3s;
     display: flex;
     align-items: center;
-  }
-
-  .networkButton {
-    display: none;
   }
 
   .icon {
@@ -646,6 +638,10 @@ header {
     padding-bottom: 8px;
   }
 
+  .networkButton {
+    display: none;
+  }
+
   .tradeBox {
     width: 100%;
   }
@@ -653,35 +649,18 @@ header {
   .chart {
     width: 100%;
   }
+}
 
-  .grid {
-    grid-template-columns: 1fr;
-    margin-bottom: 120px;
-    max-width: 320px;
-    text-align: center;
-  }
-
-  .card {
-    padding: 1rem 1.5rem;
-  }
-
-  .card h2 {
-    margin-bottom: 0.5rem;
-  }
-
-  .center {
-    padding: 8rem 0 6rem;
-  }
-
-  .center::before {
-    transform: none;
-    height: 300px;
+/* Medium Mobile */
+@media (min-width: 480px) and (max-width: 720px) {
+  .tradeBox {
+    width: 400px;
   }
 }
 
-/* Smaller Mobile */
-@media (min-width: 360px) and (max-width: 600px) {
+/* Small Mobile */
+@media (min-width: 300px) and (max-width: 480px) {
   .tradeBox {
-    width: 400px;
+    width: 320px;
   }
 }
