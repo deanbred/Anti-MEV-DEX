@@ -12,8 +12,8 @@ header {
 }
 
 .logo {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   padding-top: 8px;
   padding-bottom: 8px;
 }
@@ -239,7 +239,7 @@ header {
   border-radius: 8px;
   position: absolute;
   top: 73px;
-  right: 112px;
+  right: 115px;
   color: white;
   border: none;
   font-size: 11px;
@@ -489,24 +489,21 @@ header {
   color: white;
   margin-top: 0px;
   margin-bottom: 0px;
-  position: sticky;
-  top: 0px;
+  //position: sticky;
+  //top: 0px;
   padding-top: 25px;
   padding-bottom: 15px;
   padding-left: 0px;
-  z-index: 2;
+  //z-index: 2;
   background-color: rgb(69, 69, 69) !important;
 }
 
 .tokens_address {
-  width: 50%;
+  width: 60%;
   font-size: 24px;
   border-radius: 15px;
   margin-bottom: 0px;
   margin: auto;
-  position: sticky;
-  top: 20px;
-  z-index: 2;
   background-color: rgb(100, 100, 100) !important;
 }
 
@@ -515,12 +512,13 @@ header {
   color: white;
   border-radius: 15px;
   border: 1px solid #cfd9f0;
-  height: 600px;
+  height: 400px;
   width: 100%;
   overflow-y: auto;
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 10px;
+  flex-grow: 1; /* Add this line */
 }
 
 .tokens_header {
@@ -581,6 +579,11 @@ header {
   color: rgb(255, 255, 255);
 }
 
+.icon {
+  width: 58px;
+  height: 58px;
+}
+
 /* LargebMobile */
 @media (max-width: 720px) {
   header {
@@ -639,7 +642,7 @@ header {
 }
 
 /* Small Mobile */
-@media (min-width: 300px) and (max-width: 480px) {
+@media (min-width: 0px) and (max-width: 480px) {
   .tradeBox {
     width: 320px;
   }
@@ -663,5 +666,9 @@ header {
     height: 30px;
     padding-top: 8px;
     padding-bottom: 8px;
+  }
+
+  .chart {
+    display: none;
   }
 }

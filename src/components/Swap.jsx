@@ -627,7 +627,7 @@ export default function Swap(props) {
                 ? `Value: $${parseFloat(
                     tokenOneAmount * (ethPrice / price.sellTokenToEthRate)
                   ).toFixed(2)}`
-                : "Value:"}
+                : ""}
             </div>
 
             <div className="assetTwo" onClick={() => openModal(2)}>
@@ -666,7 +666,6 @@ export default function Swap(props) {
 
           <Popover
             content={renderJsonObject(price)}
-            title="Aggregator Details"
             trigger="click"
             placement="bottom"
           >

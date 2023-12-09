@@ -11,18 +11,54 @@ export default function Ticker() {
     script.async = true;
     script.innerHTML = JSON.stringify({
       symbols: [
-        { proName: "FOREXCOM:SPXUSD", title: "S&P 500" },
-        { proName: "BITSTAMP:BTCUSD", title: "Bitcoin" },
-        { proName: "BITSTAMP:ETHUSD", title: "Ethereum" },
-        { description: "Kaspa", proName: "BYBIT:KASUSDT.P" },
-        { description: "Link", proName: "BYBIT:LINKUSDT.P" },
-        { description: "Arbitrum", proName: "BYBIT:ARBUSDT.P" },
-        { description: "Optimism", proName: "BYBIT:OPUSDT.P" },
+        {
+          proName: "FOREXCOM:SPXUSD",
+          title: "S&P 500",
+        },
+        {
+          proName: "FOREXCOM:NSXUSD",
+          title: "US 100",
+        },
+        {
+          proName: "BITSTAMP:BTCUSD",
+          title: "Bitcoin",
+        },
+        {
+          proName: "BITSTAMP:ETHUSD",
+          title: "Ethereum",
+        },
+        {
+          description: "Solana",
+          proName: "BINANCE:SOLUSDT",
+        },
+        {
+          description: "Avalanche",
+          proName: "BINANCE:AVAXUSDT",
+        },
+        {
+          description: "Chainlink",
+          proName: "BINANCE:LINKUSD.P",
+        },
+        {
+          description: "Tia",
+          proName: "BINANCE:TIAUSDT.P",
+        },
+        {
+          description: "Kaspa",
+          proName: "BINANCE:KASUSDT.P",
+        },
+        {
+          description: "Arbitrum",
+          proName: "BINANCE:ARBUSDT.P",
+        },
+        {
+          description: "Optimism",
+          proName: "BINANCE:OPUSDT.P",
+        },
       ],
-      showSymbolLogo: true,
       colorTheme: "dark",
-      isTransparent: false,
-      displayMode: "adaptive",
+      isTransparent: true,
+      showSymbolLogo: true,
       locale: "en",
     });
     container.current.appendChild(script);
