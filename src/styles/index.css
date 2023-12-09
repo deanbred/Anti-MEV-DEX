@@ -111,3 +111,17 @@ code {
 .ant-modal-close-icon:hover {
   color: white !important;
 }
+
+/* Medium Mobile */
+@media (min-width: 480px) and (max-width: 720px) {
+  .ant-input {
+    font-size: 32px;
+  }
+}
+
+/* Small Mobile */
+@media (min-width: 300px) and (max-width: 480px) {
+  .ant-input {
+    font-size: 28px;
+  }
+}
