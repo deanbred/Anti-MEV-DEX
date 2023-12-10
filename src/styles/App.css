@@ -601,11 +601,6 @@ header {
   color: rgb(255, 255, 255);
 }
 
-.icon {
-  width: 58px;
-  height: 58px;
-}
-
 /* LargebMobile */
 @media (max-width: 720px) {
   header {
