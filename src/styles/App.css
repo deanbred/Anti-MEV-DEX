@@ -491,8 +491,8 @@ header {
 }
 
 .token_panel_container {
-  width: 100%;
-  max-width: 600px;
+  width: 90%;
+  max-width: 580px;
   display: flex;
   align-items: center;
   color: rgb(12, 12, 12);
@@ -514,7 +514,7 @@ header {
 }
 
 .tokens_address {
-  width: 60%;
+  width: 55%;
   font-size: 24px;
   border-radius: 15px;
   margin-bottom: 0px;
@@ -533,7 +533,6 @@ header {
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 10px;
-  flex-grow: 1; /* Add this line */
 }
 
 .tokens_header {
