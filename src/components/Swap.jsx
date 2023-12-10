@@ -58,10 +58,9 @@ export default function Swap(props) {
   };
 
   const alchemyConfig = alchemyKeys[client.chain.id];
-  //console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
+  console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
   const alchemy = new Alchemy(alchemyConfig);
 
-  const [isFetching, setIsFetching] = useState(false);
   const [blockNumber, setBlockNumber] = useState(null);
   const [estimatedGas, setEstimatedGas] = useState(null);
 
@@ -72,19 +71,17 @@ export default function Swap(props) {
     (token) => token.chainId === client.chain.id
   );
   const [currentTokenList, setCurrentTokenList] = useState(filteredTokenList);
+  //console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
 
-  console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
   const [tokenOne, setTokenOne] = useState(currentTokenList[1]);
-
-  console.log(`tokenOne: ${JSON.stringify(tokenOne)}`);
+  console.log(`tokenOne: ${JSON.stringify(tokenOne.name)}`);
 
   const [tokenTwo, setTokenTwo] = useState(currentTokenList[2]);
-  console.log(`tokenTwo: ${JSON.stringify(tokenTwo)}`);
+  console.log(`tokenTwo: ${JSON.stringify(tokenTwo.name)}`);
 
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
 
-  
   const [tokenOneBalance, setTokenOneBalance] = useState(null);
   const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
 
@@ -173,32 +170,26 @@ export default function Swap(props) {
   }
 
   async function getBlock() {
-    setIsFetching(true);
     try {
       const blockNumber = await alchemy.core.getBlockNumber();
       setBlockNumber(blockNumber);
       console.log(`Block Number: ${blockNumber}`);
 
+      console.log(`address: ${address}`);
+
       const estimatedGas = await alchemy.core.estimateGas({ to: address });
       setEstimatedGas(estimatedGas);
       console.log(`Estimated Gas: ${estimatedGas}`);
-    } catch (error) {
-      console.error("Failed to get block:", error);
-    } finally {
-      setIsFetching(false);
-    }
-  }
 
-  async function getEthPrice() {
-    try {
       const response = await fetch(
         "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=PCIG1T3NFQI4F4F5ZJ5W2B6RNAVZSGYZ9Q"
       );
       const data = await response.json();
       setEthPrice(data.result.ethusd);
-      console.log(`ETH PRICE: ${ethPrice}`);
+      console.log(`ETH PRICE: ${parseFloat(data.result.ethusd).toFixed(2)}`);
     } catch (error) {
-      console.error("Error fetching price:", error);
+      console.error("Failed to get block data:", error);
+    } finally {
     }
   }
 
@@ -413,12 +404,7 @@ export default function Swap(props) {
   useEffect(() => {
     const intervalId = setInterval(getBlock, 12500);
     return () => clearInterval(intervalId);
-  }, [getBlock]);
-
-  useEffect(() => {
-    const intervalId2 = setInterval(getEthPrice, 12500);
-    return () => clearInterval(intervalId2);
-  }, [getEthPrice]);
+  }, []);
 
   useEffect(() => {
     if (txDetails.to && isConnected) {
@@ -488,12 +474,20 @@ export default function Swap(props) {
 
   async function handleTokenAddressInput(e) {
     const tokenAddress = e.target.value;
+    console.log(`tokenAddress: ${tokenAddress}`);
+    let tokenMetadata;
     try {
-      const tokenMetadata = await alchemy.getTokenMetadata(tokenAddress);
+      tokenMetadata = await alchemy.core.getTokenMetadata(tokenAddress);
       console.log(`tokenMetadata: ${JSON.stringify(tokenMetadata)}`);
       setTokenOne(tokenMetadata);
     } catch (error) {
       console.error("Failed to fetch token metadata:", error);
+      tokenMetadata = {
+        name: null,
+        symbol: null,
+        logo: null,
+        decimals: null,
+      };
     }
   }
 
@@ -509,7 +503,7 @@ export default function Swap(props) {
         <div className="modalContent">
           <input
             type="text"
-            placeholder="Paste token address here"
+            placeholder="Paste token address"
             onChange={(e) => handleTokenAddressInput(e)}
           />
           {currentTokenList?.map((e, i) => {
@@ -699,7 +693,7 @@ export default function Swap(props) {
             <button className="swapButton">Show Details</button>
           </Popover>
 
-          <Row>
+          <Row gutter={120}>
             <Col>
               <div className="footer">
                 {estimatedGas
@@ -710,10 +704,7 @@ export default function Swap(props) {
 
             <Col>
               <div className="footer">
-                Block:{" "}
-                <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
-                  {blockNumber}
-                </span>
+                Block: <span style={{ color: "#089981" }}>{blockNumber}</span>
               </div>
             </Col>
           </Row>
