@@ -13,6 +13,7 @@ import Charts from "./Charts";
 import Logo from "../icon.png";
 import bgImage from "../styles/circuit.jpg";
 import qs from "qs";
+import { ethers } from "ethers";
 
 import {
   erc20ABI,
@@ -27,11 +28,8 @@ import {
 import tokenList from "../constants/tokenList.json";
 // Eth:1 BSC:56 Polygon:137 Arbitrum:42161 Optimism:10 Avax:43114 Goerli:5
 import { Alchemy, Network, Utils } from "alchemy-sdk";
-import { ethers } from "ethers";
-
-const MAX_ALLOWANCE =
-  115792089237316195423570985008687907853269984665640564039457584007913129639935n;
-const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
+import exchangeProxy from "../constants/constants.ts";
+const MAX_ALLOWANCE = ethers.constants.MaxUint256;
 
 export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
@@ -70,11 +68,22 @@ export default function Swap(props) {
   const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
   console.log(`zeroxapi: ${zeroxapi}`);
 
-  const [currentTokenList, setCurrentTokenList] = useState(tokenList);
-  console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
 
-  const [tokenOne, setTokenOne] = useState(tokenList[0]);
-  const [tokenTwo, setTokenTwo] = useState(tokenList[1]);
+
+  const [currentTokenList, setCurrentTokenList] = useState(tokenList);
+  const filteredTokenList = tokenList.filter(
+    (token) => token.chainId === client.chain.id
+  );
+  console.log(`filteredTokenList: ${JSON.stringify(filteredTokenList)}`);
+
+  const [tokenOne, setTokenOne] = useState(filteredTokenList[0]);
+  console.log(`tokenOne: ${JSON.stringify(tokenOne)}`);
+
+  const [tokenTwo, setTokenTwo] = useState(filteredTokenList[1]);
+  console.log(`tokenTwo: ${JSON.stringify(tokenTwo)}`);
+
+  fetchBalances();
+
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
   const [tokenOneBalance, setTokenOneBalance] = useState(null);

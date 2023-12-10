@@ -1,14 +1,11 @@
 import type { Address } from "wagmi";
 import { BigNumber } from "ethers";
 
-export const MAX_ALLOWANCE =
-  115792089237316195423570985008687907853269984665640564039457584007913129639935n;
-
 export const ZERO = BigNumber.from(0);
 
 export const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
 
-export const devWallet = "0xd577F7b3359862A4178667347F4415d5682B4E85"
+export const devWallet = "0xd577F7b3359862A4178667347F4415d5682B4E85";
 
 interface Token {
   name: string;
