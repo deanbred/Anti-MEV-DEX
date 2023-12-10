@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
-import Logo from "../icon.png";
+import Logo from "../logo.png";
 import bgImage from "../styles/circuit.jpg";
 import qs from "qs";
 import { ethers } from "ethers";
@@ -443,7 +443,6 @@ export default function Swap(props) {
         <Radio.Button value={2.5}>2.5%</Radio.Button>
         <Radio.Button value={5}>5.0%</Radio.Button>
         <Radio.Button value={10}>10.0%</Radio.Button>
-        <Radio.Button value={25}>25.0%</Radio.Button>
       </Radio.Group>
     </>
   );
@@ -597,13 +596,13 @@ export default function Swap(props) {
         <div className="tradeBox">
           <div className="tradeBoxHeader">
             <div className="leftH">
-              <img
+{              <img
                 src={Logo}
                 alt="logo"
                 height={48}
                 width={48}
                 className="logo"
-              />
+              />}
               <Link to="/" className="link">
                 <div className="">Market</div>
               </Link>
