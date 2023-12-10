@@ -32,8 +32,19 @@ code {
   border-radius: 12px !important;
 }
 
+.tokenAddressInput {
+  background-color: rgb(69, 69, 69) !important;
+  color: white !important;
+  border-width: 0px !important;
+  height: 48px !important;
+  margin-bottom: 8px;
+  font-size: 15px;
+  border-radius: 12px !important;
+  text-align: center;
+}
+
 .ant-input::placeholder {
-  color: #5f6783 !important;
+  color: rgb(164 , 164, 164) !important;
 }
 
 .ant-popover-arrow {
@@ -110,6 +121,10 @@ code {
 
 .ant-modal-close-icon:hover {
   color: white !important;
+}
+
+.ant-divider {
+  border-top-color: rgb(255, 255, 255) !important;
 }
 
 /* Medium Mobile */

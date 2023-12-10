@@ -96,7 +96,7 @@ header {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  margin-top: 30px;
+  margin-top: 40px;
   padding-top: 10px;
   padding-bottom: 10px;
   padding-left: 20px;
@@ -104,7 +104,7 @@ header {
 }
 
 .market {
-  width: 100%;
+  width: 90%;
   max-width: 800px;
   height: 600px;
   background-color: rgb(100, 100, 100);
@@ -113,12 +113,12 @@ header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 25px;
+  margin-top: 45px;
   padding: 10px;
 }
 
 .ticker {
-  width: 100%;
+  width: 98%;
   border: 1px solid #cfd9f0;
   display: flex;
   flex-direction: column;
@@ -447,6 +447,22 @@ header {
   font-size: 18px;
 }
 
+.tokenOne {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border: 1px solid rgb(255, 255, 255);
+  border-radius: 8px;
+}
+
+.tokenOne:hover {
+  cursor: pointer;
+  background-color: rgb(148, 148, 148);
+}
+
 .tokenChoice {
   display: flex;
   justify-content: flex-start;
@@ -672,6 +688,10 @@ header {
   }
 
   .tokens_title {
+    font-size: 20px;
+  }
+
+  .tokens_address {
     font-size: 20px;
   }
 }

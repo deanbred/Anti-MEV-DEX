@@ -1,6 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { Input, Popover, Radio, Modal, message, Col, Row, Button } from "antd";
+import {
+  Input,
+  Popover,
+  Radio,
+  Modal,
+  message,
+  Col,
+  Row,
+  Button,
+  Divider,
+} from "antd";
 import {
   ArrowDownOutlined,
   DownOutlined,
@@ -466,7 +476,6 @@ export default function Swap(props) {
   }
 
   async function handleTokenAddressInput(e) {
-    console.log(`INPUT tokenAddress: ${e.target.value}`);
     let tokenMetadata;
     try {
       tokenMetadata = await alchemy.core.getTokenMetadata(e.target.value);
@@ -479,7 +488,6 @@ export default function Swap(props) {
         chainId: client.chain.id,
         logoURI: tokenMetadata.logo,
       };
-      console.log(`tokenMetadata: ${JSON.stringify(tokenMetadata)}`);
       setTokenOne(one);
     } catch (error) {
       console.error("Failed to fetch token metadata:", error);
@@ -493,14 +501,29 @@ export default function Swap(props) {
         open={isOpen}
         footer={null}
         onCancel={() => setIsOpen(false)}
-        title="Select a token"
+        title="Select Token"
       >
         <div className="modalContent">
-          <input
+          <Input
+            className="tokenAddressInput"
             type="text"
-            placeholder="Paste token address"
+            placeholder="Paste address"
             onChange={(e) => handleTokenAddressInput(e)}
           />
+
+          <div className="tokenOne" onClick={() => setIsOpen(false)}>
+            <img
+              src={tokenOne.logoURI}
+              alt={tokenOne.symbol}
+              className="tokenLogo"
+            />
+            <div className="tokenChoiceNames">
+              <div className="tokenName">{tokenOne.name}</div>
+              <div className="tokenTicker">{tokenOne.symbol}</div>
+            </div>
+          </div>
+
+
           {currentTokenList?.map((e, i) => {
             return (
               <div
