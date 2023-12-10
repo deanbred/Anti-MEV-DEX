@@ -159,6 +159,13 @@ header {
   cursor: pointer;
 }
 
+.slippage {
+  display: flex;
+  width: 30%;
+  font-size: 16px;
+  color: #51586f;
+}
+
 .switchButton {
   background-color: rgb(0, 0, 0);
   width: 25px;
@@ -240,7 +247,7 @@ header {
   border-radius: 8px;
   position: absolute;
   top: 73px;
-  right: 115px;
+  right: 125px;
   color: white;
   border: none;
   font-size: 11px;

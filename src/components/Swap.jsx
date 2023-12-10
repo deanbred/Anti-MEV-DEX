@@ -127,7 +127,7 @@ export default function Swap(props) {
   function changeAmount(e) {
     setTokenOneAmount(e.target.value);
     if (e.target.value && price) {
-      setTokenTwoAmount((e.target.value * price.ratio).toFixed(3));
+      setTokenTwoAmount((e.target.value * price.ratio).toFixed(5));
     } else {
       setTokenTwoAmount(null);
     }
@@ -165,7 +165,7 @@ export default function Swap(props) {
 
   function setMax() {
     setTokenOneAmount(tokenOneBalance);
-    setTokenTwoAmount((tokenOneBalance * price.ratio).toFixed(3));
+    setTokenTwoAmount((tokenOneBalance * price.ratio).toFixed(5));
   }
 
   async function getBlock() {
@@ -179,7 +179,7 @@ export default function Swap(props) {
       );
       const data = await response.json();
       setEthPrice(data.result.ethusd);
-      console.log(`ETH PRICE: ${parseFloat(data.result.ethusd).toFixed(2)}`);
+      console.log(`ETH PRICE: ${parseFloat(data.result.ethusd).toFixed(5)}`);
     } catch (error) {
       console.error("Failed to get block data:", error);
     } finally {
@@ -195,7 +195,7 @@ export default function Swap(props) {
       data.tokenBalances.find((item) => {
         let balance = Number(
           Utils.formatUnits(item.tokenBalance, "ether")
-        ).toFixed(3);
+        ).toFixed(4);
         if (
           item.tokenBalance ===
           "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -213,7 +213,7 @@ export default function Swap(props) {
       data.tokenBalances.find((item) => {
         let balance = Number(
           Utils.formatUnits(item.tokenBalance, "ether")
-        ).toFixed(3);
+        ).toFixed(4);
         if (
           item.tokenBalance ===
           "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -437,13 +437,13 @@ export default function Swap(props) {
 
   const settings = (
     <>
+    <input className="slippage" onChange={handleSlippageChange} placeholder="Enter value" />
       <Radio.Group value={slippage} onChange={handleSlippageChange}>
         <Radio.Button value={0.5}>0.5%</Radio.Button>
         <Radio.Button value={2.5}>2.5%</Radio.Button>
         <Radio.Button value={5}>5.0%</Radio.Button>
         <Radio.Button value={10}>10.0%</Radio.Button>
         <Radio.Button value={25}>25.0%</Radio.Button>
-        <Radio.Button value={50}>50.0%</Radio.Button>
       </Radio.Group>
     </>
   );
@@ -539,7 +539,7 @@ export default function Swap(props) {
       >
         <div className="modalContent">
           <div className="assetReview">
-            Send: {(txDetails.sellAmount / 10 ** tokenOne.decimals).toFixed(3)}
+            Send: {(txDetails.sellAmount / 10 ** tokenOne.decimals).toFixed(5)}
             <img
               src={tokenOne.logoURI}
               alt="assetOneLogo"
@@ -549,7 +549,7 @@ export default function Swap(props) {
           </div>
           <div className="assetReview">
             Recieve:{" "}
-            {(txDetails.buyAmount / 10 ** tokenTwo.decimals).toFixed(3)}
+            {(txDetails.buyAmount / 10 ** tokenTwo.decimals).toFixed(5)}
             <img
               src={tokenTwo.logoURI}
               alt="assetOneLogo"
@@ -565,10 +565,10 @@ export default function Swap(props) {
             <li>Gross Price: {(txDetails.grossPrice * 1).toFixed(5)}</li>
             <li>
               SellTokenToEthRate:{" "}
-              {(txDetails.sellTokenToEthRate * 1).toFixed(3)}
+              {(txDetails.sellTokenToEthRate * 1).toFixed(5)}
             </li>
             <li>
-              BuyTokenToEthRate: {(txDetails.buyTokenToEthRate * 1).toFixed(3)}
+              BuyTokenToEthRate: {(txDetails.buyTokenToEthRate * 1).toFixed(5)}
             </li>
             <li>Max Slippage: {slippage} %</li>
           </ul>
@@ -674,7 +674,7 @@ export default function Swap(props) {
 
           <div className="convert">
             {price
-              ? `1 ${tokenOne.symbol} = ${parseFloat(price.ratio).toFixed(3)} ${
+              ? `1 ${tokenOne.symbol} = ${parseFloat(price.ratio).toFixed(5)} ${
                   tokenTwo.symbol
                 }`
               : "Fetching Price..."}
