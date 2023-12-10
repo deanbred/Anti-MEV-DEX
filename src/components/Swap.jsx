@@ -683,10 +683,10 @@ export default function Swap(props) {
           {isConnected ? (
             <div
               className="swapButton"
-              disabled={tokenOneAmount <= 0 || tokenOneBalance <= tokenOneAmount }
+              disabled={tokenOneAmount <= 0 || tokenOneBalance < tokenOneAmount }
               onClick={fetchQuote}
             >
-              {tokenOneBalance <= tokenOneAmount ? "Insufficient Balance" : "Market Swap"}
+              {tokenOneBalance < tokenOneAmount ? "Insufficient Balance" : "Market Swap"}
             </div>
           ) : (
             <ConnectButton />
