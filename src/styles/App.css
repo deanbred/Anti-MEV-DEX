@@ -3,12 +3,13 @@
 }
 
 header {
+  width: 92%;
   height: 90px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-left: 50px;
-  padding-right: 50px;
+  padding-left: 30px;
+  padding-right: 40px;
 }
 
 .logo {
@@ -114,7 +115,7 @@ header {
   flex-direction: column;
   align-items: center;
   margin-top: 45px;
-  padding: 10px;
+  padding: 3px;
 }
 
 .ticker {
