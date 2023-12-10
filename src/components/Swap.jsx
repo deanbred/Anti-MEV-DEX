@@ -35,7 +35,7 @@ export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
 
   console.log(`address: ${address}`);
-  console.log(`isConnected: ${isConnected}`);
+  //console.log(`isConnected: ${isConnected}`);
   console.log(`chainId:${client.chain.id} ${client.chain.name}`);
 
   const alchemyKeys = {
@@ -58,7 +58,7 @@ export default function Swap(props) {
   };
 
   const alchemyConfig = alchemyKeys[client.chain.id];
-  console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
+  //console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
   const alchemy = new Alchemy(alchemyConfig);
 
   const [isFetching, setIsFetching] = useState(false);
@@ -66,26 +66,25 @@ export default function Swap(props) {
   const [estimatedGas, setEstimatedGas] = useState(null);
 
   const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
-  console.log(`zeroxapi: ${zeroxapi}`);
+  //console.log(`zeroxapi: ${zeroxapi}`);
 
-
-
-  const [currentTokenList, setCurrentTokenList] = useState(tokenList);
   const filteredTokenList = tokenList.filter(
     (token) => token.chainId === client.chain.id
   );
-  console.log(`filteredTokenList: ${JSON.stringify(filteredTokenList)}`);
+  const [currentTokenList, setCurrentTokenList] = useState(filteredTokenList);
 
-  const [tokenOne, setTokenOne] = useState(filteredTokenList[0]);
+  console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
+  const [tokenOne, setTokenOne] = useState(currentTokenList[1]);
+
   console.log(`tokenOne: ${JSON.stringify(tokenOne)}`);
 
-  const [tokenTwo, setTokenTwo] = useState(filteredTokenList[1]);
+  const [tokenTwo, setTokenTwo] = useState(currentTokenList[2]);
   console.log(`tokenTwo: ${JSON.stringify(tokenTwo)}`);
-
-  fetchBalances();
 
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
+
+  
   const [tokenOneBalance, setTokenOneBalance] = useState(null);
   const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
 

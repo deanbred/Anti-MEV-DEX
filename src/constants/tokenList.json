@@ -8,9 +8,6 @@
     "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png",
     "extensions": {
       "bridgeInfo": {
-        "5": {
-          "tokenAddress": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6"
-        },
         "10": {
           "tokenAddress": "0x4200000000000000000000000000000000000006"
         },
@@ -47,9 +44,6 @@
     "logoURI": "https://cdn.moralis.io/eth/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.png",
     "extensions": {
       "bridgeInfo": {
-        "5": {
-          "tokenAddress": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984"
-        },
         "10": {
           "tokenAddress": "0x6fd9d7AD17242c41f7131d257212c54A0e816691"
         },
@@ -69,6 +63,27 @@
     }
   },
   {
+    "name": "DIA",
+    "address": "0x84cA8bc7997272c7CfB4D0Cd3D55cd942B3c9419",
+    "symbol": "DIA",
+    "chainId": 1,
+    "decimals": 18,
+    "logoURI": "https://assets.coingecko.com/coins/images/11955/thumb/image.png?1646041751",
+    "extensions": {
+      "bridgeInfo": {
+        "56": {
+          "tokenAddress": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD"
+        },
+        "137": {
+          "tokenAddress": "0x993f2CafE9dbE525243f4A78BeBC69DAc8D36000"
+        },
+        "42161": {
+          "tokenAddress": "0xca642467C6Ebe58c13cB4A7091317f34E17ac05e"
+        }
+      }
+    }
+  },
+  {
     "name": "USDCoin",
     "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "symbol": "USDC",
@@ -77,9 +92,6 @@
     "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png",
     "extensions": {
       "bridgeInfo": {
-        "5": {
-          "tokenAddress": "0x5FfbaC75EFc9547FBc822166feD19B05Cd5890bb"
-        },
         "10": {
           "tokenAddress": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"
         },
@@ -1290,27 +1302,6 @@
         },
         "42161": {
           "tokenAddress": "0x3Be7cB2e9413Ef8F42b4A202a0114EB59b64e227"
-        }
-      }
-    }
-  },
-  {
-    "chainId": 1,
-    "address": "0x84cA8bc7997272c7CfB4D0Cd3D55cd942B3c9419",
-    "name": "DIA",
-    "symbol": "DIA",
-    "decimals": 18,
-    "logoURI": "https://assets.coingecko.com/coins/images/11955/thumb/image.png?1646041751",
-    "extensions": {
-      "bridgeInfo": {
-        "56": {
-          "tokenAddress": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD"
-        },
-        "137": {
-          "tokenAddress": "0x993f2CafE9dbE525243f4A78BeBC69DAc8D36000"
-        },
-        "42161": {
-          "tokenAddress": "0xca642467C6Ebe58c13cB4A7091317f34E17ac05e"
         }
       }
     }
@@ -4315,14 +4306,6 @@
     "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc778417E063141139Fce010982780140Aa0cD5Ab/logo.png"
   },
   {
-    "name": "Uniswap",
-    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-    "symbol": "UNI",
-    "decimals": 18,
-    "chainId": 5,
-    "logoURI": "https://cdn.moralis.io/eth/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.png"
-  },
-  {
     "name": "Wrapped Ether",
     "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
     "symbol": "WETH",
@@ -4331,8 +4314,16 @@
     "logoURI": "https://cdn.moralis.io/eth/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.png"
   },
   {
+    "name": "Uniswap",
+    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+    "symbol": "UNI",
+    "decimals": 18,
+    "chainId": 5,
+    "logoURI": "https://cdn.moralis.io/eth/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.png"
+  },
+  {
     "name": "USD Coin",
-    "address": "0x5FfbaC75EFc9547FBc822166feD19B05Cd5890bb",
+    "address": "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
     "symbol": "USDC",
     "decimals": 18,
     "chainId": 5,
