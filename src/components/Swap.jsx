@@ -683,10 +683,10 @@ export default function Swap(props) {
           {isConnected ? (
             <div
               className="swapButton"
-              disabled={!tokenOneAmount}
+              disabled={tokenOneAmount <= 0 || tokenOneBalance <= tokenOneAmount }
               onClick={fetchQuote}
             >
-              Market Swap
+              {tokenOneBalance <= tokenOneAmount ? "Insufficient Balance" : "Market Swap"}
             </div>
           ) : (
             <ConnectButton />
@@ -697,10 +697,10 @@ export default function Swap(props) {
             trigger="click"
             placement="bottom"
           >
-            <button className="swapButton">Show Details</button>
+            <button className="swapButton">Show Aggregator</button>
           </Popover>
 
-          <Row gutter={120}>
+          <Row gutter={140}>
             <Col>
               <div className="footer">
                 {price
