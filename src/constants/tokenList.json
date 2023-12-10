@@ -8,6 +8,9 @@
     "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png",
     "extensions": {
       "bridgeInfo": {
+        "5": {
+          "tokenAddress": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6"
+        },
         "10": {
           "tokenAddress": "0x4200000000000000000000000000000000000006"
         },
@@ -44,6 +47,9 @@
     "logoURI": "https://cdn.moralis.io/eth/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.png",
     "extensions": {
       "bridgeInfo": {
+        "5": {
+          "tokenAddress": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984"
+        },
         "10": {
           "tokenAddress": "0x6fd9d7AD17242c41f7131d257212c54A0e816691"
         },
@@ -58,6 +64,42 @@
         },
         "43114": {
           "tokenAddress": "0x8eBAf22B6F053dFFeaf46f4Dd9eFA95D89ba8580"
+        }
+      }
+    }
+  },
+  {
+    "name": "USDCoin",
+    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "symbol": "USDC",
+    "decimals": 6,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png",
+    "extensions": {
+      "bridgeInfo": {
+        "5": {
+          "tokenAddress": "0x5FfbaC75EFc9547FBc822166feD19B05Cd5890bb"
+        },
+        "10": {
+          "tokenAddress": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"
+        },
+        "56": {
+          "tokenAddress": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d"
+        },
+        "137": {
+          "tokenAddress": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
+        },
+        "8453": {
+          "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+        },
+        "42161": {
+          "tokenAddress": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+        },
+        "43114": {
+          "tokenAddress": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"
+        },
+        "84531": {
+          "tokenAddress": "0xF175520C52418dfE19C8098071a252da48Cd1C19"
         }
       }
     }
@@ -3955,39 +3997,6 @@
       "bridgeInfo": {
         "56": {
           "tokenAddress": "0x0D35A2B85c5A63188d566D104bEbf7C694334Ee4"
-        }
-      }
-    }
-  },
-  {
-    "name": "USDCoin",
-    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    "symbol": "USDC",
-    "decimals": 6,
-    "chainId": 1,
-    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png",
-    "extensions": {
-      "bridgeInfo": {
-        "10": {
-          "tokenAddress": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"
-        },
-        "56": {
-          "tokenAddress": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d"
-        },
-        "137": {
-          "tokenAddress": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
-        },
-        "8453": {
-          "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
-        },
-        "42161": {
-          "tokenAddress": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
-        },
-        "43114": {
-          "tokenAddress": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"
-        },
-        "84531": {
-          "tokenAddress": "0xF175520C52418dfE19C8098071a252da48Cd1C19"
         }
       }
     }

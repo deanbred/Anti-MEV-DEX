@@ -62,6 +62,7 @@ export default function Swap(props) {
   const alchemyConfig = alchemyKeys[client.chain.id];
   console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
   const alchemy = new Alchemy(alchemyConfig);
+
   const [isFetching, setIsFetching] = useState(false);
   const [blockNumber, setBlockNumber] = useState(null);
   const [estimatedGas, setEstimatedGas] = useState(null);
@@ -70,7 +71,7 @@ export default function Swap(props) {
   console.log(`zeroxapi: ${zeroxapi}`);
 
   const [currentTokenList, setCurrentTokenList] = useState(tokenList);
-  //console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
+  console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
 
   const [tokenOne, setTokenOne] = useState(tokenList[0]);
   const [tokenTwo, setTokenTwo] = useState(tokenList[1]);
@@ -389,6 +390,8 @@ export default function Swap(props) {
       }
     }
     console.log(`tokenList: ${JSON.stringify(currentTokenList)}`);
+    fetchBalances();
+    fetchPrices(tokenOne.address, tokenTwo.address);
   }, [client.chain.id]);
 
   useEffect(() => {
@@ -475,6 +478,17 @@ export default function Swap(props) {
     }
   }
 
+  async function handleTokenAddressInput(e) {
+    const tokenAddress = e.target.value;
+    try {
+      const tokenMetadata = await alchemy.getTokenMetadata(tokenAddress);
+      console.log(`tokenMetadata: ${JSON.stringify(tokenMetadata)}`);
+      setTokenOne(tokenMetadata);
+    } catch (error) {
+      console.error("Failed to fetch token metadata:", error);
+    }
+  }
+
   return (
     <>
       {contextHolder}
@@ -485,6 +499,11 @@ export default function Swap(props) {
         title="Select a token"
       >
         <div className="modalContent">
+          <input
+            type="text"
+            placeholder="Paste token address here"
+            onChange={(e) => handleTokenAddressInput(e)}
+          />
           {currentTokenList?.map((e, i) => {
             return (
               <div
@@ -672,9 +691,9 @@ export default function Swap(props) {
             <button className="swapButton">Show Details</button>
           </Popover>
 
-          <Row gutter={190}>
+          <Row>
             <Col>
-              <div className="data">
+              <div className="footer">
                 {estimatedGas
                   ? `Estimated Gas: ${estimatedGas} gwei`
                   : "Fetching Gas..."}
@@ -682,7 +701,7 @@ export default function Swap(props) {
             </Col>
 
             <Col>
-              <div className="data">
+              <div className="footer">
                 Block:{" "}
                 <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
                   {blockNumber}
