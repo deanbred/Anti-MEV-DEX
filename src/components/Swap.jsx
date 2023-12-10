@@ -1,16 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import {
-  Input,
-  Popover,
-  Radio,
-  Modal,
-  message,
-  Col,
-  Row,
-  Button,
-  Divider,
-} from "antd";
+import { Input, Popover, Radio, Modal, message, Col, Row, Button } from "antd";
 import {
   ArrowDownOutlined,
   DownOutlined,
@@ -522,7 +512,6 @@ export default function Swap(props) {
               <div className="tokenTicker">{tokenOne.symbol}</div>
             </div>
           </div>
-
 
           {currentTokenList?.map((e, i) => {
             return (

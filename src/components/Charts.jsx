@@ -31,8 +31,8 @@ export default function Charts() {
         "TradingView" in window
       ) {
         new window.TradingView.widget({
-          width: 480,
-          height: 400,
+          width: 520,
+          height: 410,
           symbol: "BYBIT:LINKUSDT.P",
           interval: "15",
           timezone: "Etc/UTC",
@@ -40,7 +40,7 @@ export default function Charts() {
           style: "1",
           locale: "en",
           enable_publishing: false,
-          hide_side_toolbar: false,
+          hide_side_toolbar: true,
           allow_symbol_change: true,
           container_id: "tradingview_6fd81",
         });
