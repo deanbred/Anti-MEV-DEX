@@ -58,11 +58,10 @@ export default function Swap(props) {
   };
 
   const alchemyConfig = alchemyKeys[client.chain.id];
-  console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
+  //console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
   const alchemy = new Alchemy(alchemyConfig);
 
   const [blockNumber, setBlockNumber] = useState(null);
-  const [estimatedGas, setEstimatedGas] = useState(null);
 
   const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
   //console.log(`zeroxapi: ${zeroxapi}`);
@@ -74,10 +73,10 @@ export default function Swap(props) {
   //console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
 
   const [tokenOne, setTokenOne] = useState(currentTokenList[1]);
-  console.log(`tokenOne: ${JSON.stringify(tokenOne.name)}`);
+  console.log(`tokenOne: ${JSON.stringify(tokenOne)}`);
 
   const [tokenTwo, setTokenTwo] = useState(currentTokenList[2]);
-  console.log(`tokenTwo: ${JSON.stringify(tokenTwo.name)}`);
+  console.log(`tokenTwo: ${JSON.stringify(tokenTwo)}`);
 
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
@@ -174,12 +173,6 @@ export default function Swap(props) {
       const blockNumber = await alchemy.core.getBlockNumber();
       setBlockNumber(blockNumber);
       console.log(`Block Number: ${blockNumber}`);
-
-      console.log(`address: ${address}`);
-
-      const estimatedGas = await alchemy.core.estimateGas({ to: address });
-      setEstimatedGas(estimatedGas);
-      console.log(`Estimated Gas: ${estimatedGas}`);
 
       const response = await fetch(
         "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=PCIG1T3NFQI4F4F5ZJ5W2B6RNAVZSGYZ9Q"
@@ -473,21 +466,23 @@ export default function Swap(props) {
   }
 
   async function handleTokenAddressInput(e) {
-    const tokenAddress = e.target.value;
-    console.log(`tokenAddress: ${tokenAddress}`);
+    console.log(`INPUT tokenAddress: ${e.target.value}`);
     let tokenMetadata;
     try {
-      tokenMetadata = await alchemy.core.getTokenMetadata(tokenAddress);
+      tokenMetadata = await alchemy.core.getTokenMetadata(e.target.value);
+
+      const one = {
+        name: tokenMetadata.name,
+        address: e.target.value,
+        symbol: tokenMetadata.symbol,
+        decimals: tokenMetadata.decimals,
+        chainId: client.chain.id,
+        logoURI: tokenMetadata.logo,
+      };
       console.log(`tokenMetadata: ${JSON.stringify(tokenMetadata)}`);
-      setTokenOne(tokenMetadata);
+      setTokenOne(one);
     } catch (error) {
       console.error("Failed to fetch token metadata:", error);
-      tokenMetadata = {
-        name: null,
-        symbol: null,
-        logo: null,
-        decimals: null,
-      };
     }
   }
 
@@ -696,8 +691,8 @@ export default function Swap(props) {
           <Row gutter={120}>
             <Col>
               <div className="footer">
-                {estimatedGas
-                  ? `Estimated Gas: ${estimatedGas} gwei`
+                {price
+                  ? `Estimated Gas: ${price.estimatedGas} gwei`
                   : "Fetching Gas..."}
               </div>
             </Col>
