@@ -35,7 +35,7 @@ export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
 
   console.log(`address: ${address}`);
-  //console.log(`isConnected: ${isConnected}`);
+  console.log(`isConnected: ${isConnected}`);
   console.log(`chainId:${client.chain.id} ${client.chain.name}`);
 
   const alchemyKeys = {
@@ -58,19 +58,19 @@ export default function Swap(props) {
   };
 
   const alchemyConfig = alchemyKeys[client.chain.id];
-  //console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
+  console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
   const alchemy = new Alchemy(alchemyConfig);
 
   const [blockNumber, setBlockNumber] = useState(null);
 
   const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
-  //console.log(`zeroxapi: ${zeroxapi}`);
+  console.log(`zeroxapi: ${zeroxapi}`);
 
   const filteredTokenList = tokenList.filter(
     (token) => token.chainId === client.chain.id
   );
   const [currentTokenList, setCurrentTokenList] = useState(filteredTokenList);
-  //console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
+  console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
 
   const [tokenOne, setTokenOne] = useState(currentTokenList[1]);
   console.log(`tokenOne: ${JSON.stringify(tokenOne)}`);
@@ -119,7 +119,12 @@ export default function Swap(props) {
   function handleSlippageChange(e) {
     const parsedSlippage = parseFloat(e.target.value);
     if (!isNaN(parsedSlippage)) {
-      setSlippage(parsedSlippage);
+      if (parsedSlippage > 25) {
+        alert("Slippage is high!");
+        setSlippage(parsedSlippage);
+      } else {
+        setSlippage(parsedSlippage);
+      }
       console.log(`slippage: ${parsedSlippage}`);
     }
   }
@@ -437,7 +442,11 @@ export default function Swap(props) {
 
   const settings = (
     <>
-    <input className="slippage" onChange={handleSlippageChange} placeholder="Enter value" />
+      <input
+        className="slippage"
+        onChange={handleSlippageChange}
+        placeholder="Enter value"
+      />
       <Radio.Group value={slippage} onChange={handleSlippageChange}>
         <Radio.Button value={0.5}>0.5%</Radio.Button>
         <Radio.Button value={2.5}>2.5%</Radio.Button>
@@ -596,13 +605,15 @@ export default function Swap(props) {
         <div className="tradeBox">
           <div className="tradeBoxHeader">
             <div className="leftH">
-{              <img
-                src={Logo}
-                alt="logo"
-                height={48}
-                width={48}
-                className="logo"
-              />}
+              {
+                <img
+                  src={Logo}
+                  alt="logo"
+                  height={48}
+                  width={48}
+                  className="logo"
+                />
+              }
               <Link to="/" className="link">
                 <div className="">Market</div>
               </Link>
@@ -682,10 +693,12 @@ export default function Swap(props) {
           {isConnected ? (
             <div
               className="swapButton"
-              disabled={tokenOneAmount <= 0 || tokenOneBalance < tokenOneAmount }
+              disabled={tokenOneAmount <= 0 || tokenOneBalance < tokenOneAmount}
               onClick={fetchQuote}
             >
-              {tokenOneBalance < tokenOneAmount ? "Insufficient Balance" : "Market Swap"}
+              {tokenOneBalance < tokenOneAmount
+                ? "Insufficient Balance"
+                : "Market Swap"}
             </div>
           ) : (
             <ConnectButton />
