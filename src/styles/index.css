@@ -142,7 +142,7 @@ code {
   .ant-input {
     font-size: 32px;
   }
-  .ant-popover-title {
+/*   .ant-popover-title {
     color: white !important;
     font-size: 20px !important;
     text-align: center !important;
@@ -154,7 +154,7 @@ code {
     font-size: 15px !important;
     width: 100% !important;
     max-width: 460px !important;
-  }
+  } */
 }
 
 /* Small Mobile */
@@ -162,7 +162,8 @@ code {
   .ant-input {
     font-size: 28px;
   }
-  .ant-popover-title {
+  
+/*   .ant-popover-title {
     color: white !important;
     font-size: 18px !important;
     text-align: center !important;
@@ -172,8 +173,8 @@ code {
   .ant-popover-inner-content {
     color: white !important;
     font-size: 13px !important;
-    width: 99% !important;
+    width: 100% !important;
     max-width: 460px !important;
     margin-left: -10px !important;
-  }
+  } */
 }

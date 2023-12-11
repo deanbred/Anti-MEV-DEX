@@ -7,9 +7,9 @@ import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { walletConnectProvider } from "@web3modal/wagmi";
 import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import {
-  //mainnet,
-  //arbitrum,
-  //optimism,
+  mainnet,
+  arbitrum,
+  optimism,
   goerli,
   arbitrumGoerli,
   optimismGoerli,
@@ -21,9 +21,9 @@ import { LedgerConnector } from "wagmi/connectors/ledger";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 
 const chains = [
-  //mainnet,
-  //arbitrum,
-  //optimism,
+  mainnet,
+  arbitrum,
+  optimism,
   goerli,
   arbitrumGoerli,
   optimismGoerli,
