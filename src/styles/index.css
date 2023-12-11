@@ -51,9 +51,19 @@ code {
   visibility: hidden;
 }
 
+.ant-popover {
+  background-color: rgb(69, 69, 69) !important;
+  border: 1px solid white !important;
+  width: 90% !important;
+  max-width: 460px !important;
+  border-radius: 8px !important;
+}
+
 .ant-popover-title {
   color: white !important;
   font-size: 20px !important;
+  text-align: center !important;
+  border-bottom: 1px solid white !important;
 }
 
 .ant-popover-inner-content {

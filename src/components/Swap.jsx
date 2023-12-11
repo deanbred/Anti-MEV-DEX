@@ -705,6 +705,7 @@ export default function Swap(props) {
           )}
 
           <Popover
+          title="Swap Details and Liquidity Sources"
             content={renderJsonObject(price)}
             trigger="click"
             placement="bottom"
