@@ -247,7 +247,7 @@ header {
   border-radius: 8px;
   position: absolute;
   top: 73px;
-  right: 125px;
+  right: 128px;
   color: white;
   border: none;
   font-size: 11px;
@@ -656,6 +656,14 @@ header {
     width: 46px;
     height: 46px;
   }
+
+  .maxButton {
+    width: 34px;
+    height: 18px;
+    top: 74px;
+    right: 129px;
+    font-size: 10px;
+  }
 }
 
 /* Small Mobile */
@@ -695,5 +703,23 @@ header {
 
   .tokens_address {
     font-size: 20px;
+  }
+
+  .maxButton {
+    width: 34px;
+    height: 18px;
+    top: 74px;
+    right: 108px;
+    font-size: 10px;
+  }
+
+  .balanceOne {
+    right: 10px;
+    font-size: 13px;
+  }
+
+  .balanceTwo {
+    right: 10px;
+    font-size: 13px;
   }
 }
