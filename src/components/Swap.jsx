@@ -43,17 +43,21 @@ export default function Swap(props) {
       apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
       network: Network.ETH_MAINNET,
     },
-    5: {
-      apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
-      network: Network.ETH_GOERLI,
-    },
     42161: {
       apiKey: "aMlUHixH5lTM_ksIFZfJeTZm1N1nRVAO",
       network: Network.ARB_MAINNET,
     },
+    5: {
+      apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
+      network: Network.ETH_GOERLI,
+    },
     421613: {
       apiKey: "PLaTiZe1BmgkCydWULIS2cxDoGISMWLK",
       network: Network.ARB_GOERLI,
+    },
+    420: {
+      apiKey: "OdYJbCYLmfi8hAF9xABuWAbtOGNuDGeh",
+      network: Network.OPT_GOERLI,
     },
   };
 
@@ -133,8 +137,10 @@ export default function Swap(props) {
     setTokenOneAmount(e.target.value);
     if (e.target.value && price) {
       setTokenTwoAmount((e.target.value * price.ratio).toFixed(5));
+      console.log(`tokenTwoAmount: ${tokenTwoAmount}`);
     } else {
       setTokenTwoAmount(null);
+      console.log("NO PRICE DATA!");
     }
   }
 
@@ -705,7 +711,7 @@ export default function Swap(props) {
           )}
 
           <Popover
-          title="Swap Details and Liquidity Sources"
+            title="Swap Details and Liquidity Sources"
             content={renderJsonObject(price)}
             trigger="click"
             placement="bottom"
