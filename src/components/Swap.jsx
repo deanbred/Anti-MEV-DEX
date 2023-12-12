@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { Input, Popover, Radio, Modal, message, Col, Row, Button } from "antd";
+import { Input, Popover, Radio, Modal, message, Button } from "antd";
 import {
   ArrowDownOutlined,
   DownOutlined,
@@ -34,9 +34,9 @@ const MAX_ALLOWANCE = ethers.constants.MaxUint256;
 export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
 
-  console.log(`address: ${address}`);
-  console.log(`isConnected: ${isConnected}`);
-  console.log(`chainId:${client.chain.id} ${client.chain.name}`);
+  //console.log(`address: ${address}`);
+  //console.log(`isConnected: ${isConnected}`);
+  //console.log(`chainId:${client.chain.id} ${client.chain.name}`);
 
   const alchemyKeys = {
     1: {
@@ -75,14 +75,17 @@ export default function Swap(props) {
   //console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
 
   const [tokenOne, setTokenOne] = useState(currentTokenList[1]); // ETH
-  console.log(`tokenOne: ${JSON.stringify(tokenOne)}`);
+  console.log(
+    `tokenOne: ${tokenOne.name} : ${tokenOne.symbol} : ${tokenOne.address}`
+  );
 
   const [tokenTwo, setTokenTwo] = useState(currentTokenList[2]);
-  console.log(`tokenTwo: ${JSON.stringify(tokenTwo)}`);
+  console.log(
+    `tokenTwo: ${tokenTwo.name} : ${tokenTwo.symbol} : ${tokenTwo.address}`
+  );
 
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
-
 
   const [tokenOneBalance, setTokenOneBalance] = useState(null); // ETH Balance
   const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
@@ -91,9 +94,13 @@ export default function Swap(props) {
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [changeToken, setChangeToken] = useState(1);
-  const [blockNumber, setBlockNumber] = useState(null);
+  const [blockData, setBlockData] = useState({
+    blockNumber: null,
+    ethPrice: null,
+    ethBalance: null,
+  });
+
   const [price, setPrice] = useState(null);
-  const [ethPrice, setEthPrice] = useState(null);
   const [slippage, setSlippage] = useState(0.5);
   const [finalize, setFinalize] = useState(false);
 
@@ -182,28 +189,37 @@ export default function Swap(props) {
   async function getBlock() {
     try {
       const blockNumber = await alchemy.core.getBlockNumber();
-      setBlockNumber(blockNumber);
-      console.log(`Block Number: ${blockNumber}`);
+      console.log(`BLOCK : ${blockNumber}`);
 
       const response = await fetch(
         "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=PCIG1T3NFQI4F4F5ZJ5W2B6RNAVZSGYZ9Q"
       );
       const data = await response.json();
-      setEthPrice(data.result.ethusd);
-      console.log(`ETH PRICE: ${parseFloat(data.result.ethusd).toFixed(5)}`);
+      console.log(`ETH PRICE : ${parseFloat(data.result.ethusd).toFixed(5)}`);
+
+      const ethBalance = await alchemy.core.getBalance(address);
+      console.log(
+        `ETH BALANCE : ${Number(Utils.formatUnits(ethBalance, "ether")).toFixed(
+          4
+        )}`
+      );
+
+      setBlockData({
+        blockNumber: blockNumber,
+        ethPrice: data.result.ethusd,
+        ethBalance: ethBalance,
+      });
     } catch (error) {
       console.error("Failed to get block data:", error);
     } finally {
     }
   }
 
-
   async function fetchBalances(one, two) {
     try {
-      let tokenAddress = [tokenOne.address];
+      let tokenAddress = [one.address];
       let data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
-      console.log(`Token Balances: ${JSON.stringify(data)}`);
       data.tokenBalances.find((item) => {
         let balance = Number(
           Utils.formatUnits(item.tokenBalance, "ether")
@@ -237,7 +253,7 @@ export default function Swap(props) {
         return item.tokenBalance;
       });
     } catch (error) {
-      console.error("An error occurred while fetching balances:", error);
+      console.error("Error fetching balances:", error);
     }
   }
 
@@ -665,9 +681,10 @@ export default function Swap(props) {
             <div className="balanceOne">Balance: {tokenOneBalance}</div>
 
             <div className="valueOne">
-              {price && ethPrice && tokenOneAmount
+              {price && blockData.ethPrice && tokenOneAmount
                 ? `Value: $${parseFloat(
-                    tokenOneAmount * (ethPrice / price.sellTokenToEthRate)
+                    tokenOneAmount *
+                      (blockData.ethPrice / price.sellTokenToEthRate)
                   ).toFixed(2)}`
                 : ""}
             </div>
@@ -695,7 +712,9 @@ export default function Swap(props) {
                 : "Fetching..."}
             </div>
             <div className="">
-              {ethPrice ? `($${parseFloat(ethPrice).toFixed(2)})` : ""}
+              {blockData
+                ? `($${parseFloat(blockData.ethPrice).toFixed(2)})`
+                : ""}
             </div>
           </div>
 
@@ -723,15 +742,14 @@ export default function Swap(props) {
           </Popover>
 
           <div className="block-container">
-            <div>
-              {price
-                ? `Gas: ${price.estimatedGas} gwei`
-                : ""}
-            </div>
+            <div>{price ? `Gas: ${price.estimatedGas} gwei` : ""}</div>
 
-            {blockNumber && (
+            {blockData && (
               <div>
-                Block: <span style={{ color: "#089981" }}>{blockNumber}</span>
+                Block:{" "}
+                <span style={{ color: "#089981" }}>
+                  {blockData.blockNumber}
+                </span>
               </div>
             )}
           </div>
