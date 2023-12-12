@@ -62,21 +62,19 @@ export default function Swap(props) {
   };
 
   const alchemyConfig = alchemyKeys[client.chain.id];
-  console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
   const alchemy = new Alchemy(alchemyConfig);
-
-  const [blockNumber, setBlockNumber] = useState(null);
+  //console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
 
   const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
-  console.log(`zeroxapi: ${zeroxapi}`);
+  //console.log(`zeroxapi: ${zeroxapi}`);
 
   const filteredTokenList = tokenList.filter(
     (token) => token.chainId === client.chain.id
   );
   const [currentTokenList, setCurrentTokenList] = useState(filteredTokenList);
-  console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
+  //console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
 
-  const [tokenOne, setTokenOne] = useState(currentTokenList[1]);
+  const [tokenOne, setTokenOne] = useState(currentTokenList[1]); // ETH
   console.log(`tokenOne: ${JSON.stringify(tokenOne)}`);
 
   const [tokenTwo, setTokenTwo] = useState(currentTokenList[2]);
@@ -85,13 +83,15 @@ export default function Swap(props) {
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
 
-  const [tokenOneBalance, setTokenOneBalance] = useState(null);
+
+  const [tokenOneBalance, setTokenOneBalance] = useState(null); // ETH Balance
   const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [changeToken, setChangeToken] = useState(1);
+  const [blockNumber, setBlockNumber] = useState(null);
   const [price, setPrice] = useState(null);
   const [ethPrice, setEthPrice] = useState(null);
   const [slippage, setSlippage] = useState(0.5);
@@ -152,7 +152,7 @@ export default function Swap(props) {
     const two = tokenTwo;
     setTokenOne(two);
     setTokenTwo(one);
-    fetchPrices(two.address, one.address);
+    //fetchPrices(two, one);
   }
 
   function openModal(asset) {
@@ -166,17 +166,17 @@ export default function Swap(props) {
     setTokenTwoAmount(null);
     if (changeToken === 1) {
       setTokenOne(currentTokenList[i]);
-      fetchPrices(currentTokenList[i].address, tokenTwo.address);
+      fetchPrices(currentTokenList[i], tokenTwo);
     } else {
       setTokenTwo(currentTokenList[i]);
-      fetchPrices(tokenOne.address, currentTokenList[i].address);
+      fetchPrices(tokenOne, currentTokenList[i]);
     }
     setIsOpen(false);
   }
 
   function setMax() {
     setTokenOneAmount(tokenOneBalance);
-    setTokenTwoAmount((tokenOneBalance * price.ratio).toFixed(5));
+    setTokenTwoAmount((tokenOneBalance * price.ratio).toFixed(6));
   }
 
   async function getBlock() {
@@ -197,7 +197,8 @@ export default function Swap(props) {
     }
   }
 
-  async function fetchBalances() {
+
+  async function fetchBalances(one, two) {
     try {
       let tokenAddress = [tokenOne.address];
       let data = await alchemy.core.getTokenBalances(address, tokenAddress);
@@ -218,7 +219,7 @@ export default function Swap(props) {
         return item.tokenBalance;
       });
 
-      tokenAddress = [tokenTwo.address];
+      tokenAddress = [two.address];
       data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
       data.tokenBalances.find((item) => {
@@ -247,8 +248,8 @@ export default function Swap(props) {
       const amount = tokenOneAmount ? tokenOneAmount : 10 * 10 ** 18;
       const headers = { "0x-api-key": "6b47fa57-3614-4aa2-bd99-a86e006b9d3f" };
       let params = {
-        sellToken: one,
-        buyToken: two,
+        sellToken: one.address,
+        buyToken: two.address,
         sellAmount: amount.toString(),
         //takerAddress: address,
       };
@@ -393,16 +394,13 @@ export default function Swap(props) {
       }
     }
     console.log(`tokenList: ${JSON.stringify(currentTokenList)}`);
-    fetchBalances();
-    fetchPrices(tokenOne.address, tokenTwo.address);
+    fetchBalances(tokenOne, tokenTwo);
+    fetchPrices(tokenOne, tokenTwo);
   }, [client.chain.id]);
 
   useEffect(() => {
-    fetchPrices(tokenOne.address, tokenTwo.address);
-  }, [tokenOne, tokenTwo]);
-
-  useEffect(() => {
-    fetchBalances();
+    fetchBalances(tokenOne, tokenTwo);
+    fetchPrices(tokenOne, tokenTwo);
   }, [tokenOne, tokenTwo, isSuccess]);
 
   useEffect(() => {
@@ -436,7 +434,7 @@ export default function Swap(props) {
         content: "Transaction Successful",
         duration: 2.0,
       });
-      fetchBalances();
+      fetchBalances(tokenOne, tokenTwo);
     } else if (txDetails.to) {
       messageApi.open({
         type: "error",
