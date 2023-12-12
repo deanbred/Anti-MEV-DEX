@@ -94,7 +94,7 @@ export default function Swap(props) {
   const [changeToken, setChangeToken] = useState(1);
   const [price, setPrice] = useState(null);
   const [ethPrice, setEthPrice] = useState(null);
-  const [slippage, setSlippage] = useState(1.5);
+  const [slippage, setSlippage] = useState(0.5);
   const [finalize, setFinalize] = useState(false);
 
   const [txDetails, setTxDetails] = useState({
@@ -615,9 +615,9 @@ export default function Swap(props) {
                 <img
                   src={Logo}
                   alt="logo"
-                  height={48}
-                  width={48}
-                  className="logo"
+                  height={42}
+                  width={42}
+                  className="sm-logo"
                 />
               }
               <Link to="/" className="link">
@@ -688,12 +688,17 @@ export default function Swap(props) {
             <div className="balanceTwo">Balance: {tokenTwoBalance}</div>
           </div>
 
-          <div className="convert">
-            {price
-              ? `1 ${tokenOne.symbol} = ${parseFloat(price.ratio).toFixed(5)} ${
-                  tokenTwo.symbol
-                }`
-              : "Fetching Price..."}
+          <div className="price-container">
+            <div className="">
+              {price
+                ? `1 ${tokenOne.symbol} = ${parseFloat(price.ratio).toFixed(
+                    3
+                  )} ${tokenTwo.symbol}`
+                : "Fetching..."}
+            </div>
+            <div className="">
+              {ethPrice ? `($${parseFloat(ethPrice).toFixed(2)})` : ""}
+            </div>
           </div>
 
           {isConnected ? (
@@ -719,21 +724,19 @@ export default function Swap(props) {
             <button className="swapButton">Show Aggregator</button>
           </Popover>
 
-          <Row gutter={140}>
-            <Col>
-              <div className="footer">
-                {price
-                  ? `Estimated Gas: ${price.estimatedGas} gwei`
-                  : "Fetching Gas..."}
-              </div>
-            </Col>
+          <div className="block-container">
+            <div>
+              {price
+                ? `Gas: ${price.estimatedGas} gwei`
+                : ""}
+            </div>
 
-            <Col>
-              <div className="footer">
+            {blockNumber && (
+              <div>
                 Block: <span style={{ color: "#089981" }}>{blockNumber}</span>
               </div>
-            </Col>
-          </Row>
+            )}
+          </div>
         </div>
 
         <div className="chart">{<Charts />}</div>
