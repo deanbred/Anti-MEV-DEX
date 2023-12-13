@@ -631,9 +631,8 @@ export default function Swap(props) {
         className="swap"
         style={{
           backgroundImage: `url(${bgImage})`,
-          backgroundPosition: "top center",
-          //backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
+          backgroundPosition: "top center",
         }}
       >
         <div className="ticker">
@@ -642,15 +641,6 @@ export default function Swap(props) {
         <div className="tradeBox">
           <div className="tradeBoxHeader">
             <div className="leftH">
-{/*               {
-                <img
-                  src={Logo}
-                  alt="logo"
-                  height={32}
-                  width={32}
-                  className="sm-logo"
-                />
-              } */}
               <Link to="/" className="link">
                 <div className="">Market</div>
               </Link>

@@ -7,6 +7,7 @@ import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
 import Logo from "../icon.png";
+import bgImage from "../styles/circuit.jpg";
 
 import {
   erc20ABI,
@@ -585,14 +586,21 @@ export default function Limit(props) {
         </div>
       </Modal>
 
-      <div className="swap">
+      <div
+        className="swap"
+        style={{
+          backgroundImage: `url(${bgImage})`,
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "top center",
+        }}
+      >
+        {" "}
         <div className="ticker">
           <Ticker />
         </div>
         <div className="tradeBox">
           <div className="tradeBoxHeader">
             <div className="leftH">
-              <img src={Logo} alt="logo" className="logo" />
               <Link to="/" className="link">
                 <div className="headerItem opacity">Market</div>
               </Link>
@@ -706,7 +714,6 @@ export default function Limit(props) {
             </Col>
           </Row>
         </div>
-
         <div className="chart">
           <Charts />
         </div>
