@@ -1,13 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { Input, Popover, Radio, Modal, message, Col, Row, Button } from "antd";
-import { DownOutlined, SettingOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Input, Popover, Radio, Modal, message, Button } from "antd";
+import {
+  ArrowDownOutlined,
+  DownOutlined,
+  SettingOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";import { Link } from "react-router-dom";
 import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
-import Logo from "../icon.png";
 import bgImage from "../styles/circuit.jpg";
+import { ethers } from "ethers";
+import qs from "qs";
 
 import {
   erc20ABI,
@@ -24,15 +29,12 @@ import { BigNumber, hexUtils } from "@0x/utils";
 
 import tokenList from "../constants/tokenList.json";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
-import { ethers } from "ethers";
-import qs from "qs";
 
 const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
 const devWallet = "0xd577F7b3359862A4178667347F4415d5682B4E85";
-const MAX_ALLOWANCE =
-  115792089237316195423570985008687907853269984665640564039457584007913129639935n;
+const MAX_ALLOWANCE = ethers.constants.MaxUint256;
 const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
-const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const NULL_BYTES = "0x";
 const ZERO = new BigNumber(0);
 

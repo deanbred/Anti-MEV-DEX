@@ -5,15 +5,15 @@ import {
   ArrowDownOutlined,
   DownOutlined,
   SettingOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
-import Logo from "../icon.png";
 import bgImage from "../styles/circuit.jpg";
-import qs from "qs";
 import { ethers } from "ethers";
+import qs from "qs";
 
 import {
   erc20ABI,
@@ -25,11 +25,17 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 
+import { BigNumber, hexUtils } from "@0x/utils";
+
 import tokenList from "../constants/tokenList.json";
 // Eth:1 BSC:56 Polygon:137 Arbitrum:42161 Optimism:10 Avax:43114 Goerli:5
 import { Alchemy, Network, Utils } from "alchemy-sdk";
+
 import exchangeProxy from "../constants/constants.ts";
+const devWallet = "0xd577F7b3359862A4178667347F4415d5682B4E85";
 const MAX_ALLOWANCE = ethers.constants.MaxUint256;
+const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const ZERO = new BigNumber(0);
 
 export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
@@ -87,7 +93,7 @@ export default function Swap(props) {
 
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
-  const [tokenOneBalance, setTokenOneBalance] = useState(null); 
+  const [tokenOneBalance, setTokenOneBalance] = useState(null);
   const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
   const [changeToken, setChangeToken] = useState(1);
 
@@ -220,7 +226,7 @@ export default function Swap(props) {
       console.log(`tokenAddress from balances: ${tokenAddress}`);
       let data;
 
-      if (one.address === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
+      if (one.address === ETH_ADDRESS) {
         setTokenOneBalance(
           Number(Utils.formatUnits(ethBalance, "ether")).toFixed(4)
         );
@@ -242,7 +248,7 @@ export default function Swap(props) {
           return item.tokenBalance;
         });
       }
-      if (two.address === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
+      if (two.address === ETH_ADDRESS) {
         setTokenTwoBalance(
           Number(Utils.formatUnits(ethBalance, "ether")).toFixed(4)
         );
@@ -635,7 +641,7 @@ export default function Swap(props) {
         <div className="ticker">
           <Ticker />
         </div>
-        
+
         <div className="tradeBox">
           <div className="tradeBoxHeader">
             <div className="leftH">
