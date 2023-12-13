@@ -433,9 +433,6 @@ export default function Swap(props) {
 
   useEffect(() => {
     fetchBalances(tokenOne, tokenTwo);
-  }, [tokenOne, tokenTwo]);
-
-  useEffect(() => {
     fetchPrices(tokenOne, tokenTwo);
   }, [tokenOne, tokenTwo]);
 
