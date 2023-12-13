@@ -97,8 +97,9 @@ export default function Swap(props) {
   const [blockData, setBlockData] = useState({
     blockNumber: null,
     ethPrice: null,
-    ethBalance: null,
   });
+
+  const [ethBalance, setEthBalance] = useState(null);
 
   const [price, setPrice] = useState(null);
   const [slippage, setSlippage] = useState(0.5);
@@ -197,17 +198,9 @@ export default function Swap(props) {
       const data = await response.json();
       console.log(`ETH PRICE : ${parseFloat(data.result.ethusd).toFixed(5)}`);
 
-      const ethBalance = await alchemy.core.getBalance(address);
-      console.log(
-        `ETH BALANCE : ${Number(Utils.formatUnits(ethBalance, "ether")).toFixed(
-          4
-        )}`
-      );
-
       setBlockData({
         blockNumber: blockNumber,
         ethPrice: data.result.ethusd,
-        ethBalance: ethBalance,
       });
     } catch (error) {
       console.error("Failed to get block data:", error);
@@ -216,42 +209,65 @@ export default function Swap(props) {
   }
 
   async function fetchBalances(one, two) {
+    setTokenOneBalance(null);
+    setTokenTwoBalance(null);
     try {
+      const ethBalance = await alchemy.core.getBalance(address);
+      setEthBalance(ethBalance);
+      console.log(
+        `ETH BALANCE : ${Number(Utils.formatUnits(ethBalance, "ether")).toFixed(
+          4
+        )}`
+      );
+
       let tokenAddress = [one.address];
-      let data = await alchemy.core.getTokenBalances(address, tokenAddress);
+      console.log(`tokenAddress from balances: ${tokenAddress}`);
+      let data;
+      if (one.address === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
+        setTokenOneBalance(
+          Number(Utils.formatUnits(ethBalance, "ether")).toFixed(4)
+        );
+      } else {
+        data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
-      data.tokenBalances.find((item) => {
-        let balance = Number(
-          Utils.formatUnits(item.tokenBalance, "ether")
-        ).toFixed(4);
-        if (
-          item.tokenBalance ===
-          "0x0000000000000000000000000000000000000000000000000000000000000000"
-        ) {
-          setTokenOneBalance("0.000");
-        } else {
-          setTokenOneBalance(balance);
-        }
-        return item.tokenBalance;
-      });
+        data.tokenBalances.find((item) => {
+          let balance = Number(
+            Utils.formatUnits(item.tokenBalance, "ether")
+          ).toFixed(4);
+          if (
+            item.tokenBalance ===
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+          ) {
+            setTokenOneBalance("0.000");
+          } else {
+            setTokenOneBalance(balance);
+          }
+          return item.tokenBalance;
+        });
+      }
+      if (two.address === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
+        setTokenTwoBalance(
+          Number(Utils.formatUnits(ethBalance, "ether")).toFixed(4)
+        );
+      } else {
+        tokenAddress = [two.address];
+        data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
-      tokenAddress = [two.address];
-      data = await alchemy.core.getTokenBalances(address, tokenAddress);
-
-      data.tokenBalances.find((item) => {
-        let balance = Number(
-          Utils.formatUnits(item.tokenBalance, "ether")
-        ).toFixed(4);
-        if (
-          item.tokenBalance ===
-          "0x0000000000000000000000000000000000000000000000000000000000000000"
-        ) {
-          setTokenTwoBalance("0.000");
-        } else {
-          setTokenTwoBalance(balance);
-        }
-        return item.tokenBalance;
-      });
+        data.tokenBalances.find((item) => {
+          let balance = Number(
+            Utils.formatUnits(item.tokenBalance, "ether")
+          ).toFixed(4);
+          if (
+            item.tokenBalance ===
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+          ) {
+            setTokenTwoBalance("0.000");
+          } else {
+            setTokenTwoBalance(balance);
+          }
+          return item.tokenBalance;
+        });
+      }
     } catch (error) {
       console.error("Error fetching balances:", error);
     }

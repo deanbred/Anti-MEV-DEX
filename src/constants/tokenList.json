@@ -1,5 +1,29 @@
 [
   {
+    "name": "Ethereum",
+    "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    "symbol": "ETH",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://cryptologos.cc/logos/ethereum-eth-logo.png"
+  },
+  {
+    "name": "Ethereum",
+    "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    "symbol": "ETH",
+    "decimals": 18,
+    "chainId": 5,
+    "logoURI": "https://cryptologos.cc/logos/ethereum-eth-logo.png"
+  },
+  {
+    "name": "Ethereum",
+    "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    "symbol": "ETH",
+    "decimals": 18,
+    "chainId": 42161,
+    "logoURI": "https://cryptologos.cc/logos/ethereum-eth-logo.png"
+  },
+  {
     "name": "Wrapped Ether",
     "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     "symbol": "WETH",
