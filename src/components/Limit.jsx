@@ -62,14 +62,16 @@ export default function Limit(props) {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
-  const [blockNumber, setBlockNumber] = useState(null);
+
+  const [blockData, setBlockData] = useState({
+    blockNumber: null,
+    ethPrice: null,
+  });
   const [price, setPrice] = useState(null);
-  const [ethPrice, setEthPrice] = useState(null);
   const [limitPrice, setLimitPrice] = useState(null);
   const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
-  console.log(`zeroxapi: ${zeroxapi}`);
+  //console.log(`zeroxapi: ${zeroxapi}`);
 
   const [txDetails, setTxDetails] = useState({
     from: null,
@@ -125,7 +127,12 @@ export default function Limit(props) {
   function handleSlippageChange(e) {
     const parsedSlippage = parseFloat(e.target.value);
     if (!isNaN(parsedSlippage)) {
-      setSlippage(parsedSlippage);
+      if (parsedSlippage > 25) {
+        alert("Slippage is high!");
+        setSlippage(parsedSlippage);
+      } else {
+        setSlippage(parsedSlippage);
+      }
       console.log(`slippage: ${parsedSlippage}`);
     }
   }
@@ -133,9 +140,11 @@ export default function Limit(props) {
   function changeAmount(e) {
     setTokenOneAmount(e.target.value);
     if (e.target.value && price) {
-      setTokenTwoAmount((e.target.value * price.ratio).toFixed(3));
+      setTokenTwoAmount((e.target.value * price.ratio).toFixed(5));
+      console.log(`tokenTwoAmount: ${tokenTwoAmount}`);
     } else {
       setTokenTwoAmount(null);
+      console.log("NO PRICE DATA!");
     }
   }
 
@@ -173,27 +182,23 @@ export default function Limit(props) {
   }
 
   async function getBlock() {
-    setIsFetching(true);
     try {
       const blockNumber = await alchemy.core.getBlockNumber();
-      setBlockNumber(blockNumber);
-    } catch (error) {
-      console.error("Failed to get block:", error);
-    } finally {
-      setIsFetching(false);
-    }
-  }
+      console.log(`BLOCK : ${blockNumber}`);
 
-  async function getEthPrice() {
-    try {
       const response = await fetch(
         "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=PCIG1T3NFQI4F4F5ZJ5W2B6RNAVZSGYZ9Q"
       );
       const data = await response.json();
-      setEthPrice(data.result.ethusd);
-      console.log(`ETH PRICE: ${ethPrice}`);
+      console.log(`ETH PRICE : ${parseFloat(data.result.ethusd).toFixed(5)}`);
+
+      setBlockData({
+        blockNumber: blockNumber,
+        ethPrice: data.result.ethusd,
+      });
     } catch (error) {
-      console.error("Error fetching price:", error);
+      console.error("Failed to get block data:", error);
+    } finally {
     }
   }
 
@@ -695,24 +700,18 @@ export default function Limit(props) {
             <button className="swapButton">Show Details</button>
           </Popover>
 
-          <Row gutter={190}>
-            <Col>
-              <div className="data">
-                {price
-                  ? `Estimated Gas: ${price.estimatedGas} gwei`
-                  : "Fetching Gas..."}
-              </div>
-            </Col>
+          <div className="block-container">
+            <div>{price ? `Gas: ${price.estimatedGas} gwei` : ""}</div>
 
-            <Col>
-              <div className="data">
+            {blockData && (
+              <div>
                 Block:{" "}
-                <span style={{ color: isFetching ? "#3ADA40" : "#089981" }}>
-                  {blockNumber}
+                <span style={{ color: "#089981" }}>
+                  {blockData.blockNumber}
                 </span>
               </div>
-            </Col>
-          </Row>
+            )}
+          </div>
         </div>
         <div className="chart">
           <Charts />

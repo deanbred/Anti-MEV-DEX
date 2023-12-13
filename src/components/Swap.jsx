@@ -99,7 +99,7 @@ export default function Swap(props) {
     ethPrice: null,
   });
 
-  const [ethBalance, setEthBalance] = useState(null);
+  const [ethBalance, setEthBalance] = useState("0.000");
 
   const [price, setPrice] = useState(null);
   const [slippage, setSlippage] = useState(0.5);
@@ -433,10 +433,14 @@ export default function Swap(props) {
 
   useEffect(() => {
     fetchBalances(tokenOne, tokenTwo);
-    fetchPrices(tokenOne, tokenTwo);
-  }, [tokenOne, tokenTwo, isSuccess]);
+  }, [tokenOne, tokenTwo]);
 
   useEffect(() => {
+    fetchPrices(tokenOne, tokenTwo);
+  }, [tokenOne, tokenTwo]);
+
+  useEffect(() => {
+    getBlock();
     const intervalId = setInterval(getBlock, 12500);
     return () => clearInterval(intervalId);
   }, []);
@@ -721,7 +725,7 @@ export default function Swap(props) {
             <div className="">
               {blockData
                 ? `($${parseFloat(blockData.ethPrice).toFixed(2)})`
-                : ""}
+                : "($)"}
             </div>
           </div>
 
