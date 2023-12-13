@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
-import Logo from "../logo.png";
+import Logo from "../icon.png";
 
 import {
   erc20ABI,

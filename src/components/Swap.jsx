@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
-import Logo from "../logo.png";
+import Logo from "../icon.png";
 import bgImage from "../styles/circuit.jpg";
 import qs from "qs";
 import { ethers } from "ethers";
@@ -209,8 +209,8 @@ export default function Swap(props) {
   }
 
   async function fetchBalances(one, two) {
-    setTokenOneBalance(null);
-    setTokenTwoBalance(null);
+    //setTokenOneBalance(null);
+    //setTokenTwoBalance(null);
     try {
       const ethBalance = await alchemy.core.getBalance(address);
       setEthBalance(ethBalance);
@@ -223,6 +223,7 @@ export default function Swap(props) {
       let tokenAddress = [one.address];
       console.log(`tokenAddress from balances: ${tokenAddress}`);
       let data;
+      
       if (one.address === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
         setTokenOneBalance(
           Number(Utils.formatUnits(ethBalance, "ether")).toFixed(4)
