@@ -27,14 +27,6 @@ import { Alchemy, Network, Utils } from "alchemy-sdk";
 import { ethers } from "ethers";
 import qs from "qs";
 
-const config = {
-  apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
-  network: Network.ETH_MAINNET,
-  //apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
-  //network: Network.ETH_GOERLI,
-};
-const alchemy = new Alchemy(config);
-
 const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
 const devWallet = "0xd577F7b3359862A4178667347F4415d5682B4E85";
 const MAX_ALLOWANCE =
@@ -46,32 +38,76 @@ const ZERO = new BigNumber(0);
 
 export default function Limit(props) {
   const { address, connector, isConnected, client } = props;
-
   const [messageApi, contextHolder] = message.useMessage();
-  const [slippage, setSlippage] = useState(1.5);
 
-  const [currentTokenList, setCurrentTokenList] = useState(tokenList);
+  //console.log(`address: ${address}`);
+  //console.log(`isConnected: ${isConnected}`);
+  //console.log(`chainId:${client.chain.id} ${client.chain.name}`);
+
+  const alchemyKeys = {
+    1: {
+      apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
+      network: Network.ETH_MAINNET,
+    },
+    42161: {
+      apiKey: "aMlUHixH5lTM_ksIFZfJeTZm1N1nRVAO",
+      network: Network.ARB_MAINNET,
+    },
+    5: {
+      apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
+      network: Network.ETH_GOERLI,
+    },
+    421613: {
+      apiKey: "PLaTiZe1BmgkCydWULIS2cxDoGISMWLK",
+      network: Network.ARB_GOERLI,
+    },
+    420: {
+      apiKey: "OdYJbCYLmfi8hAF9xABuWAbtOGNuDGeh",
+      network: Network.OPT_GOERLI,
+    },
+  };
+
+  const alchemyConfig = alchemyKeys[client.chain.id];
+  const alchemy = new Alchemy(alchemyConfig);
+  //console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
+
+  const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
+  //console.log(`zeroxapi: ${zeroxapi}`);
+
+  const filteredTokenList = tokenList.filter(
+    (token) => token.chainId === client.chain.id
+  );
+  const [currentTokenList, setCurrentTokenList] = useState(filteredTokenList);
   //console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
+
+  const [tokenOne, setTokenOne] = useState(currentTokenList[1]); // ETH
+  console.log(
+    `tokenOne: ${tokenOne.name} : ${tokenOne.symbol} : ${tokenOne.address}`
+  );
+
+  const [tokenTwo, setTokenTwo] = useState(currentTokenList[2]);
+  console.log(
+    `tokenTwo: ${tokenTwo.name} : ${tokenTwo.symbol} : ${tokenTwo.address}`
+  );
 
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
-  const [tokenOne, setTokenOne] = useState(tokenList[0]);
-  const [tokenTwo, setTokenTwo] = useState(tokenList[1]);
   const [tokenOneBalance, setTokenOneBalance] = useState(null);
   const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
+  const [changeToken, setChangeToken] = useState(1);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
-  const [changeToken, setChangeToken] = useState(1);
-
   const [blockData, setBlockData] = useState({
     blockNumber: null,
     ethPrice: null,
   });
+  const [ethBalance, setEthBalance] = useState("0.000");
   const [price, setPrice] = useState(null);
+  const [slippage, setSlippage] = useState(0.5);
+  const [finalize, setFinalize] = useState(false);
+
   const [limitPrice, setLimitPrice] = useState(null);
-  const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
-  //console.log(`zeroxapi: ${zeroxapi}`);
 
   const [txDetails, setTxDetails] = useState({
     from: null,
@@ -167,18 +203,18 @@ export default function Limit(props) {
     setTokenOneAmount(null);
     setTokenTwoAmount(null);
     if (changeToken === 1) {
-      setTokenOne(tokenList[i]);
-      fetchPrices(tokenList[i].address, tokenTwo.address);
+      setTokenOne(currentTokenList[i]);
+      fetchPrices(currentTokenList[i], tokenTwo);
     } else {
-      setTokenTwo(tokenList[i]);
-      fetchPrices(tokenOne.address, tokenList[i].address);
+      setTokenTwo(currentTokenList[i]);
+      fetchPrices(tokenOne, currentTokenList[i]);
     }
     setIsOpen(false);
   }
 
   function setMax() {
     setTokenOneAmount(tokenOneBalance);
-    setTokenTwoAmount((tokenOneBalance * price.ratio).toFixed(3));
+    setTokenTwoAmount((tokenOneBalance * price.ratio).toFixed(6));
   }
 
   async function getBlock() {
@@ -202,46 +238,67 @@ export default function Limit(props) {
     }
   }
 
-  async function fetchBalances() {
+  async function fetchBalances(one, two) {
     try {
-      let tokenAddress = [tokenOne.address];
-      let data = await alchemy.core.getTokenBalances(address, tokenAddress);
+      const ethBalance = await alchemy.core.getBalance(address);
+      setEthBalance(ethBalance);
+      console.log(
+        `ETH BALANCE : ${Number(Utils.formatUnits(ethBalance, "ether")).toFixed(
+          4
+        )}`
+      );
 
-      console.log(`Token Balances: ${JSON.stringify(data)}`);
-      data.tokenBalances.find((item) => {
-        let balance = Number(
-          Utils.formatUnits(item.tokenBalance, "ether")
-        ).toFixed(3);
-        if (
-          item.tokenBalance ===
-          "0x0000000000000000000000000000000000000000000000000000000000000000"
-        ) {
-          setTokenOneBalance("0.000");
-        } else {
-          setTokenOneBalance(balance);
-        }
-        return item.tokenBalance;
-      });
+      let tokenAddress = [one.address];
+      console.log(`tokenAddress from balances: ${tokenAddress}`);
+      let data;
 
-      tokenAddress = [tokenTwo.address];
-      data = await alchemy.core.getTokenBalances(address, tokenAddress);
+      if (one.address === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
+        setTokenOneBalance(
+          Number(Utils.formatUnits(ethBalance, "ether")).toFixed(4)
+        );
+      } else {
+        data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
-      data.tokenBalances.find((item) => {
-        let balance = Number(
-          Utils.formatUnits(item.tokenBalance, "ether")
-        ).toFixed(3);
-        if (
-          item.tokenBalance ===
-          "0x0000000000000000000000000000000000000000000000000000000000000000"
-        ) {
-          setTokenTwoBalance("0.000");
-        } else {
-          setTokenTwoBalance(balance);
-        }
-        return item.tokenBalance;
-      });
+        data.tokenBalances.find((item) => {
+          let balance = Number(
+            Utils.formatUnits(item.tokenBalance, "ether")
+          ).toFixed(4);
+          if (
+            item.tokenBalance ===
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+          ) {
+            setTokenOneBalance("0.000");
+          } else {
+            setTokenOneBalance(balance);
+          }
+          return item.tokenBalance;
+        });
+      }
+      if (two.address === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
+        setTokenTwoBalance(
+          Number(Utils.formatUnits(ethBalance, "ether")).toFixed(4)
+        );
+      } else {
+        tokenAddress = [two.address];
+        data = await alchemy.core.getTokenBalances(address, tokenAddress);
+
+        data.tokenBalances.find((item) => {
+          let balance = Number(
+            Utils.formatUnits(item.tokenBalance, "ether")
+          ).toFixed(4);
+          if (
+            item.tokenBalance ===
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+          ) {
+            setTokenTwoBalance("0.000");
+          } else {
+            setTokenTwoBalance(balance);
+          }
+          return item.tokenBalance;
+        });
+      }
     } catch (error) {
-      console.error("An error occurred while fetching balances:", error);
+      console.error("Error fetching balances:", error);
     }
   }
 
@@ -252,10 +309,10 @@ export default function Limit(props) {
       const amount = tokenOneAmount ? tokenOneAmount : 10 * 10 ** 18;
       const headers = { "0x-api-key": "6b47fa57-3614-4aa2-bd99-a86e006b9d3f" };
       let params = {
-        sellToken: one,
-        buyToken: two,
+        sellToken: one.address,
+        buyToken: two.address,
         sellAmount: amount.toString(),
-        takerAddress: address,
+        //takerAddress: address,
       };
 
       const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
@@ -427,26 +484,26 @@ export default function Limit(props) {
       }
     }
     console.log(`tokenList: ${JSON.stringify(currentTokenList)}`);
+    fetchBalances(tokenOne, tokenTwo);
+    fetchPrices(tokenOne, tokenTwo);
   }, [client.chain.id]);
 
   useEffect(() => {
-    fetchPrices(tokenOne.address, tokenTwo.address);
+    fetchBalances(tokenOne, tokenTwo);
+    fetchPrices(tokenOne, tokenTwo);
   }, [tokenOne, tokenTwo]);
 
   useEffect(() => {
-    fetchBalances();
-  }, [tokenOne, tokenTwo, isSuccess]);
-
-  useEffect(() => {
+    getBlock();
     const intervalId = setInterval(getBlock, 12500);
     return () => clearInterval(intervalId);
-  }, [getBlock]);
+  }, []);
 
   useEffect(() => {
     if (txDetails.to && isConnected) {
       sendTransaction && sendTransaction();
     }
-  }, [txDetails.to]);
+  }, [txDetails]);
 
   useEffect(() => {
     messageApi.destroy();
@@ -480,13 +537,16 @@ export default function Limit(props) {
 
   const settings = (
     <>
+      <input
+        className="slippage"
+        onChange={handleSlippageChange}
+        placeholder="Enter value"
+      />
       <Radio.Group value={slippage} onChange={handleSlippageChange}>
         <Radio.Button value={0.5}>0.5%</Radio.Button>
         <Radio.Button value={2.5}>2.5%</Radio.Button>
         <Radio.Button value={5}>5.0%</Radio.Button>
         <Radio.Button value={10}>10.0%</Radio.Button>
-        <Radio.Button value={25}>25.0%</Radio.Button>
-        <Radio.Button value={50}>50.0%</Radio.Button>
       </Radio.Group>
     </>
   );
@@ -508,6 +568,25 @@ export default function Limit(props) {
     }
   }
 
+  async function handleTokenAddressInput(e) {
+    let tokenMetadata;
+    try {
+      tokenMetadata = await alchemy.core.getTokenMetadata(e.target.value);
+
+      const one = {
+        name: tokenMetadata.name,
+        address: e.target.value,
+        symbol: tokenMetadata.symbol,
+        decimals: tokenMetadata.decimals,
+        chainId: client.chain.id,
+        logoURI: tokenMetadata.logo,
+      };
+      setTokenOne(one);
+    } catch (error) {
+      console.error("Failed to fetch token metadata:", error);
+    }
+  }
+
   return (
     <>
       {contextHolder}
@@ -517,10 +596,6 @@ export default function Limit(props) {
         onCancel={() => setIsOpen(false)}
         title="Select a token"
       >
-        {/*         <div className="modalContent">
-          Paste in a token address or select from the list below
-          <Input placeholder="0x..." value={newToken} onChange={addTokenList} />
-        </div> */}
         <div className="modalContent">
           {tokenList?.map((e, i) => {
             return (
@@ -599,10 +674,10 @@ export default function Limit(props) {
           backgroundPosition: "top center",
         }}
       >
-        {" "}
         <div className="ticker">
           <Ticker />
         </div>
+
         <div className="tradeBox">
           <div className="tradeBoxHeader">
             <div className="leftH">
@@ -713,6 +788,7 @@ export default function Limit(props) {
             )}
           </div>
         </div>
+
         <div className="chart">
           <Charts />
         </div>

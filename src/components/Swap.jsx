@@ -33,6 +33,7 @@ const MAX_ALLOWANCE = ethers.constants.MaxUint256;
 
 export default function Swap(props) {
   const { address, connector, isConnected, client } = props;
+  const [messageApi, contextHolder] = message.useMessage();
 
   //console.log(`address: ${address}`);
   //console.log(`isConnected: ${isConnected}`);
@@ -86,21 +87,18 @@ export default function Swap(props) {
 
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
-
-  const [tokenOneBalance, setTokenOneBalance] = useState(null); // ETH Balance
+  const [tokenOneBalance, setTokenOneBalance] = useState(null); 
   const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
+  const [changeToken, setChangeToken] = useState(1);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
-  const [changeToken, setChangeToken] = useState(1);
   const [blockData, setBlockData] = useState({
     blockNumber: null,
     ethPrice: null,
   });
 
   const [ethBalance, setEthBalance] = useState("0.000");
-
   const [price, setPrice] = useState(null);
   const [slippage, setSlippage] = useState(0.5);
   const [finalize, setFinalize] = useState(false);
@@ -209,8 +207,6 @@ export default function Swap(props) {
   }
 
   async function fetchBalances(one, two) {
-    //setTokenOneBalance(null);
-    //setTokenTwoBalance(null);
     try {
       const ethBalance = await alchemy.core.getBalance(address);
       setEthBalance(ethBalance);
@@ -639,6 +635,7 @@ export default function Swap(props) {
         <div className="ticker">
           <Ticker />
         </div>
+        
         <div className="tradeBox">
           <div className="tradeBoxHeader">
             <div className="leftH">
