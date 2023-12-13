@@ -223,7 +223,7 @@ export default function Swap(props) {
       let tokenAddress = [one.address];
       console.log(`tokenAddress from balances: ${tokenAddress}`);
       let data;
-      
+
       if (one.address === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
         setTokenOneBalance(
           Number(Utils.formatUnits(ethBalance, "ether")).toFixed(4)
@@ -642,15 +642,15 @@ export default function Swap(props) {
         <div className="tradeBox">
           <div className="tradeBoxHeader">
             <div className="leftH">
-              {
+{/*               {
                 <img
                   src={Logo}
                   alt="logo"
-                  height={42}
-                  width={42}
+                  height={32}
+                  width={32}
                   className="sm-logo"
                 />
-              }
+              } */}
               <Link to="/" className="link">
                 <div className="">Market</div>
               </Link>

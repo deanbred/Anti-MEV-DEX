@@ -32,7 +32,7 @@ header {
 }
 
 .headerItem {
-  padding: 6px;
+  padding: 4px;
   padding-left: 10px;
   padding-right: 10px;
   border-radius: 8px;
@@ -139,6 +139,7 @@ header {
   justify-content: space-between;
   align-items: center;
   width: 98%;
+  height: 44px;
 }
 
 .cog {
