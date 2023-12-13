@@ -6,7 +6,8 @@ import {
   DownOutlined,
   SettingOutlined,
   SearchOutlined,
-} from "@ant-design/icons";import { Link } from "react-router-dom";
+} from "@ant-design/icons";
+import { Link } from "react-router-dom";
 import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
@@ -769,12 +770,12 @@ export default function Limit(props) {
           )}
 
           <Popover
+            title="Swap Details and Liquidity Sources"
             content={renderJsonObject(price)}
-            title="Aggregator Details"
             trigger="click"
             placement="bottom"
           >
-            <button className="swapButton">Show Details</button>
+            <button className="swapButton">Show Aggregator</button>
           </Popover>
 
           <div className="block-container">

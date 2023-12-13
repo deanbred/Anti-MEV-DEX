@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Input, Popover, Radio, Modal, message, Button } from "antd";
 import {
   ArrowDownOutlined,
+  RetweetOutlined,
   DownOutlined,
   SettingOutlined,
   SearchOutlined,
@@ -672,7 +673,7 @@ export default function Swap(props) {
             <Input placeholder="0" value={tokenTwoAmount} disabled={true} />
 
             <div className="switchButton" onClick={switchTokens}>
-              <ArrowDownOutlined className="switchArrow" />
+              <ArrowDownOutlined />
             </div>
 
             <div className="assetOne" onClick={() => openModal(1)}>
