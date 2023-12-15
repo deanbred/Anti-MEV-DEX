@@ -216,7 +216,7 @@ export default function Swap(props) {
         ethPrice: data.result.ethusd,
       });
     } catch (error) {
-      console.error("Failed to get block data:", error);
+      console.log("Failed to get block data:", error);
     } finally {
     }
   }
@@ -281,7 +281,7 @@ export default function Swap(props) {
         });
       }
     } catch (error) {
-      console.error("Error fetching balances:", error);
+      console.log("Error fetching balances:", error);
     }
   }
 
@@ -673,12 +673,18 @@ export default function Swap(props) {
 
           <div className="inputs">
             <Input
+              id="inputOne"
               placeholder="0"
               value={tokenOneAmount}
               onChange={changeAmount}
               disabled={!isConnected}
             />
-            <Input placeholder="0" value={tokenTwoAmount} disabled={true} />
+            <Input
+              id="inputTwo"
+              placeholder="0"
+              value={tokenTwoAmount}
+              disabled={true}
+            />
 
             <div className="switchButton" onClick={switchTokens}>
               <ArrowDownOutlined />

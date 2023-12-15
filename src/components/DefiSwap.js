@@ -297,7 +297,7 @@ export default function Defiswap() {
               <Row>
                 <Col>
                   <Avatar
-                    src="logo.png"
+                    src="icon.png"
                     css={{ size: "$20" }}
                     zoomed
                     bordered
