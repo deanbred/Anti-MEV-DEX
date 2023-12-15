@@ -178,11 +178,19 @@ export default function Swap(props) {
     setTokenOneAmount(null);
     setTokenTwoAmount(null);
     if (changeToken === 1) {
-      setTokenOne(currentTokenList[i]);
-      fetchPrices(currentTokenList[i], tokenTwo);
+      if (currentTokenList[i] !== tokenTwo) {
+        setTokenOne(currentTokenList[i]);
+        fetchPrices(currentTokenList[i], tokenTwo);
+      } else {
+        console.log("TokenOne and TokenTwo cannot be the same");
+      }
     } else {
-      setTokenTwo(currentTokenList[i]);
-      fetchPrices(tokenOne, currentTokenList[i]);
+      if (currentTokenList[i] !== tokenOne) {
+        setTokenTwo(currentTokenList[i]);
+        fetchPrices(tokenOne, currentTokenList[i]);
+      } else {
+        console.log("TokenOne and TokenTwo cannot be the same");
+      }
     }
     setIsOpen(false);
   }
@@ -317,7 +325,7 @@ export default function Swap(props) {
 
       setPrice(data);
     } catch (error) {
-      console.error("Error fetching price:", error);
+      console.log("Error fetching price:", error);
     }
   }
 
