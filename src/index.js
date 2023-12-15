@@ -17,7 +17,7 @@ import {
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
-import { LedgerConnector } from "wagmi/connectors/ledger";
+//import { LedgerConnector } from "wagmi/connectors/ledger";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 
 const chains = [
@@ -44,11 +44,11 @@ const wagmiConfig = createConfig({
     new WalletConnectConnector({ options: { projectId, showQrModal: false } }),
     new InjectedConnector({ options: { shimDisconnect: true } }),
     new CoinbaseWalletConnector({ options: { appName: "Web3Modal" } }),
-    new LedgerConnector({
+/*     new LedgerConnector({
       options: {
         projectId: "fd8d18072056d2a74e2a5a29c946bb47",
       },
-    }),
+    }), */
   ],
   publicClient,
 });
