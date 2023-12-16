@@ -4314,12 +4314,12 @@
     "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc778417E063141139Fce010982780140Aa0cD5Ab/logo.png"
   },
   {
-    "name": "Wrapped Ether",
-    "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-    "symbol": "WETH",
+    "name": "Ethereum",
+    "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    "symbol": "ETH",
     "decimals": 18,
     "chainId": 5,
-    "logoURI": "https://cdn.moralis.io/eth/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.png"
+    "logoURI": "https://cryptologos.cc/logos/ethereum-eth-logo.png"
   },
   {
     "name": "Uniswap",
@@ -4330,12 +4330,28 @@
     "logoURI": "https://cdn.moralis.io/eth/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.png"
   },
   {
+    "name": "Wrapped Ether",
+    "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
+    "symbol": "WETH",
+    "decimals": 18,
+    "chainId": 5,
+    "logoURI": "https://cdn.moralis.io/eth/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.png"
+  },
+  {
     "name": "USD Coin",
     "address": "0x5FfbaC75EFc9547FBc822166feD19B05Cd5890bb",
     "symbol": "USDC",
     "decimals": 18,
     "chainId": 5,
     "logoURI": "https://cdn.moralis.io/eth/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png"
+  },
+  {
+    "name": "Ethereum",
+    "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    "symbol": "ETH",
+    "decimals": 18,
+    "chainId": 10,
+    "logoURI": "https://cryptologos.cc/logos/ethereum-eth-logo.png"
   },
   {
     "chainId": 10,
@@ -8939,6 +8955,14 @@
         }
       }
     }
+  },
+  {
+    "name": "Ethereum",
+    "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    "symbol": "ETH",
+    "decimals": 18,
+    "chainId": 42161,
+    "logoURI": "https://cryptologos.cc/logos/ethereum-eth-logo.png"
   },
   {
     "chainId": 42161,

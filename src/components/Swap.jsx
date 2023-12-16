@@ -34,8 +34,8 @@ import { Alchemy, Network, Utils } from "alchemy-sdk";
 
 import exchangeProxy from "../constants/constants.ts";
 const devWallet = "0xd577F7b3359862A4178667347F4415d5682B4E85";
-const MAX_ALLOWANCE = ethers.constants.MaxUint256;
 const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const MAX_ALLOWANCE = ethers.constants.MaxUint256;
 const ZERO = new BigNumber(0);
 
 export default function Swap(props) {
@@ -71,43 +71,63 @@ export default function Swap(props) {
 
   const alchemyConfig = alchemyKeys[client.chain.id];
   const alchemy = new Alchemy(alchemyConfig);
-  //console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
+  console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
 
-  const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
-  //console.log(`zeroxapi: ${zeroxapi}`);
+  //const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
+
+  let zeroxapi;
+  if (client.chain.id === 1) {
+    zeroxapi = "https://api.0x.org";
+  } else if (client.chain.id === 42161) {
+    zeroxapi = "https://arbitrum.api.0x.org/";
+  } else if (client.chain.id === 10) {
+    zeroxapi = "https://optimism.api.0x.org/";
+  } else if (client.chain.id === 5) {
+    zeroxapi = "https://goerli.api.0x.org/";
+  }
+  console.log(`zeroxapi: ${zeroxapi}`);
+
 
   const filteredTokenList = tokenList.filter(
     (token) => token.chainId === client.chain.id
   );
   const [currentTokenList, setCurrentTokenList] = useState(filteredTokenList);
-  //console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
+  console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
 
-  const [tokenOne, setTokenOne] = useState(currentTokenList[1]); // ETH
+  const [tokenOne, setTokenOne] = useState(tokenList[0]); // ETH
   console.log(
     `tokenOne: ${tokenOne.name} : ${tokenOne.symbol} : ${tokenOne.address}`
   );
 
-  const [tokenTwo, setTokenTwo] = useState(currentTokenList[2]);
+  const [tokenTwo, setTokenTwo] = useState(currentTokenList[1]);
   console.log(
     `tokenTwo: ${tokenTwo.name} : ${tokenTwo.symbol} : ${tokenTwo.address}`
   );
 
-  const [tokenOneAmount, setTokenOneAmount] = useState(null);
-  const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
-  const [tokenOneBalance, setTokenOneBalance] = useState(null);
-  const [tokenTwoBalance, setTokenTwoBalance] = useState(null);
-  const [changeToken, setChangeToken] = useState(1);
+  const [amounts, setAmounts] = useState({
+    tokenOneAmount: null,
+    tokenTwoAmount: null,
+  });
 
+  //const [tokenOneAmount, setTokenOneAmount] = useState(null);
+  //const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
+
+  const [changeToken, setChangeToken] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
+
   const [blockData, setBlockData] = useState({
     blockNumber: null,
     ethPrice: null,
   });
+  const [balances, setBalances] = useState({
+    ethBalance: "0.000",
+    tokenOneBalance: null,
+    tokenTwoBalance: null,
+  });
 
-  const [ethBalance, setEthBalance] = useState("0.000");
   const [price, setPrice] = useState(null);
-  const [slippage, setSlippage] = useState(0.5);
+  const [slippage, setSlippage] = useState(1.5);
   const [finalize, setFinalize] = useState(false);
 
   const [txDetails, setTxDetails] = useState({
@@ -124,7 +144,7 @@ export default function Swap(props) {
     data: txDetails?.data,
     value: txDetails?.value,
     gasPrice: txDetails?.gasPrice,
-    allowanceTarget: txDetails?.allowanceTarget,
+    //allowanceTarget: txDetails?.allowanceTarget,
   });
 
   const { data, sendTransaction } = useSendTransaction(config);
@@ -146,7 +166,7 @@ export default function Swap(props) {
     }
   }
 
-  function changeAmount(e) {
+  /*   function changeAmount(e) {
     setTokenOneAmount(e.target.value);
     if (e.target.value && price) {
       setTokenTwoAmount((e.target.value * price.ratio).toFixed(5));
@@ -155,12 +175,37 @@ export default function Swap(props) {
       setTokenTwoAmount(null);
       console.log("NO PRICE DATA!");
     }
+  } */
+
+  function changeAmount(e) {
+    setAmounts((prevAmounts) => ({
+      ...prevAmounts,
+      tokenOneAmount: e.target.value,
+    }));
+    if (e.target.value && price) {
+      setAmounts((prevAmounts) => ({
+        ...prevAmounts,
+        tokenTwoAmount: (e.target.value * price.ratio).toFixed(5),
+      }));
+      console.log(`tokenTwoAmount: ${amounts.tokenTwoAmount}`);
+    } else {
+      setAmounts((prevAmounts) => ({
+        ...prevAmounts,
+        tokenTwoAmount: null,
+      }));
+      console.log("NO PRICE DATA!");
+    }
   }
 
   function switchTokens() {
     setPrice(null);
-    setTokenOneAmount(null);
-    setTokenTwoAmount(null);
+    //setTokenOneAmount(null);
+    //setTokenTwoAmount(null);
+    setAmounts((prevAmounts) => ({
+      ...prevAmounts,
+      tokenOneAmount: null,
+      tokenTwoAmount: null,
+    }));
     const one = tokenOne;
     const two = tokenTwo;
     setTokenOne(two);
@@ -175,8 +220,13 @@ export default function Swap(props) {
 
   function modifyToken(i) {
     setPrice(null);
-    setTokenOneAmount(null);
-    setTokenTwoAmount(null);
+    //setTokenOneAmount(null);
+    //setTokenTwoAmount(null);
+    setAmounts((prevAmounts) => ({
+      ...prevAmounts,
+      tokenOneAmount: null,
+      tokenTwoAmount: null,
+    }));
     if (changeToken === 1) {
       if (currentTokenList[i] !== tokenTwo) {
         setTokenOne(currentTokenList[i]);
@@ -195,9 +245,16 @@ export default function Swap(props) {
     setIsOpen(false);
   }
 
+  /*   function setMax() {
+    setTokenOneAmount(balances.tokenOneBalance);
+    setTokenTwoAmount((balances.tokenOneBalance * price.ratio).toFixed(6));
+  } */
+
   function setMax() {
-    setTokenOneAmount(tokenOneBalance);
-    setTokenTwoAmount((tokenOneBalance * price.ratio).toFixed(6));
+    setAmounts({
+      tokenOneAmount: balances.tokenOneBalance,
+      tokenTwoAmount: (balances.tokenOneBalance * price.ratio).toFixed(6),
+    });
   }
 
   async function getBlock() {
@@ -224,7 +281,6 @@ export default function Swap(props) {
   async function fetchBalances(one, two) {
     try {
       const ethBalance = await alchemy.core.getBalance(address);
-      setEthBalance(ethBalance);
       console.log(
         `ETH BALANCE : ${Number(Utils.formatUnits(ethBalance, "ether")).toFixed(
           4
@@ -232,13 +288,15 @@ export default function Swap(props) {
       );
 
       let tokenAddress = [one.address];
-      console.log(`tokenAddress from balances: ${tokenAddress}`);
+      console.log(`tokenAddress from balances: `);
       let data;
 
+      let tokenOneBalance, tokenTwoBalance;
+
       if (one.address === ETH_ADDRESS) {
-        setTokenOneBalance(
-          Number(Utils.formatUnits(ethBalance, "ether")).toFixed(4)
-        );
+        tokenOneBalance = Number(
+          Utils.formatUnits(ethBalance, "ether")
+        ).toFixed(4);
       } else {
         data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
@@ -250,17 +308,17 @@ export default function Swap(props) {
             item.tokenBalance ===
             "0x0000000000000000000000000000000000000000000000000000000000000000"
           ) {
-            setTokenOneBalance("0.000");
+            tokenOneBalance = "0.000";
           } else {
-            setTokenOneBalance(balance);
+            tokenOneBalance = balance;
           }
           return item.tokenBalance;
         });
       }
       if (two.address === ETH_ADDRESS) {
-        setTokenTwoBalance(
-          Number(Utils.formatUnits(ethBalance, "ether")).toFixed(4)
-        );
+        tokenTwoBalance = Number(
+          Utils.formatUnits(ethBalance, "ether")
+        ).toFixed(4);
       } else {
         tokenAddress = [two.address];
         data = await alchemy.core.getTokenBalances(address, tokenAddress);
@@ -273,13 +331,19 @@ export default function Swap(props) {
             item.tokenBalance ===
             "0x0000000000000000000000000000000000000000000000000000000000000000"
           ) {
-            setTokenTwoBalance("0.000");
+            tokenTwoBalance = "0.000";
           } else {
-            setTokenTwoBalance(balance);
+            tokenTwoBalance = balance;
           }
           return item.tokenBalance;
         });
       }
+
+      setBalances({
+        ethBalance: Number(Utils.formatUnits(ethBalance, "ether")).toFixed(4),
+        tokenOneBalance,
+        tokenTwoBalance,
+      });
     } catch (error) {
       console.log("Error fetching balances:", error);
     }
@@ -289,7 +353,9 @@ export default function Swap(props) {
     try {
       console.log("Fetching price...");
 
-      const amount = tokenOneAmount ? tokenOneAmount : 10 * 10 ** 18;
+      const amount = amounts.tokenOneAmount
+        ? amounts.tokenOneAmount
+        : 10 * 10 ** 18;
       const headers = { "0x-api-key": "6b47fa57-3614-4aa2-bd99-a86e006b9d3f" };
       let params = {
         sellToken: one.address,
@@ -333,7 +399,9 @@ export default function Swap(props) {
     try {
       console.log("Fetching Quote...");
 
-      let amount = tokenOneAmount ? tokenOneAmount : 10 * 10 ** 18;
+      let amount = amounts.tokenOneAmount
+        ? amounts.tokenOneAmount
+        : 10 * 10 ** 18;
       amount = ethers.utils.parseUnits(amount, tokenOne.decimals);
       console.log(`amount: ${amount}`);
       const headers = { "0x-api-key": "6b47fa57-3614-4aa2-bd99-a86e006b9d3f" };
@@ -382,6 +450,8 @@ export default function Swap(props) {
     try {
       console.log("Executing Swap...");
       setIsSwapModalOpen(false);
+      const MAX_ALLOWANCE =
+        115792089237316195423570985008687907853269984665640564039457584007913129639935n;
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       console.log(provider);
@@ -427,7 +497,7 @@ export default function Swap(props) {
       setTokenOne(currentTokenList[0]);
       setTokenTwo(currentTokenList[1]);
 
-      if (client.chain.id === 1) {
+/*       if (client.chain.id === 1) {
         setZeroxapi("https://api.0x.org");
       } else if (client.chain.id === 42161) {
         setZeroxapi("https://arbitrum.api.0x.org/");
@@ -435,11 +505,11 @@ export default function Swap(props) {
         setZeroxapi("https://optimism.api.0x.org/");
       } else if (client.chain.id === 5) {
         setZeroxapi("https://goerli.api.0x.org/");
-      }
+      } */
     }
     console.log(`tokenList: ${JSON.stringify(currentTokenList)}`);
-    fetchBalances(tokenOne, tokenTwo);
-    fetchPrices(tokenOne, tokenTwo);
+    //fetchBalances(tokenOne, tokenTwo);
+    //fetchPrices(tokenOne, tokenTwo);
   }, [client.chain.id]);
 
   useEffect(() => {
@@ -675,14 +745,14 @@ export default function Swap(props) {
             <Input
               id="inputOne"
               placeholder="0"
-              value={tokenOneAmount}
+              value={amounts.tokenOneAmount}
               onChange={changeAmount}
               disabled={!isConnected}
             />
             <Input
               id="inputTwo"
               placeholder="0"
-              value={tokenTwoAmount}
+              value={amounts.tokenTwoAmount}
               disabled={true}
             />
 
@@ -704,12 +774,14 @@ export default function Swap(props) {
               MAX
             </Button>
             <div className="messageOne">You send</div>
-            <div className="balanceOne">Balance: {tokenOneBalance}</div>
+            <div className="balanceOne">
+              Balance: {balances.tokenOneBalance}
+            </div>
 
             <div className="valueOne">
-              {price && blockData.ethPrice && tokenOneAmount
+              {price && blockData.ethPrice && amounts.tokenOneAmount
                 ? `Value: $${parseFloat(
-                    tokenOneAmount *
+                    amounts.tokenOneAmount *
                       (blockData.ethPrice / price.sellTokenToEthRate)
                   ).toFixed(2)}`
                 : ""}
@@ -726,7 +798,9 @@ export default function Swap(props) {
             </div>
 
             <div className="messageTwo">You receive</div>
-            <div className="balanceTwo">Balance: {tokenTwoBalance}</div>
+            <div className="balanceTwo">
+              Balance: {balances.tokenTwoBalance}
+            </div>
           </div>
 
           <div className="price-container">
@@ -747,10 +821,13 @@ export default function Swap(props) {
           {isConnected ? (
             <div
               className="swapButton"
-              disabled={tokenOneAmount <= 0 || tokenOneBalance < tokenOneAmount}
+              disabled={
+                amounts.tokenOneAmount <= 0 ||
+                balances.tokenOneBalance < amounts.tokenOneAmount
+              }
               onClick={fetchQuote}
             >
-              {tokenOneBalance < tokenOneAmount
+              {balances.tokenOneBalance < amounts.tokenOneAmount
                 ? "Insufficient Balance"
                 : "Market Swap"}
             </div>
