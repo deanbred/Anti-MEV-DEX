@@ -12,7 +12,7 @@ import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
 import bgImage from "../styles/circuit.jpg";
-import Web3 from "web3";
+import { ethers } from "ethers";
 import qs from "qs";
 
 import {
@@ -32,8 +32,8 @@ import { Alchemy, Network, Utils } from "alchemy-sdk";
 
 export default function Swap(props) {
   const { address, isConnected, client } = props;
-  console.log(`address: ${address}`);
-  console.log(`chainId:${client.chain.id} ${client.chain.name}`);
+  //console.log(`address: ${address}`);
+  //console.log(`chainId:${client.chain.id} ${client.chain.name}`);
   const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
   const alchemyKeys = {
@@ -57,7 +57,7 @@ export default function Swap(props) {
 
   const alchemyConfig = alchemyKeys[client.chain.id];
   const alchemy = new Alchemy(alchemyConfig);
-  console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
+  //console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
 
   let zeroxapi;
   if (client.chain.id === 1) {
@@ -69,7 +69,7 @@ export default function Swap(props) {
   } else if (client.chain.id === 5) {
     zeroxapi = "https://goerli.api.0x.org/";
   }
-  console.log(`zeroxapi: ${zeroxapi}`);
+  //console.log(`zeroxapi: ${zeroxapi}`);
 
   const filteredTokenList = tokenList.filter(
     (token) => token.chainId === client.chain.id
@@ -78,10 +78,10 @@ export default function Swap(props) {
   //console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
 
   const [tokenOne, setTokenOne] = useState(tokenList[0]); // ETH
-  console.log(`tokenOne: ${JSON.stringify(tokenOne)}`);
+  console.log(`tokenOne: ${tokenOne.symbol}`);
 
   const [tokenTwo, setTokenTwo] = useState(currentTokenList[1]);
-  console.log(`tokenTwo: ${JSON.stringify(tokenTwo)}`);
+  console.log(`tokenTwo: ${tokenTwo.symbol}`);
 
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
@@ -103,7 +103,6 @@ export default function Swap(props) {
 
   const [price, setPrice] = useState(null);
   const [slippage, setSlippage] = useState(0.5);
-  const [finalize, setFinalize] = useState(false);
 
   const [txDetails, setTxDetails] = useState({
     from: null,
@@ -118,7 +117,7 @@ export default function Swap(props) {
     to: txDetails?.to, // send call data to 0x Exchange Proxy
     data: txDetails?.data,
     value: txDetails?.value,
-    gas: txDetails?.gas,
+    //gas: txDetails?.gas,
     //allowanceTarget: txDetails?.allowanceTarget,
   });
 
@@ -160,8 +159,6 @@ export default function Swap(props) {
     const two = tokenTwo;
     setTokenOne(two);
     setTokenTwo(one);
-    fetchPrices();
-    fetchBalances();
   }
 
   function openModal(asset) {
@@ -191,7 +188,7 @@ export default function Swap(props) {
 
   function setMax() {
     setTokenOneAmount(balances.tokenOneBalance);
-    setTokenTwoAmount((balances.tokenOneBalance * price.ratio).toFixed(3));
+    setTokenTwoAmount((balances.tokenOneBalance * price.ratio).toFixed(6));
   }
 
   async function getBlock() {
@@ -203,7 +200,7 @@ export default function Swap(props) {
         "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=PCIG1T3NFQI4F4F5ZJ5W2B6RNAVZSGYZ9Q"
       );
       const data = await response.json();
-      console.log(`ETH PRICE : ${parseFloat(data.result.ethusd).toFixed(5)}`);
+      //console.log(`ETH PRICE : ${parseFloat(data.result.ethusd).toFixed(5)}`);
 
       setBlockData({
         blockNumber: blockNumber,
@@ -357,13 +354,14 @@ export default function Swap(props) {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
         sellAmount: parsedAmount,
-        takerAddress: address,
+        //takerAddress: address,
         feeRecipient: "0xd577F7b3359862A4178667347F4415d5682B4E85", //dev
         buyTokenPercentageFee: 0.01,
         slippagePercentage: slippage / 100,
+        exludeSources: "Kyber",
       };
 
-      const query = `${zeroxapi}/swap/v1/quote  ?${qs.stringify(
+      const query = `${zeroxapi}/swap/v1/quote?${qs.stringify(
         params
       )}, ${qs.stringify(headers)}`;
       console.log(`query: ${query}`);
@@ -399,30 +397,36 @@ export default function Swap(props) {
       console.log("Executing Swap...");
       setIsSwapModalOpen(false);
 
-      const web3 = new Web3(window.ethereum);
-      console.log(web3);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      console.log(provider);
+
+      const signer = provider.getSigner();
+      console.log(signer);
+
+      const ERC20Contract = new ethers.Contract(
+        tokenOne.address,
+        erc20ABI,
+        signer
+      );
 
       if (tokenOne.address !== ETH_ADDRESS) {
-        const ERC20Contract = new web3.eth.Contract(erc20ABI, tokenOne.address);
+        const allowance = await ERC20Contract.allowance(
+          tokenOne.address,
+          address
+        );
+        console.log(`allowance: ${allowance}`);
 
-        const allowance = await ERC20Contract.methods
-          .allowance(tokenOne.address, address)
-          .call();
-        console.log(`allowance: `);
+        if (allowance.eq(0)) {
+          const approval = await ERC20Contract.approve(
+            txDetails.allowanceTarget,
+            ethers.constants.MaxUint256
+          );
 
-        if (allowance === "0n") {
-          const approval = await ERC20Contract.methods
-            .approve(
-              txDetails.allowanceTarget,
-              web3.utils.toWei("1000000000", "ether") // MaxUint256 equivalent in web3
-            )
-            .send({ from: address });
-
+          await approval.wait(1);
           console.log(`approval: ${JSON.stringify(approval)}`);
         }
       }
 
-      finalize && setFinalize(true);
       sendTransaction && sendTransaction();
     } catch (error) {
       console.error(error);
@@ -447,19 +451,13 @@ export default function Swap(props) {
 
   useEffect(() => {
     fetchBalances();
-  }, [tokenOne, tokenTwo]);
+  }, [tokenOne, tokenTwo, isSuccess]);
 
   useEffect(() => {
     getBlock();
     const intervalId = setInterval(getBlock, 12500);
     return () => clearInterval(intervalId);
   }, []);
-
-  useEffect(() => {
-    if (txDetails.to && finalize) {
-      sendTransaction && sendTransaction();
-    }
-  }, [txDetails, finalize]);
 
   useEffect(() => {
     messageApi.destroy();
@@ -481,12 +479,11 @@ export default function Swap(props) {
         content: "Transaction Successful",
         duration: 2.0,
       });
-      fetchBalances();
     } else if (txDetails.to) {
       messageApi.open({
         type: "error",
         content: "Transaction Failed",
-        duration: 1.5,
+        duration: 2.0,
       });
     }
   }, [isSuccess]);

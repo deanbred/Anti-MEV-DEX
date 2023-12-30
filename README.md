@@ -81,10 +81,26 @@ Goerli Sources: https://goerli.api.0x.org/swap/v1/sources.
       });
       const { data, to, value, gas, gasPrice } = swapResponse.data;
 
- curl --location --request GET 'https://goerli.api.0x.org/swap/v1/price?buyToken=0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984&sellToken=0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6&sellAmount=100000&excludedSources=Kyber' --header '0x-api-key: 0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d'     
+## Price: WETH <> UNI
+curl --location --request GET 'https://goerli.api.0x.org/swap/v1/price?buyToken=0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984&sellToken=0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6&sellAmount=100000&excludedSources=Kyber' --header '0x-api-key: 0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d'     
+
+
+## Quote: Sell WETH, Buy UNI
+curl --location --request GET 'https://goerli.api.0x.org/swap/v1/quote?buyToken=0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984&sellToken=0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6&sellAmount=100000&excludedSources=Kyber' --header '0x-api-key: 0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d'
+
+## Quote: Sell UNI, Buy WETH
+curl --location --request GET 'https://goerli.api.0x.org/swap/v1/quote?buyToken=0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6&sellToken=0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984&sellAmount=100000&excludedSources=Kyber' --header '0x-api-key: 0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d'
+
+## Quote: Sell UNI, Buy ETH
+curl --location --request GET 'https://goerli.api.0x.org/swap/v1/quote?buyToken=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&sellToken=0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984&sellAmount=100000&excludedSources=Kyber' --header '0x-api-key: 0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d'
+
+## Quote: Sell ETH, Buy UNI
+curl --location --request GET 'https://goerli.api.0x.org/swap/v1/quote?buyToken=0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984&sellToken=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&sellAmount=100000&excludedSources=Kyber' --header '0x-api-key: 0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d'
 
 ## Test tokens available on Goerli
 Recommended testing pair is WETH <> UNI deployed by Uniswap on Goerli.
+
+## ETH: 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 
 ### UNI: `0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984`
 ### WETH: `0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6`
