@@ -83,10 +83,8 @@ export default function Swap(props) {
   const [tokenTwo, setTokenTwo] = useState(currentTokenList[1]);
   console.log(`tokenTwo: ${JSON.stringify(tokenTwo)}`);
 
-  const [amounts, setAmounts] = useState({
-    tokenOneAmount: null,
-    tokenTwoAmount: null,
-  });
+  const [tokenOneAmount, setTokenOneAmount] = useState(null);
+  const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
 
   const [balances, setBalances] = useState({
     ethBalance: null,
@@ -146,36 +144,24 @@ export default function Swap(props) {
   }
 
   function changeAmount(e) {
-    setAmounts((prevAmounts) => ({
-      ...prevAmounts,
-      tokenOneAmount: e.target.value,
-    }));
-    console.log(`tokenOneAmount: ${amounts.tokenOneAmount}`);
+    setTokenOneAmount(e.target.value);
     if (e.target.value && price) {
-      setAmounts((prevAmounts) => ({
-        ...prevAmounts,
-        tokenTwoAmount: (e.target.value * price.ratio).toFixed(6),
-      }));
-      console.log(`tokenTwoAmount: ${amounts.tokenTwoAmount}`);
+      setTokenTwoAmount((e.target.value * price.ratio).toFixed(3));
     } else {
-      setAmounts((prevAmounts) => ({
-        ...prevAmounts,
-        tokenTwoAmount: null,
-      }));
-      console.log("NO PRICE DATA!");
+      setTokenTwoAmount(null);
     }
   }
 
   function switchTokens() {
-    setAmounts((prevAmounts) => ({
-      ...prevAmounts,
-      tokenOneAmount: null,
-      tokenTwoAmount: null,
-    })); 
+    setPrice(null);
+    setTokenOneAmount(null);
+    setTokenTwoAmount(null);
     const one = tokenOne;
     const two = tokenTwo;
     setTokenOne(two);
     setTokenTwo(one);
+    fetchPrices();
+    fetchBalances();
   }
 
   function openModal(asset) {
@@ -185,22 +171,17 @@ export default function Swap(props) {
 
   function modifyToken(i) {
     setPrice(null);
-    setAmounts((prevAmounts) => ({
-      ...prevAmounts,
-      tokenOneAmount: null,
-      tokenTwoAmount: null,
-    }));
+    setTokenOneAmount(null);
+    setTokenTwoAmount(null);
     if (changeToken === 1) {
       if (currentTokenList[i] !== tokenTwo) {
         setTokenOne(currentTokenList[i]);
-        fetchPrices();
       } else {
         console.log("TokenOne and TokenTwo cannot be the same");
       }
     } else {
       if (currentTokenList[i] !== tokenOne) {
         setTokenTwo(currentTokenList[i]);
-        fetchPrices();
       } else {
         console.log("TokenOne and TokenTwo cannot be the same");
       }
@@ -209,10 +190,8 @@ export default function Swap(props) {
   }
 
   function setMax() {
-    setAmounts({
-      tokenOneAmount: balances.tokenOneBalance,
-      tokenTwoAmount: (balances.tokenOneBalance * price.ratio).toFixed(6),
-    });
+    setTokenOneAmount(balances.tokenOneBalance);
+    setTokenTwoAmount((balances.tokenOneBalance * price.ratio).toFixed(3));
   }
 
   async function getBlock() {
@@ -309,13 +288,14 @@ export default function Swap(props) {
     try {
       console.log("Fetching price...");
 
-      const amount = amounts.tokenOneAmount
-        ? amounts.tokenOneAmount
-        : "1.0";
+      const amount = tokenOneAmount ? tokenOneAmount : "1.0";
 
       console.log(`amount: ${amount}`);
 
-      const parsedAmount = Utils.parseUnits(amount, tokenOne.decimals).toString();
+      const parsedAmount = Utils.parseUnits(
+        amount,
+        tokenOne.decimals
+      ).toString();
       console.log(`parsedAmount: ${parsedAmount}`);
 
       const headers = { "0x-api-key": "816edd7e-cce4-42e7-b70a-96ae48ee1768" };
@@ -362,13 +342,14 @@ export default function Swap(props) {
     try {
       console.log("Fetching Quote...");
 
-      const amount = amounts.tokenOneAmount
-        ? amounts.tokenOneAmount
-        : undefined;
+      const amount = tokenOneAmount ? tokenOneAmount : undefined;
 
       console.log(`amount: ${amount}`);
 
-      const parsedAmount = Utils.parseUnits(amount, tokenOne.decimals).toString();
+      const parsedAmount = Utils.parseUnits(
+        amount,
+        tokenOne.decimals
+      ).toString();
       console.log(`parsedAmount: ${parsedAmount}`);
 
       const headers = { "0x-api-key": "816edd7e-cce4-42e7-b70a-96ae48ee1768" };
@@ -466,7 +447,7 @@ export default function Swap(props) {
 
   useEffect(() => {
     fetchBalances();
-  }, [tokenOne, tokenTwo]);
+  }, [tokenOne, tokenTwo, ]);
 
   useEffect(() => {
     getBlock();
@@ -500,6 +481,7 @@ export default function Swap(props) {
         content: "Transaction Successful",
         duration: 2.0,
       });
+      fetchBalances();
     } else if (txDetails.to) {
       messageApi.open({
         type: "error",
@@ -695,14 +677,14 @@ export default function Swap(props) {
             <Input
               id="inputOne"
               placeholder="0"
-              value={amounts.tokenOneAmount}
+              value={tokenOneAmount}
               onChange={changeAmount}
               disabled={!isConnected}
             />
             <Input
               id="inputTwo"
               placeholder="0"
-              value={amounts.tokenTwoAmount}
+              value={tokenTwoAmount}
               disabled={true}
             />
 
@@ -729,9 +711,9 @@ export default function Swap(props) {
             </div>
 
             <div className="valueOne">
-              {price && blockData.ethPrice && amounts.tokenOneAmount
+              {price && blockData.ethPrice && tokenOneAmount
                 ? `Value: $${parseFloat(
-                    amounts.tokenOneAmount *
+                    tokenOneAmount *
                       (blockData.ethPrice / price.sellTokenToEthRate)
                   ).toFixed(2)}`
                 : ""}
@@ -772,14 +754,11 @@ export default function Swap(props) {
             <div
               className="swapButton"
               disabled={
-                amounts.tokenOneAmount <= 0 ||
-                balances.tokenOneBalance < amounts.tokenOneAmount
+                tokenOneAmount <= 0 || balances.tokenOneBalance < tokenOneAmount
               }
               onClick={fetchQuote}
             >
-              {balances.tokenOneBalance < amounts.tokenOneAmount
-                ? "Insufficient Balance"
-                : "Market Swap"}
+              Swap
             </div>
           ) : (
             <ConnectButton />
