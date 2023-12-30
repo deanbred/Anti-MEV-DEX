@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { Input, Popover, Radio, Modal, message, Button } from "antd";
 import {
   ArrowDownOutlined,
-  RetweetOutlined,
   DownOutlined,
   SettingOutlined,
   SearchOutlined,
@@ -13,7 +12,7 @@ import ConnectButton from "./Connect";
 import Ticker from "./Ticker";
 import Charts from "./Charts";
 import bgImage from "../styles/circuit.jpg";
-import { ethers } from "ethers";
+import Web3 from "web3";
 import qs from "qs";
 
 import {
@@ -26,25 +25,16 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 
-import { BigNumber, hexUtils } from "@0x/utils";
-
 import tokenList from "../constants/tokenList.json";
-// Eth:1 BSC:56 Polygon:137 Arbitrum:42161 Optimism:10 Avax:43114 Goerli:5
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 
-import exchangeProxy from "../constants/constants.ts";
-const devWallet = "0xd577F7b3359862A4178667347F4415d5682B4E85";
-const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
-const MAX_ALLOWANCE = ethers.constants.MaxUint256;
-const ZERO = new BigNumber(0);
+//import { exchangeProxy, devWallet, ZERO} from "../constants/constants.ts";
 
 export default function Swap(props) {
-  const { address, connector, isConnected, client } = props;
-  const [messageApi, contextHolder] = message.useMessage();
-
-  //console.log(`address: ${address}`);
-  //console.log(`isConnected: ${isConnected}`);
-  //console.log(`chainId:${client.chain.id} ${client.chain.name}`);
+  const { address, isConnected, client } = props;
+  console.log(`address: ${address}`);
+  console.log(`chainId:${client.chain.id} ${client.chain.name}`);
+  const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
   const alchemyKeys = {
     1: {
@@ -55,25 +45,19 @@ export default function Swap(props) {
       apiKey: "aMlUHixH5lTM_ksIFZfJeTZm1N1nRVAO",
       network: Network.ARB_MAINNET,
     },
+    10: {
+      apiKey: "lymgKSMfxBS4I0YklOT_RnLT87MJm2we",
+      network: Network.OPT_MAINNET,
+    },
     5: {
       apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
       network: Network.ETH_GOERLI,
-    },
-    421613: {
-      apiKey: "PLaTiZe1BmgkCydWULIS2cxDoGISMWLK",
-      network: Network.ARB_GOERLI,
-    },
-    420: {
-      apiKey: "OdYJbCYLmfi8hAF9xABuWAbtOGNuDGeh",
-      network: Network.OPT_GOERLI,
     },
   };
 
   const alchemyConfig = alchemyKeys[client.chain.id];
   const alchemy = new Alchemy(alchemyConfig);
   console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
-
-  //const [zeroxapi, setZeroxapi] = useState("https://api.0x.org");
 
   let zeroxapi;
   if (client.chain.id === 1) {
@@ -87,47 +71,40 @@ export default function Swap(props) {
   }
   console.log(`zeroxapi: ${zeroxapi}`);
 
-
   const filteredTokenList = tokenList.filter(
     (token) => token.chainId === client.chain.id
   );
   const [currentTokenList, setCurrentTokenList] = useState(filteredTokenList);
-  console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
+  //console.log(`currentTokenList: ${JSON.stringify(currentTokenList)}`);
 
   const [tokenOne, setTokenOne] = useState(tokenList[0]); // ETH
-  console.log(
-    `tokenOne: ${tokenOne.name} : ${tokenOne.symbol} : ${tokenOne.address}`
-  );
+  console.log(`tokenOne: ${JSON.stringify(tokenOne)}`);
 
   const [tokenTwo, setTokenTwo] = useState(currentTokenList[1]);
-  console.log(
-    `tokenTwo: ${tokenTwo.name} : ${tokenTwo.symbol} : ${tokenTwo.address}`
-  );
+  console.log(`tokenTwo: ${JSON.stringify(tokenTwo)}`);
 
   const [amounts, setAmounts] = useState({
     tokenOneAmount: null,
     tokenTwoAmount: null,
   });
 
-  //const [tokenOneAmount, setTokenOneAmount] = useState(null);
-  //const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
-
-  const [changeToken, setChangeToken] = useState(1);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
+  const [balances, setBalances] = useState({
+    ethBalance: null,
+    tokenOneBalance: null,
+    tokenTwoBalance: null,
+  });
 
   const [blockData, setBlockData] = useState({
     blockNumber: null,
     ethPrice: null,
   });
-  const [balances, setBalances] = useState({
-    ethBalance: "0.000",
-    tokenOneBalance: null,
-    tokenTwoBalance: null,
-  });
+
+  const [changeToken, setChangeToken] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
 
   const [price, setPrice] = useState(null);
-  const [slippage, setSlippage] = useState(1.5);
+  const [slippage, setSlippage] = useState(0.5);
   const [finalize, setFinalize] = useState(false);
 
   const [txDetails, setTxDetails] = useState({
@@ -135,7 +112,7 @@ export default function Swap(props) {
     to: null,
     data: null,
     value: null,
-    gasPrice: null,
+    gas: null,
   });
 
   const { config } = usePrepareSendTransaction({
@@ -143,7 +120,7 @@ export default function Swap(props) {
     to: txDetails?.to, // send call data to 0x Exchange Proxy
     data: txDetails?.data,
     value: txDetails?.value,
-    gasPrice: txDetails?.gasPrice,
+    gas: txDetails?.gas,
     //allowanceTarget: txDetails?.allowanceTarget,
   });
 
@@ -152,6 +129,8 @@ export default function Swap(props) {
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
   });
+
+  const [messageApi, contextHolder] = message.useMessage();
 
   function handleSlippageChange(e) {
     const parsedSlippage = parseFloat(e.target.value);
@@ -166,26 +145,16 @@ export default function Swap(props) {
     }
   }
 
-  /*   function changeAmount(e) {
-    setTokenOneAmount(e.target.value);
-    if (e.target.value && price) {
-      setTokenTwoAmount((e.target.value * price.ratio).toFixed(5));
-      console.log(`tokenTwoAmount: ${tokenTwoAmount}`);
-    } else {
-      setTokenTwoAmount(null);
-      console.log("NO PRICE DATA!");
-    }
-  } */
-
   function changeAmount(e) {
     setAmounts((prevAmounts) => ({
       ...prevAmounts,
       tokenOneAmount: e.target.value,
     }));
+    console.log(`tokenOneAmount: ${amounts.tokenOneAmount}`);
     if (e.target.value && price) {
       setAmounts((prevAmounts) => ({
         ...prevAmounts,
-        tokenTwoAmount: (e.target.value * price.ratio).toFixed(5),
+        tokenTwoAmount: (e.target.value * price.ratio).toFixed(6),
       }));
       console.log(`tokenTwoAmount: ${amounts.tokenTwoAmount}`);
     } else {
@@ -199,8 +168,6 @@ export default function Swap(props) {
 
   function switchTokens() {
     setPrice(null);
-    //setTokenOneAmount(null);
-    //setTokenTwoAmount(null);
     setAmounts((prevAmounts) => ({
       ...prevAmounts,
       tokenOneAmount: null,
@@ -210,7 +177,6 @@ export default function Swap(props) {
     const two = tokenTwo;
     setTokenOne(two);
     setTokenTwo(one);
-    //fetchPrices(two, one);
   }
 
   function openModal(asset) {
@@ -220,8 +186,6 @@ export default function Swap(props) {
 
   function modifyToken(i) {
     setPrice(null);
-    //setTokenOneAmount(null);
-    //setTokenTwoAmount(null);
     setAmounts((prevAmounts) => ({
       ...prevAmounts,
       tokenOneAmount: null,
@@ -230,25 +194,20 @@ export default function Swap(props) {
     if (changeToken === 1) {
       if (currentTokenList[i] !== tokenTwo) {
         setTokenOne(currentTokenList[i]);
-        fetchPrices(currentTokenList[i], tokenTwo);
+        fetchPrices();
       } else {
         console.log("TokenOne and TokenTwo cannot be the same");
       }
     } else {
       if (currentTokenList[i] !== tokenOne) {
         setTokenTwo(currentTokenList[i]);
-        fetchPrices(tokenOne, currentTokenList[i]);
+        fetchPrices();
       } else {
         console.log("TokenOne and TokenTwo cannot be the same");
       }
     }
     setIsOpen(false);
   }
-
-  /*   function setMax() {
-    setTokenOneAmount(balances.tokenOneBalance);
-    setTokenTwoAmount((balances.tokenOneBalance * price.ratio).toFixed(6));
-  } */
 
   function setMax() {
     setAmounts({
@@ -278,7 +237,7 @@ export default function Swap(props) {
     }
   }
 
-  async function fetchBalances(one, two) {
+  async function fetchBalances() {
     try {
       const ethBalance = await alchemy.core.getBalance(address);
       console.log(
@@ -287,17 +246,14 @@ export default function Swap(props) {
         )}`
       );
 
-      let tokenAddress = [one.address];
-      console.log(`tokenAddress from balances: `);
-      let data;
+      let data, tokenAddress, tokenOneBalance, tokenTwoBalance;
 
-      let tokenOneBalance, tokenTwoBalance;
-
-      if (one.address === ETH_ADDRESS) {
+      if (tokenOne.address === ETH_ADDRESS) {
         tokenOneBalance = Number(
           Utils.formatUnits(ethBalance, "ether")
         ).toFixed(4);
       } else {
+        tokenAddress = [tokenOne.address];
         data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
         data.tokenBalances.find((item) => {
@@ -308,19 +264,20 @@ export default function Swap(props) {
             item.tokenBalance ===
             "0x0000000000000000000000000000000000000000000000000000000000000000"
           ) {
-            tokenOneBalance = "0.000";
+            tokenOneBalance = "0.0000";
           } else {
             tokenOneBalance = balance;
           }
           return item.tokenBalance;
         });
       }
-      if (two.address === ETH_ADDRESS) {
+
+      if (tokenTwo.address === ETH_ADDRESS) {
         tokenTwoBalance = Number(
           Utils.formatUnits(ethBalance, "ether")
         ).toFixed(4);
       } else {
-        tokenAddress = [two.address];
+        tokenAddress = [tokenTwo.address];
         data = await alchemy.core.getTokenBalances(address, tokenAddress);
 
         data.tokenBalances.find((item) => {
@@ -331,7 +288,7 @@ export default function Swap(props) {
             item.tokenBalance ===
             "0x0000000000000000000000000000000000000000000000000000000000000000"
           ) {
-            tokenTwoBalance = "0.000";
+            tokenTwoBalance = "0.0000";
           } else {
             tokenTwoBalance = balance;
           }
@@ -349,25 +306,34 @@ export default function Swap(props) {
     }
   }
 
-  async function fetchPrices(one, two) {
+  async function fetchPrices() {
     try {
       console.log("Fetching price...");
 
       const amount = amounts.tokenOneAmount
         ? amounts.tokenOneAmount
-        : 10 * 10 ** 18;
-      const headers = { "0x-api-key": "6b47fa57-3614-4aa2-bd99-a86e006b9d3f" };
+        : "1.25";
+
+      console.log(`amount: ${amount}`);
+
+      const parsedAmount = Utils.parseUnits(amount, tokenOne.decimals).toString();
+      console.log(`parsedAmount: ${parsedAmount}`);
+
+      const headers = { "0x-api-key": "816edd7e-cce4-42e7-b70a-96ae48ee1768" };
       let params = {
-        sellToken: one.address,
-        buyToken: two.address,
-        sellAmount: amount.toString(),
-        //takerAddress: address,
+        sellToken: tokenOne.address,
+        buyToken: tokenTwo.address,
+        sellAmount: parsedAmount,
+        takerAddress: address,
       };
 
       const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
         params
       )}, ${qs.stringify(headers)}`;
+
       console.log(`query: ${query}`);
+
+      //const query2 = curl --location --request GET 'https://goerli.api.0x.org/swap/v1/price?buyToken=0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984&sellToken=0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6&sellAmount=100000&excludedSources=Kyber' --header '0x-api-key: 0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d'
 
       const response = await fetch(
         zeroxapi + `/swap/v1/price?${qs.stringify(params)}`,
@@ -399,23 +365,27 @@ export default function Swap(props) {
     try {
       console.log("Fetching Quote...");
 
-      let amount = amounts.tokenOneAmount
+      const amount = amounts.tokenOneAmount
         ? amounts.tokenOneAmount
-        : 10 * 10 ** 18;
-      amount = ethers.utils.parseUnits(amount, tokenOne.decimals);
+        : undefined;
+
       console.log(`amount: ${amount}`);
-      const headers = { "0x-api-key": "6b47fa57-3614-4aa2-bd99-a86e006b9d3f" };
+
+      const parsedAmount = Utils.parseUnits(amount, tokenOne.decimals).toString();
+      console.log(`parsedAmount: ${parsedAmount}`);
+
+      const headers = { "0x-api-key": "816edd7e-cce4-42e7-b70a-96ae48ee1768" };
       const params = {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
-        sellAmount: amount.toString(),
+        sellAmount: parsedAmount,
         takerAddress: address,
         feeRecipient: "0xd577F7b3359862A4178667347F4415d5682B4E85", //dev
         buyTokenPercentageFee: 0.01,
         slippagePercentage: slippage / 100,
       };
 
-      const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
+      const query = `${zeroxapi}/swap/v1/quote  ?${qs.stringify(
         params
       )}, ${qs.stringify(headers)}`;
       console.log(`query: ${query}`);
@@ -450,35 +420,28 @@ export default function Swap(props) {
     try {
       console.log("Executing Swap...");
       setIsSwapModalOpen(false);
-      const MAX_ALLOWANCE =
-        115792089237316195423570985008687907853269984665640564039457584007913129639935n;
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      console.log(provider);
+      const web3 = new Web3(window.ethereum);
+      console.log(web3);
 
-      const signer = provider.getSigner();
-      console.log(signer);
+      if (tokenOne.address !== ETH_ADDRESS) {
+        const ERC20Contract = new web3.eth.Contract(erc20ABI, tokenOne.address);
 
-      const ERC20Contract = new ethers.Contract(
-        tokenOne.address,
-        erc20ABI,
-        signer
-      );
+        const allowance = await ERC20Contract.methods
+          .allowance(tokenOne.address, address)
+          .call();
+        console.log(`allowance: `);
 
-      const allowance = await ERC20Contract.allowance(
-        tokenOne.address,
-        address
-      );
-      console.log(`allowance: ${allowance}`);
+        if (allowance === "0n") {
+          const approval = await ERC20Contract.methods
+            .approve(
+              txDetails.allowanceTarget,
+              web3.utils.toWei("1000000000", "ether") // MaxUint256 equivalent in web3
+            )
+            .send({ from: address });
 
-      if (allowance.eq(0)) {
-        const approval = await ERC20Contract.approve(
-          txDetails.allowanceTarget,
-          MAX_ALLOWANCE
-        );
-
-        await approval.wait(1);
-        console.log(`approval: ${JSON.stringify(approval)}`);
+          console.log(`approval: ${JSON.stringify(approval)}`);
+        }
       }
 
       finalize && setFinalize(true);
@@ -494,27 +457,18 @@ export default function Swap(props) {
         (token) => token.chainId === client.chain.id
       );
       setCurrentTokenList(filteredTokenList);
-      setTokenOne(currentTokenList[0]);
+      setTokenOne(tokenList[0]);
       setTokenTwo(currentTokenList[1]);
-
-/*       if (client.chain.id === 1) {
-        setZeroxapi("https://api.0x.org");
-      } else if (client.chain.id === 42161) {
-        setZeroxapi("https://arbitrum.api.0x.org/");
-      } else if (client.chain.id === 10) {
-        setZeroxapi("https://optimism.api.0x.org/");
-      } else if (client.chain.id === 5) {
-        setZeroxapi("https://goerli.api.0x.org/");
-      } */
     }
     console.log(`tokenList: ${JSON.stringify(currentTokenList)}`);
-    //fetchBalances(tokenOne, tokenTwo);
-    //fetchPrices(tokenOne, tokenTwo);
   }, [client.chain.id]);
 
   useEffect(() => {
-    fetchBalances(tokenOne, tokenTwo);
-    fetchPrices(tokenOne, tokenTwo);
+    fetchPrices();
+  }, [tokenOne, tokenTwo]);
+
+  useEffect(() => {
+    fetchBalances();
   }, [tokenOne, tokenTwo]);
 
   useEffect(() => {
@@ -524,10 +478,10 @@ export default function Swap(props) {
   }, []);
 
   useEffect(() => {
-    if (txDetails.to && isConnected) {
+    if (txDetails.to && finalize) {
       sendTransaction && sendTransaction();
     }
-  }, [txDetails]);
+  }, [txDetails, finalize]);
 
   useEffect(() => {
     messageApi.destroy();
@@ -549,7 +503,6 @@ export default function Swap(props) {
         content: "Transaction Successful",
         duration: 2.0,
       });
-      fetchBalances(tokenOne, tokenTwo);
     } else if (txDetails.to) {
       messageApi.open({
         type: "error",

@@ -1,14 +1,14 @@
 import React from "react";
-import "./styles/App.css";
 import Header from "./components/Header";
 import Swap from "./components/Swap";
 import Tokens from "./components/Tokens";
 import Limit from "./components/Limit";
 import { Routes, Route } from "react-router-dom";
 import { useAccount, usePublicClient } from "wagmi";
+import "./styles/App.css";
 
 function App() {
-  const { address, connector, isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const publicClient = usePublicClient();
 
   return (
@@ -21,7 +21,6 @@ function App() {
             element={
               <Swap
                 address={address}
-                connector={connector}
                 isConnected={isConnected}
                 client={publicClient}
               />
@@ -32,7 +31,6 @@ function App() {
              element={
               <Limit
                 address={address}
-                connector={connector}
                 isConnected={isConnected}
                 client={publicClient}
               /> 
