@@ -101,7 +101,6 @@ export default function Swap(props) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
-
   const [price, setPrice] = useState(null);
   const [slippage, setSlippage] = useState(0.5);
 
@@ -394,6 +393,7 @@ export default function Swap(props) {
   async function executeSwap() {
     try {
       console.log("Executing Swap...");
+      setIsSwapModalOpen(false);
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       console.log(provider);
@@ -427,7 +427,6 @@ export default function Swap(props) {
           setIsApproving(false);
         }
       }
-      setIsSwapModalOpen(false);
 
       sendTransaction && sendTransaction();
     } catch (error) {
@@ -464,14 +463,14 @@ export default function Swap(props) {
   useEffect(() => {
     messageApi.destroy();
 
-    if (isLoading) {
+    if (isLoading || isApproving) {
       messageApi.open({
         type: "loading",
         content: "Transaction is Pending...",
         duration: 0,
       });
     }
-  }, [isLoading]);
+  }, [isLoading, isApproving]);
 
   useEffect(() => {
     messageApi.destroy();
@@ -632,17 +631,13 @@ export default function Swap(props) {
           </ul>
         </div>
 
-        {isApproving ? (
-          <div className="executeButton">Approving...</div>
-        ) : (
-          <div
-            className="executeButton"
-            disabled={!txDetails}
-            onClick={executeSwap}
-          >
-            Execute Swap
-          </div>
-        )}
+        <div
+          className="executeButton"
+          disabled={!txDetails}
+          onClick={executeSwap}
+        >
+          Execute Swap
+        </div>
       </Modal>
 
       <div
