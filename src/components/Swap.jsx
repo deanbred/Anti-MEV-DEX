@@ -167,12 +167,11 @@ export default function Swap(props) {
   }
 
   function switchTokens() {
-    setPrice(null);
     setAmounts((prevAmounts) => ({
       ...prevAmounts,
       tokenOneAmount: null,
       tokenTwoAmount: null,
-    }));
+    })); 
     const one = tokenOne;
     const two = tokenTwo;
     setTokenOne(two);
@@ -312,7 +311,7 @@ export default function Swap(props) {
 
       const amount = amounts.tokenOneAmount
         ? amounts.tokenOneAmount
-        : "1.25";
+        : "1.0";
 
       console.log(`amount: ${amount}`);
 
@@ -332,8 +331,6 @@ export default function Swap(props) {
       )}, ${qs.stringify(headers)}`;
 
       console.log(`query: ${query}`);
-
-      //const query2 = curl --location --request GET 'https://goerli.api.0x.org/swap/v1/price?buyToken=0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984&sellToken=0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6&sellAmount=100000&excludedSources=Kyber' --header '0x-api-key: 0ad3443e-19ec-4e03-bbdb-8c5492c4ad7d'
 
       const response = await fetch(
         zeroxapi + `/swap/v1/price?${qs.stringify(params)}`,
