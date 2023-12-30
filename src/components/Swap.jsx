@@ -100,6 +100,7 @@ export default function Swap(props) {
   const [changeToken, setChangeToken] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
 
   const [price, setPrice] = useState(null);
   const [slippage, setSlippage] = useState(0.5);
@@ -117,8 +118,6 @@ export default function Swap(props) {
     to: txDetails?.to, // send call data to 0x Exchange Proxy
     data: txDetails?.data,
     value: txDetails?.value,
-    //gas: txDetails?.gas,
-    //allowanceTarget: txDetails?.allowanceTarget,
   });
 
   const { data, sendTransaction } = useSendTransaction(config);
@@ -395,7 +394,6 @@ export default function Swap(props) {
   async function executeSwap() {
     try {
       console.log("Executing Swap...");
-      setIsSwapModalOpen(false);
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       console.log(provider);
@@ -417,6 +415,8 @@ export default function Swap(props) {
         console.log(`allowance: ${allowance}`);
 
         if (allowance.eq(0)) {
+          setIsApproving(true);
+
           const approval = await ERC20Contract.approve(
             txDetails.allowanceTarget,
             ethers.constants.MaxUint256
@@ -424,8 +424,10 @@ export default function Swap(props) {
 
           await approval.wait(1);
           console.log(`approval: ${JSON.stringify(approval)}`);
+          setIsApproving(false);
         }
       }
+      setIsSwapModalOpen(false);
 
       sendTransaction && sendTransaction();
     } catch (error) {
@@ -469,7 +471,7 @@ export default function Swap(props) {
         duration: 0,
       });
     }
-  }, [isLoading, messageApi]);
+  }, [isLoading]);
 
   useEffect(() => {
     messageApi.destroy();
@@ -629,13 +631,18 @@ export default function Swap(props) {
             <li>Max Slippage: {slippage} %</li>
           </ul>
         </div>
-        <div
-          className="executeButton"
-          disabled={!txDetails}
-          onClick={executeSwap}
-        >
-          Execute Swap
-        </div>
+
+        {isApproving ? (
+          <div className="executeButton">Approving...</div>
+        ) : (
+          <div
+            className="executeButton"
+            disabled={!txDetails}
+            onClick={executeSwap}
+          >
+            Execute Swap
+          </div>
+        )}
       </Modal>
 
       <div
