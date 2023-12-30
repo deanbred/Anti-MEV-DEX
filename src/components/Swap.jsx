@@ -447,7 +447,7 @@ export default function Swap(props) {
 
   useEffect(() => {
     fetchBalances();
-  }, [tokenOne, tokenTwo, ]);
+  }, [tokenOne, tokenTwo]);
 
   useEffect(() => {
     getBlock();
@@ -754,7 +754,8 @@ export default function Swap(props) {
             <div
               className="swapButton"
               disabled={
-                tokenOneAmount <= 0 || balances.tokenOneBalance < tokenOneAmount
+                Number(tokenOneAmount) <= 0 ||
+                Number(balances.tokenOneBalance) < Number(tokenOneAmount)
               }
               onClick={fetchQuote}
             >
