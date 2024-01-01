@@ -28,15 +28,24 @@ function App() {
           />
           <Route
             path="/limit"
-             element={
+            element={
               <Limit
                 address={address}
                 isConnected={isConnected}
                 client={publicClient}
-              /> 
+              />
             }
-          /> 
-          <Route path="/tokens" element={<Tokens address={address} />} />
+          />
+          <Route
+            path="/tokens"
+            element={
+              <Tokens
+                address={address}
+                isConnected={isConnected}
+                client={publicClient}
+              />
+            }
+          />
         </Routes>
       </div>
     </>

@@ -28,13 +28,22 @@ import {
 import tokenList from "../constants/tokenList.json";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 
-//import { exchangeProxy, devWallet, ZERO} from "../constants/constants.ts";
+import { LimitOrder, OrderStatus, SignatureType } from "@0x/protocol-utils";
+import { BigNumber, hexUtils } from "@0x/utils";
 
-export default function Swap(props) {
+import {
+  exchangeProxy,
+  devWallet,
+  NULL_ADDRESS,
+  ETH_ADDRESS,
+  ZERO,
+} from "../constants/constants.ts";
+
+export default function Limit(props) {
   const { address, isConnected, client } = props;
   //console.log(`address: ${address}`);
   //console.log(`chainId:${client.chain.id} ${client.chain.name}`);
-  const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+  //const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
   const alchemyKeys = {
     1: {
@@ -99,7 +108,8 @@ export default function Swap(props) {
 
   const [changeToken, setChangeToken] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
-  const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
+  const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
+
   const [isApproving, setIsApproving] = useState(false);
   const [price, setPrice] = useState(null);
   const [slippage, setSlippage] = useState(0.5);
@@ -387,48 +397,72 @@ export default function Swap(props) {
     } catch (error) {
       console.error("Error fetching quote:", error);
     }
-    setIsSwapModalOpen(true);
+    setIsLimitModalOpen(true);
   }
 
-  async function executeSwap() {
+  async function createLimitOrder() {
     try {
-      console.log("Executing Swap...");
-      setIsSwapModalOpen(false);
+      console.log("Creating Limit Order...");
+      setIsLimitModalOpen(false);
+
+      const expiration = new BigNumber(Date.now() + 600000)
+        .div(1000)
+        .integerValue(BigNumber.ROUND_CEIL);
+      const pool = hexUtils.leftPad(1);
+
+      // Create the order
+      const order = new LimitOrder({
+        chainId: client.chain.id,
+        verifyingContract: exchangeProxy,
+        maker: address,
+        taker: NULL_ADDRESS,
+        makerToken: tokenOne.address,
+        takerToken: tokenTwo.address,
+        makerAmount: tokenOneAmount,
+        takerAmount: tokenTwoAmount,
+        takerTokenFeeAmount: ZERO,
+        sender: NULL_ADDRESS,
+        feeRecipient: devWallet,
+        expiry: expiration,
+        pool,
+        salt: new BigNumber(Date.now()),
+      });
+
+      console.log(`limitOrder: ${JSON.stringify(order)}`);
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      console.log(provider);
-
       const signer = provider.getSigner();
-      console.log(signer);
 
-      const ERC20Contract = new ethers.Contract(
-        tokenOne.address,
-        erc20ABI,
-        signer
+      const signature = await order.getSignatureWithProviderAsync(
+        provider,
+        SignatureType.EIP712, 
+        signer,
       );
 
-      if (tokenOne.address !== ETH_ADDRESS) {
-        const allowance = await ERC20Contract.allowance(
-          tokenOne.address,
-          address
+      console.log(`Signature: ${JSON.stringify(signature, undefined, 2)}`);
+
+      const signedOrder = { ...order, signature };
+
+      const resp = await fetch("https://api.0x.org/v1/order", {
+        method: "POST",
+        body: JSON.stringify(signedOrder),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (resp.status === 200) {
+        alert("Successfully posted order");
+      } else {
+        const body = await resp.json();
+        alert(
+          `ERROR(status code ${resp.status}): ${JSON.stringify(
+            body,
+            undefined,
+            2
+          )}`
         );
-        console.log(`allowance: ${allowance}`);
-
-        if (allowance.eq(0)) {
-          setIsApproving(true);
-
-          const approval = await ERC20Contract.approve(
-            txDetails.allowanceTarget,
-            ethers.constants.MaxUint256
-          );
-
-          await approval.wait(1);
-          console.log(`approval: ${JSON.stringify(approval)}`);
-          setIsApproving(false);
-        }
       }
-
-      sendTransaction && sendTransaction();
     } catch (error) {
       console.error(error);
     }
@@ -589,14 +623,14 @@ export default function Swap(props) {
       </Modal>
 
       <Modal
-        open={isSwapModalOpen}
+        open={isLimitModalOpen}
         footer={null}
-        onCancel={() => setIsSwapModalOpen(false)}
-        title="Review Swap"
+        onCancel={() => setIsLimitModalOpen(false)}
+        title="Limit Order"
       >
         <div className="modalContent">
           <div className="assetReview">
-            Send: {(txDetails.sellAmount / 10 ** tokenOne.decimals).toFixed(5)}
+            Send: {(txDetails.sellAmount / 10 ** tokenOne.decimals).toFixed(3)}
             <img
               src={tokenOne.logoURI}
               alt="assetOneLogo"
@@ -606,7 +640,7 @@ export default function Swap(props) {
           </div>
           <div className="assetReview">
             Recieve:{" "}
-            {(txDetails.buyAmount / 10 ** tokenTwo.decimals).toFixed(5)}
+            {(txDetails.buyAmount / 10 ** tokenTwo.decimals).toFixed(3)}
             <img
               src={tokenTwo.logoURI}
               alt="assetOneLogo"
@@ -622,21 +656,20 @@ export default function Swap(props) {
             <li>Gross Price: {(txDetails.grossPrice * 1).toFixed(5)}</li>
             <li>
               SellTokenToEthRate:{" "}
-              {(txDetails.sellTokenToEthRate * 1).toFixed(5)}
+              {(txDetails.sellTokenToEthRate * 1).toFixed(3)}
             </li>
             <li>
-              BuyTokenToEthRate: {(txDetails.buyTokenToEthRate * 1).toFixed(5)}
+              BuyTokenToEthRate: {(txDetails.buyTokenToEthRate * 1).toFixed(3)}
             </li>
             <li>Max Slippage: {slippage} %</li>
           </ul>
         </div>
-
         <div
           className="executeButton"
           disabled={!txDetails}
-          onClick={executeSwap}
+          onClick={createLimitOrder}
         >
-          Execute Swap
+          Create Limit Order
         </div>
       </Modal>
 
@@ -656,10 +689,10 @@ export default function Swap(props) {
           <div className="tradeBoxHeader">
             <div className="leftH">
               <Link to="/" className="link">
-                <div className="">Market</div>
+                <div className="headerItem opacity">Market</div>
               </Link>
               <Link to="/limit" className="link">
-                <div className="headerItem opacity">Limit</div>
+                <div className="headerItem">Limit</div>
               </Link>
             </div>
             <Popover
@@ -758,7 +791,7 @@ export default function Swap(props) {
               }
               onClick={fetchQuote}
             >
-              Swap
+              Create Order
             </div>
           ) : (
             <ConnectButton />

@@ -10,51 +10,51 @@ export default function Ticker() {
     script.type = "text/javascript";
     script.async = true;
     script.innerHTML = JSON.stringify({
-      symbols: [
+      symbols:  [
         {
-          proName: "FOREXCOM:SPXUSD",
-          title: "S&P 500",
+          "proName": "FOREXCOM:SPXUSD",
+          "title": "S&P 500"
         },
         {
-          proName: "FOREXCOM:NSXUSD",
-          title: "US 100",
+          "proName": "BITSTAMP:BTCUSD",
+          "title": "Bitcoin"
         },
         {
-          proName: "BITSTAMP:BTCUSD",
-          title: "Bitcoin",
+          "proName": "BITSTAMP:ETHUSD",
+          "title": "Ethereum"
         },
         {
-          proName: "BITSTAMP:ETHUSD",
-          title: "Ethereum",
+          "description": "",
+          "proName": "COINBASE:SOLUSD"
         },
         {
-          description: "Solana",
-          proName: "BINANCE:SOLUSDT",
+          "description": "",
+          "proName": "CRYPTO:AVAXUSD"
         },
         {
-          description: "Avalanche",
-          proName: "BINANCE:AVAXUSDT",
+          "description": "",
+          "proName": "BITSTAMP:INJUSD"
         },
         {
-          description: "Chainlink",
-          proName: "BINANCE:LINKUSD.P",
+          "description": "",
+          "proName": "KRAKEN:ARBUSD.PM"
         },
         {
-          description: "Tia",
-          proName: "BINANCE:TIAUSDT.P",
+          "description": "",
+          "proName": "COINBASE:OPUSD"
         },
         {
-          description: "Kaspa",
-          proName: "BINANCE:KASUSDT.P",
+          "description": "",
+          "proName": "CRYPTO:KASUSD"
         },
         {
-          description: "Arbitrum",
-          proName: "BINANCE:ARBUSDT.P",
+          "description": "",
+          "proName": "BINANCE:RNDRUSD"
         },
         {
-          description: "Optimism",
-          proName: "BINANCE:OPUSDT.P",
-        },
+          "description": "",
+          "proName": "COINBASE:SEIUSD"
+        }
       ],
       colorTheme: "dark",
       isTransparent: true,

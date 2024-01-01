@@ -2,10 +2,11 @@ import type { Address } from "wagmi";
 import { BigNumber } from "ethers";
 
 export const ZERO = BigNumber.from(0);
-
 export const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
+export const devWallet = "0xc2657176e213DDF18646eFce08F36D656aBE3396";
+export const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
-export const devWallet = "0xd577F7b3359862A4178667347F4415d5682B4E85";
 
 // Eth:1 BSC:56 Polygon:137 Arbitrum:42161 Optimism:10 Avax:43114 Goerli:5
 

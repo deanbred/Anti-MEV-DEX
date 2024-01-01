@@ -104,7 +104,7 @@ export default function Balances(props) {
   return (
     <div className="token_panel_container">
       <div className="tokens_box">
-          <h3 className="tokens_title">My Balances</h3>
+          <h3 className="tokens_title">My Portfolio</h3>
           {address?.length ? (
             <div className="tokens_address">
               {address?.slice(0, 6)}...
