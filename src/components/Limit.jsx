@@ -407,11 +407,11 @@ export default function Limit(props) {
       const expiration = new BigNumber(Date.now() + 600000)
         .div(1000)
         .integerValue(BigNumber.ROUND_CEIL);
-      const pool = hexUtils.leftPad(1);
+      const _pool = hexUtils.leftPad(1);
 
       // Create the order
       const order = new LimitOrder({
-        chainId: client.chain.id,
+        chainId: 1,
         verifyingContract: exchangeProxy,
         maker: address,
         taker: NULL_ADDRESS,
@@ -423,19 +423,21 @@ export default function Limit(props) {
         sender: NULL_ADDRESS,
         feeRecipient: devWallet,
         expiry: expiration,
-        pool,
+        pool: _pool,
         salt: new BigNumber(Date.now()),
       });
 
       console.log(`limitOrder: ${JSON.stringify(order)}`);
 
-      const supportedProvider = new ethers.providers.Web3Provider(window.ethereum);
-      //const signer = provider.getSigner();
+      const supportedProvider = new ethers.providers.Web3Provider(
+        window.ethereum
+      );
+      const signer = supportedProvider.getSigner();
 
       const signature = await order.getSignatureWithProviderAsync(
         supportedProvider,
-        SignatureType.EIP712
-        //      signer,
+        SignatureType.EIP712,
+        signer
       );
 
       console.log(`Signature: ${JSON.stringify(signature, undefined, 2)}`);
