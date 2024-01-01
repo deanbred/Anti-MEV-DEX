@@ -43,7 +43,6 @@ export default function Limit(props) {
   const { address, isConnected, client } = props;
   //console.log(`address: ${address}`);
   //console.log(`chainId:${client.chain.id} ${client.chain.name}`);
-  //const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
   const alchemyKeys = {
     1: {
@@ -430,13 +429,13 @@ export default function Limit(props) {
 
       console.log(`limitOrder: ${JSON.stringify(order)}`);
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
+      const supportedProvider = new ethers.providers.Web3Provider(window.ethereum);
+      //const signer = provider.getSigner();
 
       const signature = await order.getSignatureWithProviderAsync(
-        provider,
-        SignatureType.EIP712, 
-        signer,
+        supportedProvider,
+        SignatureType.EIP712
+        //      signer,
       );
 
       console.log(`Signature: ${JSON.stringify(signature, undefined, 2)}`);

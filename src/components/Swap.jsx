@@ -28,13 +28,12 @@ import {
 import tokenList from "../constants/tokenList.json";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
 
-//import { exchangeProxy, devWallet, ZERO} from "../constants/constants.ts";
+import { devWallet, ETH_ADDRESS } from "../constants/constants.ts";
 
 export default function Swap(props) {
   const { address, isConnected, client } = props;
   //console.log(`address: ${address}`);
   //console.log(`chainId:${client.chain.id} ${client.chain.name}`);
-  const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
   const alchemyKeys = {
     1: {
@@ -353,7 +352,7 @@ export default function Swap(props) {
         buyToken: tokenTwo.address,
         sellAmount: parsedAmount,
         //takerAddress: address,
-        feeRecipient: "0xd577F7b3359862A4178667347F4415d5682B4E85", //dev
+        feeRecipient: devWallet,
         buyTokenPercentageFee: 0.01,
         slippagePercentage: slippage / 100,
         exludeSources: "Kyber",

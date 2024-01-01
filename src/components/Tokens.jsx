@@ -164,7 +164,7 @@ export default function Tokens(props) {
               <DownOutlined />
             </div>
 
-            <Button className="maxButton" onClick={setMax}>
+            <Button className="maxButton2" onClick={setMax}>
               MAX
             </Button>
             <div className="messageOne">You send</div>
