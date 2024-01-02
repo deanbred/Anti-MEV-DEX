@@ -786,9 +786,9 @@ export default function Limit(props) {
           {isConnected ? (
             <div
               className="swapButton"
-              disabled={
-                Number(tokenOneAmount) <= 0 ||
-                Number(balances.tokenOneBalance) < Number(tokenOneAmount)
+              disabled={true
+                //Number(tokenOneAmount) <= 0 ||
+               // Number(balances.tokenOneBalance) < Number(tokenOneAmount)
               }
               onClick={fetchQuote}
             >
