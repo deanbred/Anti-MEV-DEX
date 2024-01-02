@@ -102,7 +102,6 @@ export default function Swap(props) {
   const [isApproving, setIsApproving] = useState(false);
   const [price, setPrice] = useState(null);
   const [slippage, setSlippage] = useState(0.5);
-  const [finalize, setFinalize] = useState(false);
 
   const [txDetails, setTxDetails] = useState({
     from: null,
@@ -427,12 +426,10 @@ export default function Swap(props) {
           setIsApproving(false);
         }
       }
-
-      setFinalize(true);
+      sendTransaction && sendTransaction();
     } catch (error) {
       console.error(error);
     }
-    setFinalize(false);
   }
 
   useEffect(() => {
@@ -449,7 +446,7 @@ export default function Swap(props) {
 
   useEffect(() => {
     sendTransaction && sendTransaction();
-  }, [finalize, txDetails.to]);
+  }, [txDetails.to]);
 
   useEffect(() => {
     fetchPrices();
