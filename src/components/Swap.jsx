@@ -102,6 +102,7 @@ export default function Swap(props) {
   const [isApproving, setIsApproving] = useState(false);
   const [price, setPrice] = useState(null);
   const [slippage, setSlippage] = useState(0.5);
+  const [finalize, setFinalize] = useState(false);
 
   const [txDetails, setTxDetails] = useState({
     from: null,
@@ -427,10 +428,11 @@ export default function Swap(props) {
         }
       }
 
-      sendTransaction && sendTransaction();
+      setFinalize(true);
     } catch (error) {
       console.error(error);
     }
+    setFinalize(false);
   }
 
   useEffect(() => {
@@ -444,6 +446,10 @@ export default function Swap(props) {
     }
     console.log(`tokenList: ${JSON.stringify(currentTokenList)}`);
   }, [client.chain.id]);
+
+  useEffect(() => {
+    sendTransaction && sendTransaction();
+  }, [finalize, txDetails.to]);
 
   useEffect(() => {
     fetchPrices();
@@ -479,12 +485,12 @@ export default function Swap(props) {
         content: "Transaction Successful",
         duration: 2.0,
       });
-    } else if (txDetails.to) {
+/*     } else if (txDetails.to) {
       messageApi.open({
         type: "error",
         content: "Transaction Failed",
         duration: 2.0,
-      });
+      }); */
     }
   }, [isSuccess]);
 
