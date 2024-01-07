@@ -6,7 +6,56 @@ export const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
 export const devWallet = "0xc2657176e213DDF18646eFce08F36D656aBE3396";
 export const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const etherscan =
+  "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=PCIG1T3NFQI4F4F5ZJ5W2B6RNAVZSGYZ9Q";
 
+export const headers = { "0x-api-key": "816edd7e-cce4-42e7-b70a-96ae48ee1768" };
+
+export enum Network {
+  ETH_MAINNET = "eth-mainnet",
+  /** @deprecated - Will be removed in subsequent versions */
+  ETH_ROPSTEN = "eth-ropsten",
+  ETH_GOERLI = "eth-goerli",
+  /** @deprecated - Will be removed in subsequent versions */
+  ETH_KOVAN = "eth-kovan",
+  /** @deprecated - Will be removed in subsequent versions */
+  ETH_RINKEBY = "eth-rinkeby",
+  ETH_SEPOLIA = "eth-sepolia",
+  OPT_MAINNET = "opt-mainnet",
+  /** @deprecated - Will be removed in subsequent versions */
+  OPT_KOVAN = "opt-kovan",
+  OPT_GOERLI = "opt-goerli",
+  ARB_MAINNET = "arb-mainnet",
+  /** @deprecated - Will be removed in subsequent versions */
+  ARB_RINKEBY = "arb-rinkeby",
+  ARB_GOERLI = "arb-goerli",
+  MATIC_MAINNET = "polygon-mainnet",
+  MATIC_MUMBAI = "polygon-mumbai",
+  ASTAR_MAINNET = "astar-mainnet",
+  POLYGONZKEVM_MAINNET = "polygonzkevm-mainnet",
+  POLYGONZKEVM_TESTNET = "polygonzkevm-testnet",
+  BASE_MAINNET = "base-mainnet",
+  BASE_GOERLI = "base-goerli",
+}
+
+export const alchemySetup = {
+  1: {
+    apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
+    network: Network.ETH_MAINNET,
+  },
+  42161: {
+    apiKey: "aMlUHixH5lTM_ksIFZfJeTZm1N1nRVAO",
+    network: Network.ARB_MAINNET,
+  },
+  10: {
+    apiKey: "lymgKSMfxBS4I0YklOT_RnLT87MJm2we",
+    network: Network.OPT_MAINNET,
+  },
+  5: {
+    apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
+    network: Network.ETH_GOERLI,
+  },
+};
 
 // Eth:1 BSC:56 Polygon:137 Arbitrum:42161 Optimism:10 Avax:43114 Goerli:5
 
