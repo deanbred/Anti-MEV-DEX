@@ -26,7 +26,7 @@ import {
 } from "wagmi";
 
 import tokenList from "../constants/tokenList.json";
-import { Alchemy, Network, Utils } from "alchemy-sdk";
+import { Alchemy, Utils } from "alchemy-sdk";
 
 import { LimitOrder, OrderStatus, SignatureType } from "@0x/protocol-utils";
 import { BigNumber, hexUtils } from "@0x/utils";
@@ -37,6 +37,9 @@ import {
   NULL_ADDRESS,
   ETH_ADDRESS,
   ZERO,
+  alchemySetup,
+  etherscan,
+  headers,
 } from "../constants/constants.ts";
 
 export default function Limit(props) {
@@ -44,28 +47,9 @@ export default function Limit(props) {
   //console.log(`address: ${address}`);
   //console.log(`chainId:${client.chain.id} ${client.chain.name}`);
 
-  const alchemyKeys = {
-    1: {
-      apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
-      network: Network.ETH_MAINNET,
-    },
-    42161: {
-      apiKey: "aMlUHixH5lTM_ksIFZfJeTZm1N1nRVAO",
-      network: Network.ARB_MAINNET,
-    },
-    10: {
-      apiKey: "lymgKSMfxBS4I0YklOT_RnLT87MJm2we",
-      network: Network.OPT_MAINNET,
-    },
-    5: {
-      apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
-      network: Network.ETH_GOERLI,
-    },
-  };
-
-  const alchemyConfig = alchemyKeys[client.chain.id];
+  const alchemyConfig = alchemySetup[client.chain.id];
   const alchemy = new Alchemy(alchemyConfig);
-  //console.log(`alchemyConfig: ${JSON.stringify(alchemyConfig)}`);
+  //console.log(`alchemyConfig: ${alchemyConfig.network}`);
 
   let zeroxapi;
   if (client.chain.id === 1) {
@@ -203,9 +187,7 @@ export default function Limit(props) {
       const blockNumber = await alchemy.core.getBlockNumber();
       console.log(`BLOCK : ${blockNumber}`);
 
-      const response = await fetch(
-        "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=PCIG1T3NFQI4F4F5ZJ5W2B6RNAVZSGYZ9Q"
-      );
+      const response = await fetch(etherscan);
       const data = await response.json();
       //console.log(`ETH PRICE : ${parseFloat(data.result.ethusd).toFixed(5)}`);
 
@@ -302,7 +284,6 @@ export default function Limit(props) {
       ).toString();
       console.log(`parsedAmount: ${parsedAmount}`);
 
-      const headers = { "0x-api-key": "816edd7e-cce4-42e7-b70a-96ae48ee1768" };
       let params = {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
@@ -310,10 +291,7 @@ export default function Limit(props) {
         takerAddress: address,
       };
 
-      const query = `${zeroxapi}/swap/v1/price?${qs.stringify(
-        params
-      )}, ${qs.stringify(headers)}`;
-
+      const query = `${zeroxapi}/swap/v1/price?${qs.stringify(params)}`;
       console.log(`query: ${query}`);
 
       const response = await fetch(
@@ -356,7 +334,6 @@ export default function Limit(props) {
       ).toString();
       console.log(`parsedAmount: ${parsedAmount}`);
 
-      const headers = { "0x-api-key": "816edd7e-cce4-42e7-b70a-96ae48ee1768" };
       const params = {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
@@ -368,9 +345,7 @@ export default function Limit(props) {
         exludeSources: "Kyber",
       };
 
-      const query = `${zeroxapi}/swap/v1/quote?${qs.stringify(
-        params
-      )}, ${qs.stringify(headers)}`;
+      const query = `${zeroxapi}/swap/v1/quote?${qs.stringify(params)}`;
       console.log(`query: ${query}`);
 
       const response = await fetch(
@@ -786,9 +761,10 @@ export default function Limit(props) {
           {isConnected ? (
             <div
               className="swapButton"
-              disabled={true
+              disabled={
+                true
                 //Number(tokenOneAmount) <= 0 ||
-               // Number(balances.tokenOneBalance) < Number(tokenOneAmount)
+                // Number(balances.tokenOneBalance) < Number(tokenOneAmount)
               }
               onClick={fetchQuote}
             >

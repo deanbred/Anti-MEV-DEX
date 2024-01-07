@@ -26,7 +26,7 @@ import {
 } from "wagmi";
 
 import tokenList from "../constants/tokenList.json";
-import { Alchemy, Network, Utils } from "alchemy-sdk";
+import { Alchemy, Utils } from "alchemy-sdk";
 
 import {
   devWallet,
@@ -285,7 +285,7 @@ export default function Swap(props) {
         takerAddress: address,
       };
 
-      const query = `${zeroxapi}/swap/v1/quote?${qs.stringify(params)}`;
+      const query = `${zeroxapi}/swap/v1/price?${qs.stringify(params)}`;
       console.log(`query: ${query}`);
 
       const response = await fetch(
@@ -328,7 +328,6 @@ export default function Swap(props) {
       ).toString();
       console.log(`parsedAmount: ${parsedAmount}`);
 
-      //const headers = { "0x-api-key": "816edd7e-cce4-42e7-b70a-96ae48ee1768" };
       const params = {
         sellToken: tokenOne.address,
         buyToken: tokenTwo.address,
