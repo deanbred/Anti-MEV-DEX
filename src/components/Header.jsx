@@ -10,6 +10,9 @@ function Header() {
         <Link to="/" className="link">
           <div className="headerItem">Swap</div>
         </Link>
+        <Link to="/xchain" className="link">
+          <div className="headerItem">Cross-Chain</div>
+        </Link>
         <Link to="/tokens" className="link">
           <div className="headerItem">Tokens</div>
         </Link>

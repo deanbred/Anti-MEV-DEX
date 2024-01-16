@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import Swap from "./components/Swap";
 import Tokens from "./components/Tokens";
 import Limit from "./components/Limit";
+import Xchain from "./components/Xchain";
 import { Routes, Route } from "react-router-dom";
 import { useAccount, usePublicClient } from "wagmi";
 import "./styles/App.css";
@@ -40,6 +41,16 @@ function App() {
             path="/tokens"
             element={
               <Tokens
+                address={address}
+                isConnected={isConnected}
+                client={publicClient}
+              />
+            }
+          />
+          <Route
+            path="/xchain"
+            element={
+              <Xchain
                 address={address}
                 isConnected={isConnected}
                 client={publicClient}

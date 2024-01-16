@@ -36,6 +36,7 @@ import {
   headers,
 } from "../constants/constants.ts";
 
+
 export default function Swap(props) {
   const { address, isConnected, client } = props;
   //console.log(`address: ${address}`);
@@ -400,7 +401,7 @@ export default function Swap(props) {
             ethers.constants.MaxUint256
           );
 
-          await approval.wait(1);
+          await approval.wait();
           console.log(`approval: ${JSON.stringify(approval)}`);
           setIsApproving(false);
         }
