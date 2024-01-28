@@ -48,7 +48,7 @@ export default <SquidWidget
 />; */
 import Ticker from "./Ticker";
 
-export default () => (
+const Xchain = () => (
   <div className="swap">
     <div className="ticker">
       <Ticker />
@@ -61,3 +61,5 @@ export default () => (
     />
   </div>
 );
+
+export default Xchain;

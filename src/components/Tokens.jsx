@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import "../styles/App.css";
 import React, { useState, useEffect } from "react";
+import { ethers } from "ethers";
+import { erc20ABI } from "wagmi";
 
 import { Input, Modal, message, Button } from "antd";
 import { ArrowDownOutlined, DownOutlined } from "@ant-design/icons";
@@ -8,34 +10,25 @@ import ConnectButton from "./Connect";
 import Balances from "./Balances.jsx";
 import Market from "./Market";
 
-import { Alchemy, Network, Utils } from "alchemy-sdk";
+import { Alchemy, Utils } from "alchemy-sdk";
+import { alchemySetup, BURN_ADDRESS } from "../constants/constants.ts";
 
 export default function Tokens(props) {
   const { address, isConnected, client } = props;
 
-  const alchemyKeys = {
-    1: {
-      apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
-      network: Network.ETH_MAINNET,
-    },
-    5: {
-      apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
-      network: Network.ETH_GOERLI,
-    },
-  };
-
-  const alchemyConfig = alchemyKeys[client.chain.id];
+  const alchemyConfig = alchemySetup[client.chain.id];
   const alchemy = new Alchemy(alchemyConfig);
 
   const tokenOne = {
-    address: "0x48b8039cF08E1D1524A68fC6d707D1D7e032e90C",
+    //address: "0x48b8039cF08E1D1524A68fC6d707D1D7e032e90C", // mainnet AntiMEV
+    address: "0x0BC0F6b6B642b75c3cbe0eDFC0a378a1E3da2dc4", // sepolia AntiMEV
     symbol: "AntiMEV",
     decimals: 18,
     logoURI: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
   };
 
   const tokenTwo = {
-    address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH
+    address: "0xE1f909c59bd03261b3bE2e4d2cceBa5dC54F4AFe", // sepolia XMEV
     symbol: "XMEV",
     decimals: 18,
     logoURI: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
@@ -52,11 +45,38 @@ export default function Tokens(props) {
     tokenTwoBalance: null,
   });
 
-
   function setMax() {
     setTokenOneAmount(balances.tokenOneBalance);
     setTokenTwoAmount(balances.tokenOneBalance);
   }
+
+  // Token Migrate function burns AntiMEV and mints XMEV
+  // approve AntiMEV to be burned
+  // send AntiMEV to burn address
+  // mint XMEV to user address
+
+  async function migrate(amount) {
+    // Step 1: Approve AntiMEV to be burned
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    console.log(provider);
+
+    const signer = provider.getSigner();
+    console.log(signer);
+    
+    const antiMEVContract = new ethers.Contract(tokenOne.address, erc20ABI, signer);
+    const approvalTx = await antiMEVContract.approve(BURN_ADDRESS, ethers.utils.parseUnits(amount.toString(), tokenOne.decimals));
+    await approvalTx.wait();
+   
+    // Step 2: Send AntiMEV to burn address
+    const burnTx = await antiMEVContract.transferFrom(signer.getAddress(), BURN_ADDRESS, ethers.utils.parseUnits(amount.toString(), tokenOne.decimals));
+    await burnTx.wait();
+   
+    // Step 3: Mint XMEV to user address
+    const xmevContract = new ethers.Contract(tokenTwo.address, erc20ABI, signer);
+    const mintTx = await xmevContract.mint(signer.getAddress(), ethers.utils.parseUnits(amount.toString(), tokenTwo.decimals));
+    await mintTx.wait();
+   }
+
 
   async function fetchBalances() {
     try {
@@ -191,10 +211,10 @@ export default function Tokens(props) {
           {isConnected ? (
             <div
               className="swapButton"
-              disabled={true
-                //!tokenOneAmount
-                //Number(tokenOneAmount) <= 0 ||
-                //Number(balances.tokenOneBalance) < Number(tokenOneAmount)
+              disabled={
+                !tokenOneAmount ||
+                Number(tokenOneAmount) <= 0 ||
+                Number(balances.tokenOneBalance) < Number(tokenOneAmount)
               }
               onClick={fetchBalances}
             >

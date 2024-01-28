@@ -5,6 +5,7 @@ export const ZERO = BigNumber.from(0);
 export const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
 export const devWallet = "0xc2657176e213DDF18646eFce08F36D656aBE3396";
 export const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+export const BURN_ADDRESS = "0x000000000000000000000000000000000000dEaD";
 export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const etherscan =
   "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=PCIG1T3NFQI4F4F5ZJ5W2B6RNAVZSGYZ9Q";
