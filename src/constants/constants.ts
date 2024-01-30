@@ -6,6 +6,8 @@ export const exchangeProxy = "0xDef1C0ded9bec7F1a1670819833240f027b25EfF";
 export const devWallet = "0xc2657176e213DDF18646eFce08F36D656aBE3396";
 export const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const BURN_ADDRESS = "0x000000000000000000000000000000000000dEaD";
+export const DEPLOYER = "0x5b3eC3A39403202A9C5a9e3496FbB3793B244B44"
+export const MINTER = "0xB5FB4BE02232B1bBA4dC8f81dc24C26980dE9e3C";
 export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const etherscan =
   "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=PCIG1T3NFQI4F4F5ZJ5W2B6RNAVZSGYZ9Q";
@@ -48,13 +50,17 @@ export const alchemySetup = {
     apiKey: "aMlUHixH5lTM_ksIFZfJeTZm1N1nRVAO",
     network: Network.ARB_MAINNET,
   },
-  10: {
-    apiKey: "lymgKSMfxBS4I0YklOT_RnLT87MJm2we",
-    network: Network.OPT_MAINNET,
+  421613: {
+    apiKey: "PLaTiZe1BmgkCydWULIS2cxDoGISMWLK",
+    network: Network.ARB_GOERLI,
   },
   5: {
     apiKey: "la9mAkNVUg51xj0AjxrGdIxSk1yBcpGg",
     network: Network.ETH_GOERLI,
+  },
+  11155111: {
+    apiKey: "CPd9JEJZRIs7lrMy2FZbDkWiHPQIGLJx",
+    network: Network.ETH_SEPOLIA,
   },
 };
 

@@ -1,18 +1,11 @@
 import "../styles/App.css";
 import React, { useState, useEffect } from "react";
-import { Alchemy, Network } from "alchemy-sdk";
-
-const config = {
-  apiKey: "TlfW-wkPo26fcc7FPw_3xwVQiPwAmI3T",
-  network: Network.ETH_MAINNET,
-};
-
-const alchemy = new Alchemy(config);
+import { ETH_ADDRESS } from "../constants/constants.ts";
 
 export default function Balances(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [balances, setBalances] = useState([]);
-  const { address } = props;
+  const { address, client, alchemy } = props;
 
   useEffect(() => {
     async function fetchBalances() {
@@ -28,8 +21,8 @@ export default function Balances(props) {
         symbol: "ETH",
         logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
         decimals: 18,
-        balance: parsedEthBalance.toFixed(2),
-        address: "0x",
+        balance: parsedEthBalance.toFixed(4),
+        address: ETH_ADDRESS,
       };
 
       const fetchedTokens = await alchemy.core.getTokenBalances(address);
@@ -81,7 +74,7 @@ export default function Balances(props) {
                 symbol.length > 6 ? `${symbol.substring(0, 6)}...` : symbol,
               logo,
               decimals,
-              balance: convertedBalance.toFixed(2),
+              balance: convertedBalance.toFixed(4),
               address,
             };
             unifiedBalancedAndMetadata.push(tokenBalanceAndMetadata);
@@ -99,25 +92,26 @@ export default function Balances(props) {
     }
 
     fetchBalances();
-  }, [address]);
+  }, [address, alchemy.core, client]);
 
   return (
     <div className="token_panel_container">
       <div className="tokens_box">
-          <h3 className="tokens_title">My Portfolio</h3>
-          {address?.length ? (
-            <div className="tokens_address">
-              {address?.slice(0, 6)}...
-              {address?.slice(address.length - 4)}
-            </div>
-          ) : (
-            ""
-          )}
+        <h3 className="tokens_title">My Portfolio</h3>
+        {address?.length ? (
+          <div className="tokens_address">
+            {address?.slice(0, 6)}...
+            {address?.slice(address.length - 4)}
+          </div>
+        ) : (
+          ""
+        )}
         {isLoading
           ? "Loading..."
           : balances?.length &&
             balances?.map((token, i) => {
-              const convertedBalance = Math.round(token.balance * 100) / 100;
+              const convertedBalance =
+                Math.round(token.balance * 10000) / 10000;
               return (
                 <div key={i} className="token_container">
                   <div className="token_name_logo">

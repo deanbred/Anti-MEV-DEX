@@ -9,7 +9,8 @@ import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import {
   mainnet,
   arbitrum,
-  optimism,
+  arbitrumGoerli,
+  sepolia,
   goerli,
 } from "wagmi/chains";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
@@ -20,8 +21,9 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 const chains = [
   mainnet,
   arbitrum,
-  optimism,
+  arbitrumGoerli,
   goerli,
+  sepolia,
 ];
 
 const projectId = "fd8d18072056d2a74e2a5a29c946bb47";

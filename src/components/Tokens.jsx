@@ -4,14 +4,17 @@ import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { erc20ABI } from "wagmi";
 
-import { Input, Modal, message, Button } from "antd";
+import { Input, message, Button } from "antd";
 import { ArrowDownOutlined, DownOutlined } from "@ant-design/icons";
 import ConnectButton from "./Connect";
 import Balances from "./Balances.jsx";
-import Market from "./Market";
 
 import { Alchemy, Utils } from "alchemy-sdk";
-import { alchemySetup, BURN_ADDRESS } from "../constants/constants.ts";
+import {
+  alchemySetup,
+  BURN_ADDRESS,
+  DEPLOYER,
+} from "../constants/constants.ts";
 
 export default function Tokens(props) {
   const { address, isConnected, client } = props;
@@ -20,15 +23,14 @@ export default function Tokens(props) {
   const alchemy = new Alchemy(alchemyConfig);
 
   const tokenOne = {
-    //address: "0x48b8039cF08E1D1524A68fC6d707D1D7e032e90C", // mainnet AntiMEV
-    address: "0x0BC0F6b6B642b75c3cbe0eDFC0a378a1E3da2dc4", // sepolia AntiMEV
+    address: "0x40f61395C4Dc6430909a08cF57001a2Ec0b24830", // arb AntiMEV
     symbol: "AntiMEV",
     decimals: 18,
     logoURI: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
   };
 
   const tokenTwo = {
-    address: "0xE1f909c59bd03261b3bE2e4d2cceBa5dC54F4AFe", // sepolia XMEV
+    address: "0xEC6dC6dF9E97FAf99f62aaD64934136bE8142735", // arb XMEV
     symbol: "XMEV",
     decimals: 18,
     logoURI: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
@@ -50,33 +52,53 @@ export default function Tokens(props) {
     setTokenTwoAmount(balances.tokenOneBalance);
   }
 
-  // Token Migrate function burns AntiMEV and mints XMEV
+  // Token Migrate function
   // approve AntiMEV to be burned
-  // send AntiMEV to burn address
-  // mint XMEV to user address
+  // transfer AntiMEV to burn address
+  // transfer XMEV from deployer to user address
 
-  async function migrate(amount) {
-    // Step 1: Approve AntiMEV to be burned
+  async function migrate() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    console.log(provider);
 
     const signer = provider.getSigner();
-    console.log(signer);
-    
-    const antiMEVContract = new ethers.Contract(tokenOne.address, erc20ABI, signer);
-    const approvalTx = await antiMEVContract.approve(BURN_ADDRESS, ethers.utils.parseUnits(amount.toString(), tokenOne.decimals));
-    await approvalTx.wait();
-   
-    // Step 2: Send AntiMEV to burn address
-    const burnTx = await antiMEVContract.transferFrom(signer.getAddress(), BURN_ADDRESS, ethers.utils.parseUnits(amount.toString(), tokenOne.decimals));
-    await burnTx.wait();
-   
-    // Step 3: Mint XMEV to user address
-    const xmevContract = new ethers.Contract(tokenTwo.address, erc20ABI, signer);
-    const mintTx = await xmevContract.mint(signer.getAddress(), ethers.utils.parseUnits(amount.toString(), tokenTwo.decimals));
-    await mintTx.wait();
-   }
 
+    const antiMEVContract = new ethers.Contract(
+      tokenOne.address,
+      erc20ABI,
+      signer
+    );
+
+    const xmevContract = new ethers.Contract(
+      tokenTwo.address,
+      erc20ABI,
+      signer
+    );
+
+    const approval = await antiMEVContract.approve(
+      address,
+      ethers.utils.parseUnits(tokenOneAmount.toString(), tokenOne.decimals)
+    );
+    await approval.wait();
+
+    message.loading("Burning AntiMEV...", 5);
+    const burn = await antiMEVContract.transferFrom(
+      address,
+      BURN_ADDRESS,
+      ethers.utils.parseUnits(tokenOneAmount.toString(), tokenOne.decimals)
+    );
+    await burn.wait();
+
+    message.loading("Claiming XMEV...", 5);
+    const claim = await xmevContract.transferFrom(
+      DEPLOYER,
+      address,
+      ethers.utils.parseUnits(tokenOneAmount.toString(), tokenOne.decimals)
+    );
+    await claim.wait();
+
+    message.success("Migration complete!", 5);
+    fetchBalances();
+  }
 
   async function fetchBalances() {
     try {
@@ -216,7 +238,7 @@ export default function Tokens(props) {
                 Number(tokenOneAmount) <= 0 ||
                 Number(balances.tokenOneBalance) < Number(tokenOneAmount)
               }
-              onClick={fetchBalances}
+              onClick={migrate}
             >
               Migrate
             </div>
@@ -227,15 +249,12 @@ export default function Tokens(props) {
       </div>
       <div className="container">
         {address ? (
-          <Balances address={address} />
+        <Balances address={address} isConnected={isConnected} client={client} alchemy={alchemy} />
         ) : (
           <div className="connect-wallet">
             Connect wallet to see token balances
           </div>
         )}
-        <div className="market">
-          <Market />
-        </div>
       </div>
     </>
   );
