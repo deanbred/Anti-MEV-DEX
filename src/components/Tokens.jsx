@@ -100,6 +100,20 @@ export default function Tokens(props) {
     fetchBalances();
   }
 
+  async function addToMM() {
+    try {
+      await window.ethereum.request({
+        method: "wallet_watchAsset",
+        params: {
+          type: "ERC20",
+          options: tokenTwo,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async function fetchBalances() {
     try {
       const ethBalance = await alchemy.core.getBalance(address);
@@ -168,7 +182,8 @@ export default function Tokens(props) {
 
   useEffect(() => {
     fetchBalances();
-  }, []);
+    setMax();
+  }, [balances.tokenOneBalance, balances.tokenTwoBalance]);
 
   return (
     <>
@@ -234,9 +249,8 @@ export default function Tokens(props) {
             <div
               className="swapButton"
               disabled={
-                !tokenOneAmount ||
                 Number(tokenOneAmount) <= 0 ||
-                Number(balances.tokenOneBalance) < Number(tokenOneAmount)
+                Number(tokenOneAmount) > Number(balances.tokenOneBalance)
               }
               onClick={migrate}
             >
@@ -245,11 +259,19 @@ export default function Tokens(props) {
           ) : (
             <ConnectButton />
           )}
+          <div className="swapButton" onClick={addToMM}>
+            Add XMEV to Metamask
+          </div>
         </div>
       </div>
       <div className="container">
         {address ? (
-        <Balances address={address} isConnected={isConnected} client={client} alchemy={alchemy} />
+          <Balances
+            address={address}
+            isConnected={isConnected}
+            client={client}
+            alchemy={alchemy}
+          />
         ) : (
           <div className="connect-wallet">
             Connect wallet to see token balances

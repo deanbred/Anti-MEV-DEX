@@ -1,6 +1,5 @@
 import "../styles/App.css";
 import React, { useState, useEffect } from "react";
-import { ETH_ADDRESS } from "../constants/constants.ts";
 
 export default function Balances(props) {
   const [isLoading, setIsLoading] = useState(true);
@@ -22,10 +21,11 @@ export default function Balances(props) {
         logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
         decimals: 18,
         balance: parsedEthBalance.toFixed(4),
-        address: ETH_ADDRESS,
+        address: "0x",
       };
 
       const fetchedTokens = await alchemy.core.getTokenBalances(address);
+      console.log(fetchedTokens);
 
       const fetchedTokenBalances = fetchedTokens.tokenBalances.map(
         (token) => token.tokenBalance
@@ -74,7 +74,7 @@ export default function Balances(props) {
                 symbol.length > 6 ? `${symbol.substring(0, 6)}...` : symbol,
               logo,
               decimals,
-              balance: convertedBalance.toFixed(4),
+              balance: convertedBalance.toFixed(2),
               address,
             };
             unifiedBalancedAndMetadata.push(tokenBalanceAndMetadata);
