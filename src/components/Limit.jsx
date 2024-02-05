@@ -44,12 +44,9 @@ import {
 
 export default function Limit(props) {
   const { address, isConnected, client } = props;
-  //console.log(`address: ${address}`);
-  //console.log(`chainId:${client.chain.id} ${client.chain.name}`);
 
   const alchemyConfig = alchemySetup[client.chain.id];
   const alchemy = new Alchemy(alchemyConfig);
-  //console.log(`alchemyConfig: ${alchemyConfig.network}`);
 
   let zeroxapi;
   if (client.chain.id === 1) {
@@ -61,7 +58,6 @@ export default function Limit(props) {
   } else if (client.chain.id === 5) {
     zeroxapi = "https://goerli.api.0x.org/";
   }
-  //console.log(`zeroxapi: ${zeroxapi}`);
 
   const filteredTokenList = tokenList.filter(
     (token) => token.chainId === client.chain.id
@@ -339,7 +335,7 @@ export default function Limit(props) {
         buyToken: tokenTwo.address,
         sellAmount: parsedAmount,
         //takerAddress: address,
-        feeRecipient: "0xd577F7b3359862A4178667347F4415d5682B4E85", //dev
+        feeRecipient: devWallet,
         buyTokenPercentageFee: 0.01,
         slippagePercentage: slippage / 100,
         exludeSources: "Kyber",
