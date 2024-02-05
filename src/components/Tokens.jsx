@@ -261,20 +261,7 @@ export default function Tokens(props) {
           </div>
         </div>
       </div>
-      <div className="container">
-        {address ? (
-          <Balances
-            address={address}
-            isConnected={isConnected}
-            client={client}
-            alchemy={alchemy}
-          />
-        ) : (
-          <div className="connect-wallet">
-            Connect wallet to see token balances
-          </div>
-        )}
-      </div>
+
     </>
   );
 }
