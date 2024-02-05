@@ -23,16 +23,16 @@ export default function Tokens(props) {
   const alchemy = new Alchemy(alchemyConfig);
 
   const tokenOne = {
-    address: "0x48b8039cF08E1D1524A68fC6d707D1D7e032e90C", // eth AntiMEV
-    //address: "0x40f61395C4Dc6430909a08cF57001a2Ec0b24830",  // arb AntiMEV
+    //address: "0x48b8039cF08E1D1524A68fC6d707D1D7e032e90C", // eth AntiMEV
+    address: "0x40f61395C4Dc6430909a08cF57001a2Ec0b24830",  // arb AntiMEV
     symbol: "AntiMEV",
     decimals: 18,
     logoURI: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
   };
 
   const tokenTwo = {
-    address: "0xDBbF2dFC3F8fb9DE18Aed9A935a73b39CAbA327B", // eth XMEV
-    //address: "0xEC6dC6dF9E97FAf99f62aaD64934136bE8142735", // arb XMEV
+    //address: "0xDBbF2dFC3F8fb9DE18Aed9A935a73b39CAbA327B", // eth XMEV
+    address: "0xEC6dC6dF9E97FAf99f62aaD64934136bE8142735", // arb XMEV
     symbol: "XMEV",
     decimals: 18,
     logoURI: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
