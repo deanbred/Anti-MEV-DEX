@@ -18,6 +18,7 @@ Goerli Sources: https://goerli.api.0x.org/swap/v1/sources.
     gasPrice: new BigNumber(quote.gasPrice).toString(16), // Convert gasPrice to hexadecimal
   };
 
+ Add 
   // Execute trade directly with Metamask
   try {
     const txHash = await window.ethereum.request({
