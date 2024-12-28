@@ -24,6 +24,7 @@ export default function Balances(props) {
         address: "0x",
       };
 
+      // fetch the token balances for the address
       const fetchedTokens = await alchemy.core.getTokenBalances(address);
       console.log(fetchedTokens);
 
